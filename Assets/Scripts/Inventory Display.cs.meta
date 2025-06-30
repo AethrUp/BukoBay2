@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 431179905c3468343a2368d4abc65b95
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - equippedGearPanel: {instanceID: 0}
+  - tackleBoxPanel: {instanceID: 0}
+  - actionCardsPanel: {instanceID: 0}
+  - cardDisplayPrefab: {fileID: 6458836799170135447, guid: 12550df5a68506c42a60feb337592931, type: 3}
+  - playerInventory: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1eef1ddfd312f349befb60c7f60d2f3, type: 3}
+  m_Name: Giant Cloister
+  m_EditorClassIdentifier: 
+  fishName: Giant Cloister
+  fishImage: {fileID: 0}
+  mainDepth: 1
+  subDepth: 3
+  power: 4
+  coins: 3
+  material1: Metal
+  materialDiff1: 2
+  material2: 
+  materialDiff2: 0
+  material3: 
+  materialDiff3: 0
+  gear1Damage: 1
+  gear2Damage: 0
+  gear3Damage: 0
+  gear4Damage: 0
+  gear5Damage: 0
+  description: You know what they say

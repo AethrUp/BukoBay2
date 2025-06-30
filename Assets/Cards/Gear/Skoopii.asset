@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d78ab6811626154c8b5d434865685a0, type: 3}
+  m_Name: Skoopii
+  m_EditorClassIdentifier: 
+  gearName: Skoopii
+  manufacturer: Brinko
+  gearImage: {fileID: 8045273757233315233, guid: 3151b8acef8ad124097561db8d5d79e8, type: 3}
+  gearType: Lure
+  power: 2
+  durability: 5
+  material: Metal
+  depth1Effect: 0
+  depth2Effect: 0
+  depth3Effect: 0
+  depth4Effect: 1
+  depth5Effect: 1
