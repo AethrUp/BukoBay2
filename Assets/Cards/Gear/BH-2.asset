@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: BH-2
   m_EditorClassIdentifier: 
   gearName: BH-2
-  manufacturer: Blake
-  gearType: Lure
-  power: 1
-  durability: 5
-  material: Metal
-  depth1Effect: 1
-  depth2Effect: 2
-  depth3Effect: 1
+  manufacturer: Lure
+  gearImage: {fileID: 0}
+  gearType: Metal
+  power: 5
+  durability: 6
+  material: 1
+  depth1Effect: 2
+  depth2Effect: 1
+  depth3Effect: 0
   depth4Effect: 0
   depth5Effect: 0

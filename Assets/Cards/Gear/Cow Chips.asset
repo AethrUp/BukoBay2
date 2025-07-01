@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Cow Chips
   m_EditorClassIdentifier: 
   gearName: Cow Chips
-  manufacturer: Homemade
-  gearType: Bait
-  power: 2
-  durability: 1
-  material: Bio
+  manufacturer: Bait
+  gearImage: {fileID: 0}
+  gearType: Bio
+  power: 1
+  durability: 3
+  material: 2
   depth1Effect: 0
   depth2Effect: 0
   depth3Effect: 0

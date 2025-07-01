@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Elektric K
   m_EditorClassIdentifier: 
   gearName: Elektric K
-  manufacturer: Rybak
-  gearType: Lure
-  power: 1
-  durability: 3
-  material: Plastic
+  manufacturer: Lure
+  gearImage: {fileID: 0}
+  gearType: Plastic
+  power: 3
+  durability: 4
+  material: 1
   depth1Effect: 3
   depth2Effect: 3
-  depth3Effect: 3
+  depth3Effect: 1
   depth4Effect: 1
-  depth5Effect: 1
+  depth5Effect: 0

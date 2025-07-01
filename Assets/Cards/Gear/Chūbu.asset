@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: "Ch\u016Bbu"
   m_EditorClassIdentifier: 
   gearName: "Ch\u016Bbu"
-  manufacturer: Ryoshi
-  gearType: Line
-  power: 2
-  durability: 5
-  material: Metal
-  depth1Effect: -1
+  manufacturer: Line
+  gearImage: {fileID: 0}
+  gearType: Metal
+  power: 5
+  durability: 11
+  material: 2
+  depth1Effect: 0
   depth2Effect: 0
-  depth3Effect: 0
-  depth4Effect: 1
-  depth5Effect: 2
+  depth3Effect: 1
+  depth4Effect: 2
+  depth5Effect: 1

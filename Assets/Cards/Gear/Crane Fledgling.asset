@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Crane Fledgling
   m_EditorClassIdentifier: 
   gearName: Crane Fledgling
-  manufacturer: Sherwood
-  gearType: Rod
-  power: 1
-  durability: 3
-  material: Plastic
+  manufacturer: Rod
+  gearImage: {fileID: 0}
+  gearType: Plastic
+  power: 3
+  durability: 4
+  material: 1
   depth1Effect: 2
   depth2Effect: 2
   depth3Effect: 2
-  depth4Effect: 2
+  depth4Effect: 1
   depth5Effect: 1

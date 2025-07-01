@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: PRT-L
   m_EditorClassIdentifier: 
   gearName: PRT-L
-  manufacturer: Holmberg
-  gearType: Line
-  power: 3
-  durability: 5
-  material: Metal
+  manufacturer: Line
+  gearImage: {fileID: 0}
+  gearType: Metal
+  power: 5
+  durability: 16
+  material: 3
   depth1Effect: 1
-  depth2Effect: 1
+  depth2Effect: 0
   depth3Effect: 0
-  depth4Effect: 0
+  depth4Effect: 1
   depth5Effect: 1

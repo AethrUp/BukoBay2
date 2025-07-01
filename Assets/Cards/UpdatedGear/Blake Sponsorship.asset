@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d78ab6811626154c8b5d434865685a0, type: 3}
+  m_Name: Blake Sponsorship
+  m_EditorClassIdentifier: 
+  gearName: Blake Sponsorship
+  manufacturer: Blake
+  gearImage: {fileID: -6828436147032539243, guid: 7d6e8d7bfef8c50418a746ff1e934c5c, type: 3}
+  gearType: Gear
+  power: 0
+  durability: 0
+  material: 
+  depth1Effect: 0
+  depth2Effect: 0
+  depth3Effect: 0
+  depth4Effect: 0
+  depth5Effect: 0
+  depth6Effect: 0
+  depth7Effect: 0
+  depth8Effect: 0
+  depth9Effect: 0
+  price: 0
+  description: Welcome to Team Blake!

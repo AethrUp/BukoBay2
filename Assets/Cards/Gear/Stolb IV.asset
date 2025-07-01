@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Stolb IV
   m_EditorClassIdentifier: 
   gearName: Stolb IV
-  manufacturer: Rybak
-  gearType: Rod
+  manufacturer: Rod
+  gearImage: {fileID: 0}
+  gearType: Wood
   power: 2
-  durability: 2
-  material: Wood
+  durability: 5
+  material: 2
   depth1Effect: 1
-  depth2Effect: 1
+  depth2Effect: 0
   depth3Effect: 0
   depth4Effect: 0
   depth5Effect: 0

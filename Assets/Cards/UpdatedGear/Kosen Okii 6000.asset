@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d78ab6811626154c8b5d434865685a0, type: 3}
+  m_Name: Kosen Okii 6000
+  m_EditorClassIdentifier: 
+  gearName: Kosen Okii 6000
+  manufacturer: Ryoshi
+  gearImage: {fileID: -6096503331943720758, guid: 5d29fcd010290a944a0257e271f893b2, type: 3}
+  gearType: Line
+  power: 2
+  durability: 3
+  material: Plastic
+  depth1Effect: 1
+  depth2Effect: 1
+  depth3Effect: 2
+  depth4Effect: 2
+  depth5Effect: 2
+  depth6Effect: 0
+  depth7Effect: 0
+  depth8Effect: 0
+  depth9Effect: 0
+  price: 7
+  description: Almost braid and braid middleman fiish rope for extra fiish time.

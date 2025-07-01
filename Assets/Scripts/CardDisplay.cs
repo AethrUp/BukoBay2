@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
-public class CardDisplay : MonoBehaviour
+public class CardDisplay : MonoBehaviour, IPointerClickHandler
 {
     [Header("UI References")]
     public TextMeshProUGUI cardNameText;
@@ -18,9 +19,18 @@ public class CardDisplay : MonoBehaviour
     public FishCard fishCard;
     public ActionCard actionCard;
     
+    [Header("Comparison System")]
+    public static GearComparisonDisplay gearComparison;
+    
     void Start()
     {
         DisplayCard();
+        
+        // Find the comparison system if not set
+        if (gearComparison == null)
+        {
+            gearComparison = FindFirstObjectByType<GearComparisonDisplay>();
+        }
     }
     
     // This will update the display whenever we change the card in the inspector
@@ -103,5 +113,16 @@ public class CardDisplay : MonoBehaviour
         
         if (statsText != null) statsText.text = stats;
         if (cardArtwork != null) cardArtwork.sprite = actionCard.actionImage;
+    }
+    
+    // Handle clicks on the card
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        // Only handle gear card clicks for now
+        if (gearCard != null && gearComparison != null)
+        {
+            Debug.Log($"Clicked on {gearCard.gearName}");
+            gearComparison.ShowGearComparison(gearCard);
+        }
     }
 }

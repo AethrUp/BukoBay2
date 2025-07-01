@@ -77,27 +77,37 @@ public class DropZone : MonoBehaviour
     {
         if (playerInventory == null) return;
         
+        // Store the currently equipped gear (if any) before replacing it
+        GearCard previousGear = null;
+        
         switch (zoneType)
         {
             case DropZoneType.EquippedRod:
+                previousGear = playerInventory.equippedRod;
                 playerInventory.equippedRod = gearCard;
                 break;
             case DropZoneType.EquippedReel:
+                previousGear = playerInventory.equippedReel;
                 playerInventory.equippedReel = gearCard;
                 break;
             case DropZoneType.EquippedLine:
+                previousGear = playerInventory.equippedLine;
                 playerInventory.equippedLine = gearCard;
                 break;
             case DropZoneType.EquippedLure:
+                previousGear = playerInventory.equippedLure;
                 playerInventory.equippedLure = gearCard;
                 break;
             case DropZoneType.EquippedBait:
+                previousGear = playerInventory.equippedBait;
                 playerInventory.equippedBait = gearCard;
                 break;
             case DropZoneType.EquippedExtra1:
+                previousGear = playerInventory.equippedExtra1;
                 playerInventory.equippedExtra1 = gearCard;
                 break;
             case DropZoneType.EquippedExtra2:
+                previousGear = playerInventory.equippedExtra2;
                 playerInventory.equippedExtra2 = gearCard;
                 break;
             case DropZoneType.TackleBox:
@@ -106,6 +116,28 @@ public class DropZone : MonoBehaviour
                     playerInventory.extraGear.Add(gearCard);
                 }
                 break;
+        }
+        
+        // If we replaced an equipped item, move the old one to tackle box
+        if (previousGear != null && zoneType != DropZoneType.TackleBox)
+        {
+            if (!playerInventory.extraGear.Contains(previousGear))
+            {
+                playerInventory.extraGear.Add(previousGear);
+                Debug.Log($"Moved {previousGear.gearName} to tackle box");
+            }
+        }
+        
+        // Update the gear comparison display if it exists
+        GearComparisonDisplay comparisonDisplay = FindFirstObjectByType<GearComparisonDisplay>();
+        if (comparisonDisplay != null)
+        {
+            Debug.Log("Found GearComparisonDisplay, updating totals...");
+            comparisonDisplay.UpdateTotalEquippedDisplay();
+        }
+        else
+        {
+            Debug.LogWarning("Could not find GearComparisonDisplay component!");
         }
     }
     

@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Firecracker
   m_EditorClassIdentifier: 
   gearName: Firecracker
-  manufacturer: Homemade
-  gearImage: {fileID: 7366123105573129970, guid: df3c6c84fbcdfa140bf98bf78e822e64, type: 3}
-  gearType: Lure
-  power: 3
-  durability: 2
-  material: Wood
+  manufacturer: Lure
+  gearImage: {fileID: 0}
+  gearType: Wood
+  power: 2
+  durability: 7
+  material: 3
   depth1Effect: 1
   depth2Effect: 1
   depth3Effect: 1

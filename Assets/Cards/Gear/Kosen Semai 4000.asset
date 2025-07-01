@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Kosen Semai 4000
   m_EditorClassIdentifier: 
   gearName: Kosen Semai 4000
-  manufacturer: Ryoshi
-  gearType: Line
-  power: 2
-  durability: 5
-  material: Metal
+  manufacturer: Line
+  gearImage: {fileID: 0}
+  gearType: Metal
+  power: 5
+  durability: 11
+  material: 2
   depth1Effect: 0
-  depth2Effect: 0
+  depth2Effect: 1
   depth3Effect: 1
   depth4Effect: 1
-  depth5Effect: 1
+  depth5Effect: 2

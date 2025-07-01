@@ -302,23 +302,8 @@ public class FishingManager : MonoBehaviour
     {
         if (gear == null) return 0;
         
-        // For now, use the existing depth effects from gear (depth1Effect, depth2Effect, etc.)
-        // We'll map sub-depths to these effects until we update the gear cards
-        
-        int modifier = 0;
-        
-        // Map sub-depth (1-9) to gear depth effects (1-5)
-        // This is temporary until we update gear cards for sub-depth system
-        if (subDepth >= 1 && subDepth <= 2)
-            modifier = gear.depth1Effect;  // Very shallow
-        else if (subDepth >= 3 && subDepth <= 4)
-            modifier = gear.depth2Effect;  // Shallow
-        else if (subDepth >= 5 && subDepth <= 6)
-            modifier = gear.depth3Effect;  // Medium
-        else if (subDepth >= 7 && subDepth <= 8)
-            modifier = gear.depth4Effect;  // Deep
-        else if (subDepth == 9)
-            modifier = gear.depth5Effect;  // Very deep
+        // Now we can directly use the sub-depth (1-9) with the gear's depth effects
+        int modifier = gear.GetDepthEffect(subDepth);
         
         if (modifier != 0)
         {

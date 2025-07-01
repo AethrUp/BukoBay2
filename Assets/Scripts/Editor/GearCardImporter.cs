@@ -38,7 +38,8 @@ public class GearCardImporter : EditorWindow
         GUILayout.Label("Instructions:", EditorStyles.boldLabel);
         GUILayout.Label("1. Click 'Browse for CSV File' and select your gear CSV");
         GUILayout.Label("2. Click 'Import Gear Cards' to create all assets");
-        GUILayout.Label("3. Gear cards will be created in Assets/Cards/Gear/");
+        GUILayout.Label("3. Gear cards will be created in Assets/Cards/UpdatedGear/");
+        GUILayout.Label("Note: Now supports 9 depth effects (D1-D9)");
     }
     
     void ImportGearCards()
@@ -49,17 +50,17 @@ public class GearCardImporter : EditorWindow
             return;
         }
         
-        Debug.Log("Starting gear card import...");
+        Debug.Log("Starting updated gear card import...");
         
         // Create directories if they don't exist
         string cardsPath = "Assets/Cards";
-        string gearPath = "Assets/Cards/Gear";
+        string gearPath = "Assets/Cards/UpdatedGear";
         
         if (!AssetDatabase.IsValidFolder(cardsPath))
             AssetDatabase.CreateFolder("Assets", "Cards");
         
         if (!AssetDatabase.IsValidFolder(gearPath))
-            AssetDatabase.CreateFolder("Assets/Cards", "Gear");
+            AssetDatabase.CreateFolder("Assets/Cards", "UpdatedGear");
         
         // Read CSV file
         string csvContent = File.ReadAllText(csvFilePath);
@@ -69,54 +70,64 @@ public class GearCardImporter : EditorWindow
         string[] allLines = csvContent.Split('\n');
         Debug.Log($"Total lines in file: {allLines.Length}");
         
-        if (allLines.Length < 3) // Need header line + at least one data line
+        if (allLines.Length < 2) // Need header + at least one data line
         {
             EditorUtility.DisplayDialog("Error", "CSV file appears to be empty or has no data rows", "OK");
             return;
         }
         
-        // Skip the first line (0,1,2,3...) and use the second line as headers
-        string headerLine = allLines[1].Trim().Replace("\r", "");
+        // Use the first line as headers (no number row in this CSV)
+        string headerLine = allLines[0].Trim().Replace("\r", "");
         Debug.Log($"Header line: '{headerLine}'");
         
-        // Simple split by comma for headers
-        string[] headers = headerLine.Split(',');
-        for (int i = 0; i < headers.Length; i++)
-        {
-            headers[i] = headers[i].Trim().Replace("\"", "");
-        }
+        // Parse CSV headers
+        string[] headers = ParseCSVLine(headerLine);
+        Debug.Log($"Found {headers.Length} headers");
         
-        Debug.Log($"Found {headers.Length} headers: {string.Join(" | ", headers)}");
+        // Find column indices
+        int titleIndex = FindColumnIndex(headers, "Title");
+        int typeIndex = FindColumnIndex(headers, "Type");
+        int brandIndex = FindColumnIndex(headers, "Brand");
+        int itemIndex = FindColumnIndex(headers, "Item");
+        int materialIndex = FindColumnIndex(headers, "Material");
+        int powerIndex = FindColumnIndex(headers, "Power");
+        int durabilityIndex = FindColumnIndex(headers, "Durability");
+        int priceIndex = FindColumnIndex(headers, "Price");
+        int descriptionIndex = FindColumnIndex(headers, "Description");
+        
+        // Debug column indices
+        Debug.Log($"Column indices - Type: {typeIndex}, Item: {itemIndex}, Material: {materialIndex}, Power: {powerIndex}, Durability: {durabilityIndex}");
+        
+        // Find depth effect indices (D1-D9)
+        int[] depthIndices = new int[9];
+        for (int i = 1; i <= 9; i++)
+        {
+            depthIndices[i-1] = FindColumnIndex(headers, $"D{i}");
+        }
         
         int importedCount = 0;
         int skippedCount = 0;
         
-        // Process each data line (skip first two lines: numbers and headers)
-        for (int lineIndex = 2; lineIndex < allLines.Length; lineIndex++)
+        // Process each data line (skip header)
+        for (int lineIndex = 1; lineIndex < allLines.Length; lineIndex++)
         {
             string line = allLines[lineIndex].Trim().Replace("\r", "");
             if (string.IsNullOrEmpty(line)) continue;
             
-            Debug.Log($"Processing line {lineIndex}: '{line.Substring(0, System.Math.Min(100, line.Length))}...'");
+            Debug.Log($"Processing line {lineIndex}");
             
-            // Simple split by comma
-            string[] values = line.Split(',');
-            for (int i = 0; i < values.Length; i++)
-            {
-                values[i] = values[i].Trim().Replace("\"", "");
-            }
+            // Parse CSV line
+            string[] values = ParseCSVLine(line);
             
-            Debug.Log($"Split into {values.Length} values. Gear name: '{(values.Length > 3 ? values[3] : "NOT FOUND")}'");
-            
-            if (values.Length < 14) // Need at least through D5 column
+            if (values.Length < 20) // Need at least through D9 column
             {
                 Debug.LogWarning($"Line {lineIndex} has too few values ({values.Length}), skipping");
                 skippedCount++;
                 continue;
             }
             
-            // Get gear name from column 3 (Item)
-            string gearName = values[3];
+            // Get gear name from Item column
+            string gearName = GetValue(values, itemIndex);
             if (string.IsNullOrEmpty(gearName))
             {
                 Debug.LogWarning($"Line {lineIndex} has empty gear name, skipping");
@@ -124,39 +135,49 @@ public class GearCardImporter : EditorWindow
                 continue;
             }
             
-            Debug.Log($"Creating gear card for: '{gearName}'");
+            Debug.Log($"Creating updated gear card for: '{gearName}'");
             
             // Create new GearCard
             GearCard gearCard = ScriptableObject.CreateInstance<GearCard>();
             
             // Set basic info
-            gearCard.gearName = gearName;                    // Column 3 - Item
-            gearCard.manufacturer = values[1];               // Column 1 - Brand
-            gearCard.gearType = values[4];                   // Column 4 - Type
-            gearCard.material = values[5];                   // Column 5 - Material
+            gearCard.gearName = gearName;
+            gearCard.manufacturer = GetValue(values, brandIndex);
+            gearCard.gearType = GetValue(values, typeIndex);  // This should be Type column
+            gearCard.material = GetValue(values, materialIndex);
+            gearCard.description = GetValue(values, descriptionIndex);
             
             // Set numeric values with error checking
-            if (int.TryParse(values[6], out int power))
-                gearCard.power = power;                      // Column 6 - Power
+            if (int.TryParse(GetValue(values, powerIndex), out int power))
+                gearCard.power = power;
             
-            if (int.TryParse(values[7], out int durability))
-                gearCard.durability = durability;            // Column 7 - Durability
+            if (int.TryParse(GetValue(values, durabilityIndex), out int durability))
+                gearCard.durability = durability;
             
-            // Set depth effects (columns 9-13: D1, D2, D3, D4, D5)
-            if (int.TryParse(values[9], out int d1))
-                gearCard.depth1Effect = d1;
+            if (float.TryParse(GetValue(values, priceIndex), out float price))
+                gearCard.price = price;
             
-            if (int.TryParse(values[10], out int d2))
-                gearCard.depth2Effect = d2;
+            // Set depth effects (D1-D9)
+            for (int d = 1; d <= 9; d++)
+            {
+                if (depthIndices[d-1] >= 0) // Check if column exists
+                {
+                    if (int.TryParse(GetValue(values, depthIndices[d-1]), out int depthEffect))
+                    {
+                        gearCard.SetDepthEffect(d, depthEffect);
+                    }
+                }
+            }
             
-            if (int.TryParse(values[11], out int d3))
-                gearCard.depth3Effect = d3;
-            
-            if (int.TryParse(values[12], out int d4))
-                gearCard.depth4Effect = d4;
-            
-            if (int.TryParse(values[13], out int d5))
-                gearCard.depth5Effect = d5;
+            // Try to find and assign gear image
+            // Look for images in Assets/Images/Gear/ folder
+            string imageName = gearName;
+            Sprite gearSprite = FindGearImage(imageName);
+            if (gearSprite != null)
+            {
+                gearCard.gearImage = gearSprite;
+                Debug.Log($"Found image for {gearName}");
+            }
             
             // Create safe filename
             string safeFileName = gearName;
@@ -179,8 +200,68 @@ public class GearCardImporter : EditorWindow
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         
-        Debug.Log($"Import complete! Created {importedCount} gear cards, skipped {skippedCount} rows");
+        Debug.Log($"Import complete! Created {importedCount} updated gear cards, skipped {skippedCount} rows");
         EditorUtility.DisplayDialog("Import Complete", 
-            $"Successfully imported {importedCount} gear cards.\nSkipped {skippedCount} rows.\nSee console for details.", "OK");
+            $"Successfully imported {importedCount} updated gear cards.\nSkipped {skippedCount} rows.\nSee console for details.", "OK");
+    }
+    
+    string[] ParseCSVLine(string line)
+    {
+        System.Collections.Generic.List<string> result = new System.Collections.Generic.List<string>();
+        bool inQuotes = false;
+        string currentField = "";
+        
+        for (int i = 0; i < line.Length; i++)
+        {
+            char c = line[i];
+            
+            if (c == '"')
+            {
+                inQuotes = !inQuotes;
+            }
+            else if (c == ',' && !inQuotes)
+            {
+                result.Add(currentField.Trim());
+                currentField = "";
+            }
+            else
+            {
+                currentField += c;
+            }
+        }
+        
+        result.Add(currentField.Trim());
+        return result.ToArray();
+    }
+    
+    int FindColumnIndex(string[] headers, string columnName)
+    {
+        for (int i = 0; i < headers.Length; i++)
+        {
+            if (headers[i].Trim().Equals(columnName, System.StringComparison.OrdinalIgnoreCase))
+                return i;
+        }
+        return -1;
+    }
+    
+    string GetValue(string[] values, int index)
+    {
+        if (index >= 0 && index < values.Length)
+            return values[index].Trim().Replace("\"", "");
+        return "";
+    }
+    
+    Sprite FindGearImage(string imageName)
+    {
+        // Look for the image in Assets/Images/Gear/
+        string[] guids = AssetDatabase.FindAssets($"{imageName} t:Sprite", new[] { "Assets/Images/Gear" });
+        
+        if (guids.Length > 0)
+        {
+            string assetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
+            return AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+        }
+        
+        return null;
     }
 }

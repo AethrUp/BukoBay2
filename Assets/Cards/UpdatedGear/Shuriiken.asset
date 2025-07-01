@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d78ab6811626154c8b5d434865685a0, type: 3}
+  m_Name: Shuriiken
+  m_EditorClassIdentifier: 
+  gearName: Shuriiken
+  manufacturer: Ryoshi
+  gearImage: {fileID: -2688351069662342726, guid: ba5142379fbf4c94aa03747ddd24b16d, type: 3}
+  gearType: Reel
+  power: 3
+  durability: 5
+  material: Metal
+  depth1Effect: 1
+  depth2Effect: 1
+  depth3Effect: 1
+  depth4Effect: 1
+  depth5Effect: 0
+  depth6Effect: 0
+  depth7Effect: 0
+  depth8Effect: -2
+  depth9Effect: -2
+  price: 16
+  description: Lightning suitable fast fiish reel device for pro. Fiisher.

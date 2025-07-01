@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Ol' Redwood
   m_EditorClassIdentifier: 
   gearName: Ol' Redwood
-  manufacturer: Jinro's
-  gearType: Rod
+  manufacturer: Rod
+  gearImage: {fileID: 0}
+  gearType: Wood
   power: 2
-  durability: 2
-  material: Wood
+  durability: 5
+  material: 2
   depth1Effect: 3
   depth2Effect: 3
   depth3Effect: 3

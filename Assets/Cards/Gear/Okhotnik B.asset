@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Okhotnik B
   m_EditorClassIdentifier: 
   gearName: Okhotnik B
-  manufacturer: Rybak
-  gearType: Reel
-  power: 1
-  durability: 5
-  material: Metal
+  manufacturer: Reel
+  gearImage: {fileID: 0}
+  gearType: Metal
+  power: 5
+  durability: 6
+  material: 1
   depth1Effect: 2
   depth2Effect: 2
-  depth3Effect: 2
+  depth3Effect: 1
   depth4Effect: 1
   depth5Effect: 1

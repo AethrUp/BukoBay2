@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Rock
   m_EditorClassIdentifier: 
   gearName: Rock
-  manufacturer: Homemade
-  gearType: Lure
-  power: 1
-  durability: 4
-  material: Stone
+  manufacturer: Lure
+  gearImage: {fileID: 0}
+  gearType: Stone
+  power: 4
+  durability: 5
+  material: 1
   depth1Effect: 0
   depth2Effect: 0
   depth3Effect: 0

@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Werm
   m_EditorClassIdentifier: 
   gearName: Werm
-  manufacturer: Homemade
-  gearType: Bait
-  power: 2
-  durability: 1
-  material: Bio
+  manufacturer: Bait
+  gearImage: {fileID: 0}
+  gearType: Bio
+  power: 1
+  durability: 3
+  material: 2
   depth1Effect: 1
   depth2Effect: 1
-  depth3Effect: 1
+  depth3Effect: 0
   depth4Effect: 0
   depth5Effect: 0

@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Kosen Okii 8000
   m_EditorClassIdentifier: 
   gearName: Kosen Okii 8000
-  manufacturer: Ryoshi
-  gearType: Line
+  manufacturer: Line
+  gearImage: {fileID: 0}
+  gearType: Plastic
   power: 3
-  durability: 3
-  material: Plastic
+  durability: 10
+  material: 3
   depth1Effect: 0
   depth2Effect: 0
   depth3Effect: 0
   depth4Effect: 0
-  depth5Effect: 0
+  depth5Effect: 1

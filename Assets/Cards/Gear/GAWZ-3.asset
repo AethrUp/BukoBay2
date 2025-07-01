@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: GAWZ-3
   m_EditorClassIdentifier: 
   gearName: GAWZ-3
-  manufacturer: Holmberg
-  gearType: Reel
-  power: 2
-  durability: 5
-  material: Metal
+  manufacturer: Reel
+  gearImage: {fileID: 0}
+  gearType: Metal
+  power: 5
+  durability: 11
+  material: 2
   depth1Effect: 0
   depth2Effect: 0
-  depth3Effect: 0
+  depth3Effect: 2
   depth4Effect: 2
   depth5Effect: 2

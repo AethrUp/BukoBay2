@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d78ab6811626154c8b5d434865685a0, type: 3}
+  m_Name: Tri Might
+  m_EditorClassIdentifier: 
+  gearName: Tri Might
+  manufacturer: Sherwood
+  gearImage: {fileID: 6896678512636956356, guid: ef8f70319382ec742b89d634f1364ed1, type: 3}
+  gearType: Lure
+  power: 3
+  durability: 5
+  material: Metal
+  depth1Effect: 3
+  depth2Effect: 3
+  depth3Effect: 0
+  depth4Effect: 0
+  depth5Effect: 3
+  depth6Effect: 3
+  depth7Effect: 0
+  depth8Effect: 3
+  depth9Effect: 3
+  price: 16
+  description: For within three, there is strength.

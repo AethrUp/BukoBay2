@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Sowbelly
   m_EditorClassIdentifier: 
   gearName: Sowbelly
-  manufacturer: Jinro's
-  gearType: Bait
-  power: 3
-  durability: 1
-  material: Bio
+  manufacturer: Bait
+  gearImage: {fileID: 0}
+  gearType: Bio
+  power: 1
+  durability: 4
+  material: 3
   depth1Effect: 0
   depth2Effect: 0
   depth3Effect: 0

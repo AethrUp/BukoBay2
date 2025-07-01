@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Reelque Sponsorship
   m_EditorClassIdentifier: 
   gearName: Reelque Sponsorship
-  manufacturer: Reel.Q
-  gearType: Gear
+  manufacturer: Gear
+  gearImage: {fileID: 0}
+  gearType: 
   power: 0
   durability: 0
-  material: NA
+  material: 
   depth1Effect: 0
   depth2Effect: 0
   depth3Effect: 0

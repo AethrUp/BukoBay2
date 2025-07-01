@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d78ab6811626154c8b5d434865685a0, type: 3}
+  m_Name: BH-4
+  m_EditorClassIdentifier: 
+  gearName: BH-4
+  manufacturer: Blake
+  gearImage: {fileID: -5230849155111583608, guid: b2f4d408cdcd5834e87da4d8559bd2c9, type: 3}
+  gearType: Lure
+  power: 2
+  durability: 5
+  material: Metal
+  depth1Effect: 0
+  depth2Effect: 0
+  depth3Effect: 1
+  depth4Effect: 2
+  depth5Effect: 1
+  depth6Effect: 0
+  depth7Effect: 0
+  depth8Effect: 0
+  depth9Effect: 0
+  price: 11
+  description: Now we're getting somewhere. This is for fiishers starting to get
+    serious with fiishing.

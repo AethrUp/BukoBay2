@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Rybak Sponsorship
   m_EditorClassIdentifier: 
   gearName: Rybak Sponsorship
-  manufacturer: Rybak
-  gearType: Gear
+  manufacturer: Gear
+  gearImage: {fileID: 0}
+  gearType: 
   power: 0
   durability: 0
-  material: NA
+  material: 
   depth1Effect: 0
   depth2Effect: 0
   depth3Effect: 0

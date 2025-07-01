@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Black Snake
   m_EditorClassIdentifier: 
   gearName: Black Snake
-  manufacturer: Sherwood
-  gearType: Rod
-  power: 2
-  durability: 1
-  material: Bio
+  manufacturer: Rod
+  gearImage: {fileID: 0}
+  gearType: Bio
+  power: 1
+  durability: 3
+  material: 2
   depth1Effect: 1
   depth2Effect: 1
   depth3Effect: 1
