@@ -9,11 +9,17 @@ public class InteractivePhaseUI : MonoBehaviour
     public Transform actionCardContainer;
     
     [Header("UI Elements")]
-    public TextMeshProUGUI timerText;
+    public TextMeshProUGUI roundText;
     public TextMeshProUGUI playerPowerText;
     public TextMeshProUGUI fishPowerText;
     public TextMeshProUGUI fishNameText;
-    public Button endPhaseButton;
+    public TextMeshProUGUI playerStaminaText;
+    public TextMeshProUGUI fishStaminaText;
+    public Button nextRoundButton;
+    public Button skipActionButton;
+    
+    [Header("Tug of War Display")]
+    public TugOfWarStaminaBar tugOfWarBar;
     
     [Header("Action Card UI")]
     public GameObject actionCardButtonPrefab;
@@ -33,8 +39,11 @@ public class InteractivePhaseUI : MonoBehaviour
     void Start()
     {
         // Set up buttons
-        if (endPhaseButton != null)
-            endPhaseButton.onClick.AddListener(EndPhase);
+        if (nextRoundButton != null)
+            nextRoundButton.onClick.AddListener(NextRound);
+        
+        if (skipActionButton != null)
+            skipActionButton.onClick.AddListener(SkipAction);
         
         if (targetPlayerButton != null)
             targetPlayerButton.onClick.AddListener(() => SetTarget(true));
@@ -64,6 +73,9 @@ public class InteractivePhaseUI : MonoBehaviour
         SetupActionCards();
         UpdateFishInfo();
         UpdateTargetButtons();
+        
+        // Initialize the tug-of-war bar when fishing starts
+        InitializeTugOfWarBar();
     }
     
     public void HideInteractivePhase()
@@ -200,10 +212,21 @@ public class InteractivePhaseUI : MonoBehaviour
     {
         if (fishingManager == null) return;
         
-        // Update timer
-        if (timerText != null)
+        // Update round display
+        if (roundText != null)
         {
-            timerText.text = $"Time: {fishingManager.timeRemaining:F1}s";
+            roundText.text = $"Round: {fishingManager.currentRound}";
+        }
+        
+        // Update stamina displays
+        if (playerStaminaText != null)
+        {
+            playerStaminaText.text = $"Player Stamina: {fishingManager.playerStamina}";
+        }
+        
+        if (fishStaminaText != null)
+        {
+            fishStaminaText.text = $"Fish Stamina: {fishingManager.fishStamina}";
         }
         
         // Update power displays
@@ -225,6 +248,9 @@ public class InteractivePhaseUI : MonoBehaviour
                 fishPowerText.text += $" ({basePower} + {fishingManager.totalFishBuffs:+0;-#})";
         }
         
+        // Update tug-of-war display
+        UpdateTugOfWarDisplay();
+        
         // Show interactive panel if phase is active
         if (!interactivePanel.activeInHierarchy)
         {
@@ -242,17 +268,54 @@ public class InteractivePhaseUI : MonoBehaviour
         }
     }
     
-    void EndPhase()
+    void NextRound()
     {
         if (fishingManager != null)
         {
-            fishingManager.ForceEndInteractivePhase();
+            fishingManager.NextRound();
         }
+    }
+    
+    void SkipAction()
+    {
+        Debug.Log("Player skipped their action this round");
+        // For now, just advance to next round
+        // Later we might want to track who skipped for auto-win logic
+        NextRound();
     }
     
     // Called when interactive phase ends
     public void OnInteractivePhaseEnd()
     {
         HideInteractivePhase();
+    }
+    
+    void InitializeTugOfWarBar()
+    {
+        if (tugOfWarBar != null && fishingManager != null)
+        {
+            // Initialize with starting values (100 stamina each, current power difference)
+            int playerPower = fishingManager.CalculatePlayerPower() + fishingManager.totalPlayerBuffs;
+            int fishPower = fishingManager.CalculateFishPower() + fishingManager.totalFishBuffs;
+            int powerDifference = playerPower - fishPower;
+            
+            tugOfWarBar.UpdateAll(fishingManager.playerStamina, fishingManager.fishStamina, powerDifference);
+            
+            Debug.Log($"Initialized tug-of-war bar: Player Power {playerPower}, Fish Power {fishPower}, Difference {powerDifference}");
+        }
+    }
+    
+    void UpdateTugOfWarDisplay()
+    {
+        if (tugOfWarBar != null && fishingManager != null)
+        {
+            // Calculate current powers including action card effects
+            int playerPower = fishingManager.CalculatePlayerPower() + fishingManager.totalPlayerBuffs;
+            int fishPower = fishingManager.CalculateFishPower() + fishingManager.totalFishBuffs;
+            int powerDifference = playerPower - fishPower;
+            
+            // Update the tug-of-war display
+            tugOfWarBar.UpdateAll(fishingManager.playerStamina, fishingManager.fishStamina, powerDifference);
+        }
     }
 }

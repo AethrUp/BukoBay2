@@ -20,10 +20,11 @@ public class FishingManager : MonoBehaviour
     [Header("Fish Database")]
     public List<FishCard> allFishCards = new List<FishCard>();
     
-    [Header("Interactive Phase")]
-    public float interactionTimer = 30f;
+    [Header("Round-Based Battle System")]
     public bool isInteractionPhase = false;
-    public float timeRemaining;
+    public int currentRound = 0;
+    public int playerStamina = 100;
+    public int fishStamina = 100;
     
     [Header("Action Card Effects")]
     public int totalPlayerBuffs = 0;
@@ -143,8 +144,8 @@ public class FishingManager : MonoBehaviour
             Debug.Log($"Cast at depth {depth}! A {currentFish.fishName} appears!");
             Debug.Log($"Fish power: {currentFish.power}, Coins: {currentFish.coins}");
             
-            // Start interactive phase
-            StartInteractivePhase();
+            // Start round-based battle
+            StartRoundBasedBattle();
         }
         else
         {
@@ -152,19 +153,30 @@ public class FishingManager : MonoBehaviour
         }
     }
     
-    void StartInteractivePhase()
+    void StartRoundBasedBattle()
     {
-        Debug.Log($"=== INTERACTIVE PHASE STARTED ===");
-        Debug.Log($"Players have {interactionTimer} seconds to play action cards!");
+        Debug.Log($"=== ROUND-BASED BATTLE STARTED ===");
+        Debug.Log($"Fighting {currentFish.fishName} (Power: {currentFish.power})");
         
-        // Reset action card effects
+        // Reset battle state
+        currentRound = 1;
+        playerStamina = 100;
+        fishStamina = 100;
         totalPlayerBuffs = 0;
         totalFishBuffs = 0;
         appliedEffects.Clear();
         
-        // Start timer
+        // Start first round
+        StartNewRound();
+    }
+    
+    void StartNewRound()
+    {
+        Debug.Log($"=== ROUND {currentRound} STARTED ===");
+        Debug.Log($"Players can now play action cards or skip their turn");
+        
+        // Start interactive phase for this round
         isInteractionPhase = true;
-        timeRemaining = interactionTimer;
         
         // Show UI
         if (interactiveUI != null)
@@ -172,8 +184,95 @@ public class FishingManager : MonoBehaviour
             interactiveUI.ShowInteractivePhase();
         }
         
-        // Calculate initial powers (without action card effects)
-        CalculateFishingPowers();
+        // Check for auto-win conditions
+        CheckAutoWinConditions();
+    }
+    
+    void CheckAutoWinConditions()
+    {
+        int playerPower = CalculatePlayerPower() + totalPlayerBuffs;
+        int fishPower = CalculateFishPower() + totalFishBuffs;
+        
+        Debug.Log($"Checking auto-win: Player Power {playerPower} vs Fish Power {fishPower}");
+        
+        // For now, we'll implement the basic check
+        // Later we'll add logic for other players helping/hindering
+        
+        if (playerPower > fishPower)
+        {
+            Debug.Log("Player power is higher - potential auto-win if no hindering");
+            // TODO: Check if other players want to hinder
+        }
+        else if (playerPower <= fishPower)
+        {
+            Debug.Log("Fish power is equal or higher - potential fish win if no helping");
+            // TODO: Check if other players want to help or if active player has actions
+        }
+    }
+    
+    // Public function to advance to next round (called by UI button)
+    public void NextRound()
+    {
+        if (!isInteractionPhase)
+        {
+            Debug.LogWarning("Cannot advance round - not in interaction phase!");
+            return;
+        }
+        
+        EndCurrentRound();
+    }
+    
+    void EndCurrentRound()
+    {
+        Debug.Log($"=== ENDING ROUND {currentRound} ===");
+        isInteractionPhase = false;
+        
+        // Calculate final powers for this round
+        int playerPower = CalculatePlayerPower() + totalPlayerBuffs;
+        int fishPower = CalculateFishPower() + totalFishBuffs;
+        
+        Debug.Log($"Round {currentRound} final powers: Player {playerPower} vs Fish {fishPower}");
+        
+        // Apply stamina damage
+        if (playerPower > fishPower)
+        {
+            int damage = playerPower - fishPower;
+            fishStamina -= damage;
+            Debug.Log($"Fish takes {damage} damage! Fish stamina: {fishStamina}");
+        }
+        else if (fishPower > playerPower)
+        {
+            int damage = fishPower - playerPower;
+            playerStamina -= damage;
+            Debug.Log($"Player takes {damage} damage! Player stamina: {playerStamina}");
+        }
+        else
+        {
+            Debug.Log("Powers are equal - no damage dealt this round");
+        }
+        
+        // Check for battle end
+        if (playerStamina <= 0)
+        {
+            HandleFailure();
+            return;
+        }
+        else if (fishStamina <= 0)
+        {
+            HandleSuccess();
+            return;
+        }
+        
+        // Battle continues - start next round
+        currentRound++;
+        
+        // Reset action card effects for next round
+        totalPlayerBuffs = 0;
+        totalFishBuffs = 0;
+        appliedEffects.Clear();
+        
+        // Small delay then start next round
+        Invoke("StartNewRound", 1f);
     }
     
     FishCard GetRandomFishAtDepth(int depth)
@@ -203,10 +302,8 @@ public class FishingManager : MonoBehaviour
     
     void CalculateFishingPowers()
     {
-        // Calculate player's effective power
+        // This method is for detailed debugging only
         int playerPower = CalculatePlayerPower();
-        
-        // Calculate fish's effective power  
         int fishPower = CalculateFishPower();
         
         Debug.Log($"=== POWER CALCULATION ===");
@@ -215,11 +312,11 @@ public class FishingManager : MonoBehaviour
         
         if (playerPower >= fishPower)
         {
-            Debug.Log($"SUCCESS! Player wins by {playerPower - fishPower}");
+            Debug.Log($"Player advantage by {playerPower - fishPower}");
         }
         else
         {
-            Debug.Log($"FAILURE! Fish wins by {fishPower - playerPower}");
+            Debug.Log($"Fish advantage by {fishPower - playerPower}");
         }
     }
     
@@ -230,18 +327,14 @@ public class FishingManager : MonoBehaviour
         
         // Start with base gear power
         int basePower = currentPlayer.GetTotalPower();
-        Debug.Log($"Base gear power: {basePower}");
         
         // Apply material bonuses/penalties from fish
         int materialModifier = CalculateMaterialModifier();
-        Debug.Log($"Material modifier: {materialModifier:+0;-#;0}");
         
         // Apply sub-depth gear effectiveness
         int subDepthModifier = CalculateSubDepthGearModifier();
-        Debug.Log($"Sub-depth gear modifier: {subDepthModifier:+0;-#;0}");
         
         int finalPower = basePower + materialModifier + subDepthModifier;
-        Debug.Log($"Final player power: {basePower} + {materialModifier} + {subDepthModifier} = {finalPower}");
         
         return finalPower;
     }
@@ -302,13 +395,23 @@ public class FishingManager : MonoBehaviour
     {
         if (gear == null) return 0;
         
-        // Now we can directly use the sub-depth (1-9) with the gear's depth effects
-        int modifier = gear.GetDepthEffect(subDepth);
+        // For now, use the existing depth effects from gear (depth1Effect, depth2Effect, etc.)
+        // We'll map sub-depths to these effects until we update the gear cards
         
-        if (modifier != 0)
-        {
-            Debug.Log($"{slotName} ({gear.gearName}): effectiveness at sub-depth {subDepth} gives {modifier:+0;-#}");
-        }
+        int modifier = 0;
+        
+        // Map sub-depth (1-9) to gear depth effects (1-5)
+        // This is temporary until we update gear cards for sub-depth system
+        if (subDepth >= 1 && subDepth <= 2)
+            modifier = gear.depth1Effect;  // Very shallow
+        else if (subDepth >= 3 && subDepth <= 4)
+            modifier = gear.depth2Effect;  // Shallow
+        else if (subDepth >= 5 && subDepth <= 6)
+            modifier = gear.depth3Effect;  // Medium
+        else if (subDepth >= 7 && subDepth <= 8)
+            modifier = gear.depth4Effect;  // Deep
+        else if (subDepth == 9)
+            modifier = gear.depth5Effect;  // Very deep
         
         return modifier;
     }
@@ -321,66 +424,22 @@ public class FishingManager : MonoBehaviour
         // Sub-depth affects gear effectiveness, not fish difficulty
         int fishPower = currentFish.power;
         
-        Debug.Log($"Fish base power: {fishPower}");
-        
         return fishPower;
     }
     
-    void Update()
-    {
-        // Handle interaction phase timer
-        if (isInteractionPhase)
-        {
-            timeRemaining -= Time.deltaTime;
-            
-            if (timeRemaining <= 0)
-            {
-                EndInteractivePhase();
-            }
-        }
-    }
+    // Remove the old Update method that handled timer
+    // void Update() - REMOVED
     
-    void EndInteractivePhase()
+    void HandleSuccess()
     {
-        Debug.Log($"=== INTERACTIVE PHASE ENDED ===");
-        isInteractionPhase = false;
+        Debug.Log($"SUCCESS! Player catches {currentFish.fishName}!");
+        Debug.Log($"Received {currentFish.coins} coins!");
         
-        // Notify UI
+        // Hide UI
         if (interactiveUI != null)
         {
             interactiveUI.OnInteractivePhaseEnd();
         }
-        
-        // Calculate final result with all action card effects
-        ResolveFishingAttempt();
-    }
-    
-    void ResolveFishingAttempt()
-    {
-        // Calculate final powers including action card effects
-        int playerPower = CalculatePlayerPower() + totalPlayerBuffs;
-        int fishPower = CalculateFishPower() + totalFishBuffs;
-        
-        Debug.Log($"=== FINAL RESOLUTION ===");
-        Debug.Log($"Final Player Power: {playerPower} (including +{totalPlayerBuffs} from actions)");
-        Debug.Log($"Final Fish Power: {fishPower} (including +{totalFishBuffs} from actions)");
-        
-        if (playerPower >= fishPower)
-        {
-            Debug.Log($"SUCCESS! Player wins by {playerPower - fishPower}");
-            HandleSuccess();
-        }
-        else
-        {
-            Debug.Log($"FAILURE! Fish wins by {fishPower - playerPower}");
-            HandleFailure();
-        }
-    }
-    
-    void HandleSuccess()
-    {
-        Debug.Log($"Player catches {currentFish.fishName}!");
-        Debug.Log($"Received {currentFish.coins} coins!");
         
         // TODO: Add coins to player inventory
         // TODO: Distribute rewards to helpers
@@ -388,8 +447,14 @@ public class FishingManager : MonoBehaviour
     
     void HandleFailure()
     {
-        Debug.Log($"Player fails to catch {currentFish.fishName}!");
+        Debug.Log($"FAILURE! Player fails to catch {currentFish.fishName}!");
         Debug.Log("Gear takes damage...");
+        
+        // Hide UI
+        if (interactiveUI != null)
+        {
+            interactiveUI.OnInteractivePhaseEnd();
+        }
         
         // TODO: Apply gear damage
         // TODO: Distribute rewards to opponents
@@ -442,13 +507,13 @@ public class FishingManager : MonoBehaviour
         return true;
     }
     
-    // Function to manually end interaction phase (for testing)
-    [ContextMenu("End Interactive Phase")]
-    public void ForceEndInteractivePhase()
+    // Public function to manually end round (for UI button)
+    [ContextMenu("Next Round")]
+    public void ForceNextRound()
     {
         if (isInteractionPhase)
         {
-            EndInteractivePhase();
+            NextRound();
         }
     }
     
@@ -497,5 +562,67 @@ public class FishingManager : MonoBehaviour
             string depthName = i == 1 ? "Coast" : i == 2 ? "Ocean" : i == 3 ? "Abyss" : "Invalid";
             Debug.Log($"Depth {i} ({depthName}): {depthCounts[i]} fish");
         }
+    }
+    
+    [ContextMenu("Test Tug of War UI")]
+    public void TestTugOfWarUI()
+    {
+        // Quick test to verify tug-of-war integration
+        if (interactiveUI != null && interactiveUI.tugOfWarBar != null)
+        {
+            Debug.Log("Testing tug-of-war display...");
+            
+            // Simulate a battle scenario
+            playerStamina = 75;
+            fishStamina = 60;
+            totalPlayerBuffs = 3;
+            totalFishBuffs = 1;
+            
+            // Force update the UI
+            if (interactiveUI.tugOfWarBar != null)
+            {
+                int playerPower = CalculatePlayerPower() + totalPlayerBuffs;
+                int fishPower = CalculateFishPower() + totalFishBuffs;
+                int powerDiff = playerPower - fishPower;
+                
+                interactiveUI.tugOfWarBar.UpdateAll(playerStamina, fishStamina, powerDiff);
+                Debug.Log($"Updated tug-of-war: Player {playerStamina} stamina, Fish {fishStamina} stamina, Power diff {powerDiff}");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Tug-of-war bar not found! Make sure InteractivePhaseUI.tugOfWarBar is assigned.");
+        }
+    }
+    
+    [ContextMenu("Debug Current Powers")]
+    public void DebugCurrentPowers()
+    {
+        if (currentPlayer == null || currentFish == null)
+        {
+            Debug.LogWarning("No active fishing battle to debug!");
+            return;
+        }
+        
+        Debug.Log("=== DETAILED POWER CALCULATION ===");
+        
+        // Calculate player power with detailed logging
+        int basePower = currentPlayer.GetTotalPower();
+        Debug.Log($"Base gear power: {basePower}");
+        
+        int materialModifier = CalculateMaterialModifier();
+        Debug.Log($"Material modifier: {materialModifier:+0;-#;0}");
+        
+        int subDepthModifier = CalculateSubDepthGearModifier();
+        Debug.Log($"Sub-depth gear modifier: {subDepthModifier:+0;-#;0}");
+        
+        int playerPower = basePower + materialModifier + subDepthModifier + totalPlayerBuffs;
+        Debug.Log($"Final player power: {basePower} + {materialModifier} + {subDepthModifier} + {totalPlayerBuffs} = {playerPower}");
+        
+        int fishPower = CalculateFishPower() + totalFishBuffs;
+        Debug.Log($"Final fish power: {currentFish.power} + {totalFishBuffs} = {fishPower}");
+        
+        Debug.Log($"Power difference: {playerPower - fishPower} (positive = player advantage)");
+        Debug.Log($"Current stamina - Player: {playerStamina}, Fish: {fishStamina}");
     }
 }
