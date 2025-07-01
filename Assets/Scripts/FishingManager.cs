@@ -25,6 +25,8 @@ public class FishingManager : MonoBehaviour
     public int currentRound = 0;
     public int playerStamina = 100;
     public int fishStamina = 100;
+    public float staminaDrainRate = 1f; // Points per second
+    private float lastStaminaUpdate;
     
     [Header("Action Card Effects")]
     public int totalPlayerBuffs = 0;
@@ -177,6 +179,7 @@ public class FishingManager : MonoBehaviour
         
         // Start interactive phase for this round
         isInteractionPhase = true;
+        lastStaminaUpdate = Time.time;
         
         // Show UI
         if (interactiveUI != null)
@@ -425,6 +428,68 @@ public class FishingManager : MonoBehaviour
         int fishPower = currentFish.power;
         
         return fishPower;
+    }
+    
+    void Update()
+    {
+        // Handle continuous stamina drain during interaction phase
+        if (isInteractionPhase)
+        {
+            UpdateStaminaDrain();
+        }
+    }
+    
+    void UpdateStaminaDrain()
+    {
+        // Calculate how much time has passed since last update
+        float deltaTime = Time.time - lastStaminaUpdate;
+        
+        if (deltaTime >= staminaDrainRate) // Update every second (or whatever drain rate)
+        {
+            // Calculate current power difference
+            int playerPower = CalculatePlayerPower() + totalPlayerBuffs;
+            int fishPower = CalculateFishPower() + totalFishBuffs;
+            int powerDifference = playerPower - fishPower;
+            
+            Debug.Log($"Stamina drain update: Player Power {playerPower} vs Fish Power {fishPower}, Difference: {powerDifference}");
+            
+            // Apply stamina damage based on power difference
+            if (powerDifference > 0)
+            {
+                // Player is winning - fish loses stamina
+                fishStamina -= Mathf.Abs(powerDifference);
+                Debug.Log($"Fish takes {Mathf.Abs(powerDifference)} damage! Fish stamina: {fishStamina}");
+            }
+            else if (powerDifference < 0)
+            {
+                // Fish is winning - player loses stamina
+                playerStamina -= Mathf.Abs(powerDifference);
+                Debug.Log($"Player takes {Mathf.Abs(powerDifference)} damage! Player stamina: {playerStamina}");
+            }
+            else
+            {
+                Debug.Log("Equal power - no damage dealt");
+            }
+            
+            // Clamp stamina values
+            playerStamina = Mathf.Clamp(playerStamina, 0, 100);
+            fishStamina = Mathf.Clamp(fishStamina, 0, 100);
+            
+            // Check for battle end
+            if (playerStamina <= 0)
+            {
+                HandleFailure();
+                return;
+            }
+            else if (fishStamina <= 0)
+            {
+                HandleSuccess();
+                return;
+            }
+            
+            // Update timer for next drain
+            lastStaminaUpdate = Time.time;
+        }
     }
     
     // Remove the old Update method that handled timer

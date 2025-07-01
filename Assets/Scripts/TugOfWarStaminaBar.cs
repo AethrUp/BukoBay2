@@ -42,33 +42,34 @@ public class TugOfWarStaminaBar : MonoBehaviour
     
     void SetupBars()
     {
-        // Setup player bar (blue, grows right)
+        // Setup player bar (blue, grows LEFT from center)
         if (playerBar != null)
         {
             playerBar.color = playerBarColor;
             playerBar.type = Image.Type.Filled;
             playerBar.fillMethod = Image.FillMethod.Horizontal;
+            playerBar.fillOrigin = 1; // Fill from right (center) to left
             
-            // Anchor to left side
+            // Anchor to left half of container
             RectTransform playerRect = playerBar.rectTransform;
-            playerRect.anchorMin = new Vector2(0, 0);
-            playerRect.anchorMax = new Vector2(0.5f, 1);
+            playerRect.anchorMin = new Vector2(0f, 0);   // Start from left edge
+            playerRect.anchorMax = new Vector2(0.5f, 1); // Extend to center
             playerRect.offsetMin = Vector2.zero;
             playerRect.offsetMax = Vector2.zero;
         }
         
-        // Setup fish bar (yellow, grows left)  
+        // Setup fish bar (yellow, grows RIGHT from center)  
         if (fishBar != null)
         {
             fishBar.color = fishBarColor;
             fishBar.type = Image.Type.Filled;
             fishBar.fillMethod = Image.FillMethod.Horizontal;
-            fishBar.fillOrigin = 1; // Fill from right to left
+            fishBar.fillOrigin = 0; // Fill from left (center) to right
             
-            // Anchor to right side
+            // Anchor to right half of container
             RectTransform fishRect = fishBar.rectTransform;
-            fishRect.anchorMin = new Vector2(0.5f, 0);
-            fishRect.anchorMax = new Vector2(1, 1);
+            fishRect.anchorMin = new Vector2(0.5f, 0); // Start from center
+            fishRect.anchorMax = new Vector2(1f, 1);   // Extend to right edge
             fishRect.offsetMin = Vector2.zero;
             fishRect.offsetMax = Vector2.zero;
         }
@@ -146,16 +147,16 @@ public class TugOfWarStaminaBar : MonoBehaviour
     {
         if (playerBar != null)
         {
-            // Player bar grows as fish loses stamina
-            float playerAdvantage = (100f - fishStamina) / 100f;
-            playerBar.fillAmount = playerAdvantage;
+            // Player bar grows as FISH loses stamina (player is winning)
+            float playerWinning = (100f - fishStamina) / 100f;
+            playerBar.fillAmount = playerWinning;
         }
         
         if (fishBar != null)
         {
-            // Fish bar grows as player loses stamina
-            float fishAdvantage = (100f - playerStamina) / 100f;
-            fishBar.fillAmount = fishAdvantage;
+            // Fish bar grows as PLAYER loses stamina (fish is winning)
+            float fishWinning = (100f - playerStamina) / 100f;
+            fishBar.fillAmount = fishWinning;
         }
     }
     
