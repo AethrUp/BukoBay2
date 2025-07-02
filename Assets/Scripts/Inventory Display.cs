@@ -36,12 +36,29 @@ public class InventoryDisplay : MonoBehaviour
             CreateCardDisplayPrefab();
         }
         
-        // Use the persistent PlayerInventory if available
-        if (PlayerInventory.Instance != null)
+        // Find PlayerInventory automatically if not assigned
+        if (playerInventory == null)
         {
-            playerInventory = PlayerInventory.Instance;
+            playerInventory = FindFirstObjectByType<PlayerInventory>();
+            Debug.Log($"Auto-found PlayerInventory: {(playerInventory != null ? "Success" : "Failed")}");
         }
         
+        UpdateDisplay();
+    }
+    
+    void OnEnable()
+    {
+        // Refresh display whenever this object becomes active
+        // This helps when transitioning between scenes
+        Invoke("DelayedUpdate", 0.1f);
+    }
+    
+    void DelayedUpdate()
+    {
+        if (playerInventory == null)
+        {
+            playerInventory = FindFirstObjectByType<PlayerInventory>();
+        }
         UpdateDisplay();
     }
     
@@ -102,19 +119,31 @@ public class InventoryDisplay : MonoBehaviour
     
     public void UpdateDisplay()
     {
+        Debug.Log("UpdateDisplay called - checking inventory...");
+        
+        // Try to find PlayerInventory if not assigned
+        if (playerInventory == null)
+        {
+            playerInventory = FindFirstObjectByType<PlayerInventory>();
+            Debug.Log($"Auto-finding PlayerInventory: {(playerInventory != null ? "Success" : "Failed")}");
+        }
+        
         // Clear existing displayed cards
         ClearDisplay();
         
-        if (playerInventory == null) return;
+        if (playerInventory == null) 
+        {
+            Debug.Log("PlayerInventory is still null - cannot display inventory!");
+            return;
+        }
+        
+        Debug.Log($"Found {playerInventory.extraGear.Count} gear cards in tackle box");
         
         // Display equipped gear
         DisplayEquippedGear();
         
-        // Display tackle box gear (only if panel exists)
-        if (tackleBoxPanel != null)
-        {
-            DisplayTackleBoxGear();
-        }
+        // Display tackle box gear
+        DisplayTackleBoxGear();
         
         // Display action cards
         DisplayActionCards();
@@ -159,13 +188,10 @@ public class InventoryDisplay : MonoBehaviour
     
     void DisplayTackleBoxGear()
     {
-        Debug.Log($"DisplayTackleBoxGear called. Extra gear count: {playerInventory.extraGear.Count}");
-        
         Vector2 position = new Vector2(10, -10); // Start from top-left
         
         foreach (GearCard gear in playerInventory.extraGear)
         {
-            Debug.Log($"Displaying gear in tackle box: {gear.gearName}");
             CreateCardDisplay(gear, null, null, tackleBoxPanel, position, true); // Use grid positioning
             position.x += cardWidth + cardSpacing;
             
@@ -233,8 +259,8 @@ public class InventoryDisplay : MonoBehaviour
         cardDisplay.fishCard = fishCard;
         cardDisplay.actionCard = actionCard;
         
-        // Add drag and drop functionality for gear cards
-        if (gearCard != null)
+        // Add drag and drop functionality for gear cards AND action cards
+        if (gearCard != null || actionCard != null)
         {
             CardDragDrop dragDrop = cardObj.GetComponent<CardDragDrop>();
             if (dragDrop == null)
@@ -243,6 +269,7 @@ public class InventoryDisplay : MonoBehaviour
             }
             
             dragDrop.gearCard = gearCard;
+            dragDrop.actionCard = actionCard;  // This is the key line we added!
             dragDrop.canvas = GetComponentInParent<Canvas>();
             dragDrop.raycaster = dragDrop.canvas.GetComponent<GraphicRaycaster>();
         }

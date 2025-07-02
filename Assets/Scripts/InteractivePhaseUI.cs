@@ -20,6 +20,9 @@ public class InteractivePhaseUI : MonoBehaviour
     
     [Header("Tug of War Display")]
     public TugOfWarStaminaBar tugOfWarBar;
+    [Header("Action Target Panels")]
+    public Transform targetFishPanel;
+    public Transform targetPlayerPanel;
     
     [Header("Action Card UI")]
     public GameObject actionCardButtonPrefab;

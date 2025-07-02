@@ -15,8 +15,18 @@ public class FishingUI : MonoBehaviour
     public FishingManager fishingManager;
     public PlayerInventory playerInventory;
     
+    // Track previous gear count to avoid spam
+    private int previousGearCount = -1;
+    
     void Start()
     {
+        // Find the persistent PlayerInventory if not already assigned
+        if (playerInventory == null && PlayerInventory.Instance != null)
+        {
+            playerInventory = PlayerInventory.Instance;
+            Debug.Log("FishingUI: Found persistent PlayerInventory");
+        }
+        
         // Set up button
         if (startFishingButton != null)
         {
@@ -40,23 +50,44 @@ public class FishingUI : MonoBehaviour
     
     void UpdateUI()
     {
-        if (playerInventory == null || fishingManager == null) return;
+        // Try to find persistent PlayerInventory if we don't have one
+        if (playerInventory == null && PlayerInventory.Instance != null)
+        {
+            playerInventory = PlayerInventory.Instance;
+            Debug.Log("FishingUI: Connected to persistent PlayerInventory in UpdateUI");
+        }
+        
+        if (playerInventory == null || fishingManager == null) 
+        {
+            if (playerInventory == null)
+                Debug.LogWarning("FishingUI: Missing playerInventory");
+            return;
+        }
         
         // Count equipped gear
         int gearCount = CountEquippedGear();
         
-        // Update gear count display
-        if (gearCountText != null)
+        // Only update and log if gear count changed
+        if (gearCount != previousGearCount)
         {
-            gearCountText.text = $"Equipped Gear: {gearCount} pieces";
+            Debug.Log($"FishingUI: Gear count changed to {gearCount}");
+            previousGearCount = gearCount;
+            
+            // Update gear count display
+            if (gearCountText != null)
+            {
+                gearCountText.text = $"Equipped Gear: {gearCount} pieces";
+            }
+            
+            // Update depth info and button state
+            UpdateDepthInfo(gearCount);
         }
-        
-        // Update depth info and button state
-        UpdateDepthInfo(gearCount);
     }
     
     int CountEquippedGear()
     {
+        if (playerInventory == null) return 0;
+        
         int count = 0;
         
         if (playerInventory.equippedRod != null) count++;
