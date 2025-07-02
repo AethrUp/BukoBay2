@@ -29,6 +29,13 @@ public class GearComparisonDisplay : MonoBehaviour
     
     void Start()
     {
+        // Find the persistent PlayerInventory if not already assigned
+        if (playerInventory == null && PlayerInventory.Instance != null)
+        {
+            playerInventory = PlayerInventory.Instance;
+            Debug.Log("GearComparisonDisplay: Found persistent PlayerInventory");
+        }
+        
         // Clear both panels initially
         ClearEquippedDisplay();
         ClearComparedDisplay();
@@ -38,21 +45,56 @@ public class GearComparisonDisplay : MonoBehaviour
     {
         if (clickedGear == null) return;
         
-        Debug.Log($"Showing comparison for {clickedGear.gearName}");
+        Debug.Log($"GearComparisonDisplay: Showing comparison for {clickedGear.gearName}");
         
-        // Show the clicked gear in the bottom panel
-        DisplayComparedGear(clickedGear);
-        
-        // Find equipped gear of the same type and show in top panel
+        // Check if the clicked gear is currently equipped
+        bool clickedGearIsEquipped = IsGearEquipped(clickedGear);
         GearCard equippedGear = GetEquippedGearOfType(clickedGear.gearType);
-        if (equippedGear != null)
+        
+        if (clickedGearIsEquipped)
         {
-            DisplayEquippedGear(equippedGear);
+            // If clicked gear is equipped, show it in the top panel only
+            Debug.Log($"GearComparisonDisplay: Selected gear is equipped. Clearing compared panel.");
+            ClearComparedDisplay(); // Clear first
+            DisplayEquippedGear(clickedGear);
+            Debug.Log($"GearComparisonDisplay: Showing equipped gear: {clickedGear.gearName}");
         }
         else
         {
-            ClearEquippedDisplay();
+            // If clicked gear is not equipped, show it in the bottom panel
+            DisplayComparedGear(clickedGear);
+            
+            // Show the currently equipped gear of the same type in the top panel (if different)
+            if (equippedGear != null && equippedGear != clickedGear)
+            {
+                DisplayEquippedGear(equippedGear);
+                Debug.Log($"GearComparisonDisplay: Comparing {clickedGear.gearName} with equipped {equippedGear.gearName}");
+            }
+            else
+            {
+                ClearEquippedDisplay();
+                Debug.Log($"GearComparisonDisplay: No {clickedGear.gearType} is currently equipped");
+            }
         }
+    }
+    
+    bool IsGearEquipped(GearCard gearCard)
+    {
+        if (playerInventory == null || gearCard == null) return false;
+        
+        Debug.Log($"GearComparisonDisplay: Checking if {gearCard.gearName} is equipped");
+        
+        // Check if this specific gear instance is equipped
+        bool isEquipped = (playerInventory.equippedRod == gearCard ||
+                          playerInventory.equippedReel == gearCard ||
+                          playerInventory.equippedLine == gearCard ||
+                          playerInventory.equippedLure == gearCard ||
+                          playerInventory.equippedBait == gearCard ||
+                          playerInventory.equippedExtra1 == gearCard ||
+                          playerInventory.equippedExtra2 == gearCard);
+        
+        Debug.Log($"GearComparisonDisplay: {gearCard.gearName} is equipped: {isEquipped}");
+        return isEquipped;
     }
     
     void DisplayEquippedGear(GearCard gear)
@@ -87,6 +129,7 @@ public class GearComparisonDisplay : MonoBehaviour
     
     void ClearComparedDisplay()
     {
+        Debug.Log("GearComparisonDisplay: ClearComparedDisplay called");
         if (comparedGearName != null) comparedGearName.text = "Click gear to compare";
         if (comparedGearType != null) comparedGearType.text = "";
         if (comparedPower != null) comparedPower.text = "";

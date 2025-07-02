@@ -3248,67 +3248,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1714551767}
   m_CullTransparentMesh: 1
---- !u!1 &1812337085
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1812337087}
-  - component: {fileID: 1812337086}
-  m_Layer: 0
-  m_Name: PlayerInventory
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1812337086
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1812337085}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46b02894b86c06a43ab24e2847831bdf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  equippedRod: {fileID: 0}
-  equippedReel: {fileID: 0}
-  equippedLine: {fileID: 0}
-  equippedLure: {fileID: 0}
-  equippedBait: {fileID: 0}
-  equippedExtra1: {fileID: 0}
-  equippedExtra2: {fileID: 0}
-  extraGear:
-  - {fileID: 11400000, guid: 2510a34729062764d997069aed4cfe2e, type: 2}
-  - {fileID: 11400000, guid: d1143b84bf3a2db40b6b83f580facdc4, type: 2}
-  - {fileID: 11400000, guid: be5365893a6d3b742b164c98bbc2236a, type: 2}
-  - {fileID: 11400000, guid: 14b8b30281157fd48b0ad7218f6df68f, type: 2}
-  - {fileID: 11400000, guid: f7b48c9aa9c139349b8a5ff399e71f32, type: 2}
-  - {fileID: 11400000, guid: 62dd3d53b8fdcb348bd2f34134dd70c0, type: 2}
-  - {fileID: 11400000, guid: 062948dedf0b632408d05f09ca59c8f7, type: 2}
-  - {fileID: 11400000, guid: ea2c4c5974c705d4f8037b9a95ce6ee3, type: 2}
-  actionCards: []
---- !u!4 &1812337087
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1812337085}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1116.9377, y: 519.668, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1832134148
 GameObject:
   m_ObjectHideFlags: 0
@@ -3623,7 +3562,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1938728880}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1944998915}
+        m_TargetAssemblyTypeName: SceneManagerHelper, Assembly-CSharp
+        m_MethodName: ReturnToMain
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1938728880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3662,6 +3613,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1938728877}
   m_CullTransparentMesh: 1
+--- !u!1 &1944998914
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1944998916}
+  - component: {fileID: 1944998915}
+  m_Layer: 0
+  m_Name: SceneManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1944998915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1944998914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8dfaab9b3502ac459b1531b62f5248c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1944998916
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1944998914}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1111.672, y: 738.1397, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1958795311
 GameObject:
   m_ObjectHideFlags: 0
@@ -3765,7 +3760,7 @@ MonoBehaviour:
   lurePanel: {fileID: 1370739150}
   baitPanel: {fileID: 1613562621}
   cardDisplayPrefab: {fileID: 6458836799170135447, guid: 12550df5a68506c42a60feb337592931, type: 3}
-  playerInventory: {fileID: 1812337086}
+  playerInventory: {fileID: 0}
   cardWidth: 120
   cardHeight: 120
   cardSpacing: 10
@@ -3795,7 +3790,7 @@ MonoBehaviour:
   comparedDepthDisplay: {fileID: 1313432850}
   totalEquippedPower: {fileID: 2103634245}
   totalDepthDisplay: {fileID: 650274159}
-  playerInventory: {fileID: 1812337086}
+  playerInventory: {fileID: 0}
 --- !u!1 &2016683490
 GameObject:
   m_ObjectHideFlags: 0
@@ -4156,5 +4151,5 @@ SceneRoots:
   - {fileID: 1579756821}
   - {fileID: 1095461660}
   - {fileID: 172373763}
-  - {fileID: 1812337087}
   - {fileID: 476830972}
+  - {fileID: 1944998916}

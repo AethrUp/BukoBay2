@@ -16,9 +16,22 @@ public class PlayerInventory : MonoBehaviour
     public List<GearCard> extraGear = new List<GearCard>();
     public List<ActionCard> actionCards = new List<ActionCard>();
     
-    // Placeholder system for drag and drop
-    private GearCard dragPlaceholder = null;
-    private int placeholderIndex = -1;
+    // Static instance to persist across scenes
+    public static PlayerInventory Instance;
+    
+    void Awake()
+    {
+        // If there's already an instance, destroy this one
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        
+        // Make this the persistent instance
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
     
     // Function to check if a specific gear type is equipped
     public bool HasGearType(string gearType)
@@ -48,93 +61,5 @@ public class PlayerInventory : MonoBehaviour
         if (equippedExtra2 != null) totalPower += equippedExtra2.power;
         
         return totalPower;
-    }
-    
-    // Placeholder system methods
-    public void CreatePlaceholder(GearCard gearCard)
-    {
-        int index = extraGear.IndexOf(gearCard);
-        if (index >= 0)
-        {
-            dragPlaceholder = gearCard;
-            placeholderIndex = index;
-            extraGear[index] = null; // Replace with null placeholder
-            Debug.Log($"Created placeholder for {gearCard.gearName} at index {index}");
-        }
-    }
-    
-    // Clean up any null entries in the extra gear list
-    public void CleanupNullEntries()
-    {
-        for (int i = extraGear.Count - 1; i >= 0; i--)
-        {
-            if (extraGear[i] == null)
-            {
-                extraGear.RemoveAt(i);
-                Debug.Log($"Removed null entry at index {i}");
-            }
-        }
-    }
-    
-    public void RestorePlaceholder()
-    {
-        if (dragPlaceholder != null && placeholderIndex >= 0)
-        {
-            extraGear[placeholderIndex] = dragPlaceholder;
-            Debug.Log($"Restored {dragPlaceholder.gearName} to index {placeholderIndex}");
-            ClearPlaceholder();
-        }
-    }
-    
-    public void CommitPlaceholderRemoval()
-    {
-        if (dragPlaceholder != null && placeholderIndex >= 0)
-        {
-            extraGear.RemoveAt(placeholderIndex);
-            Debug.Log($"Committed removal of {dragPlaceholder.gearName} from index {placeholderIndex}");
-            ClearPlaceholder();
-        }
-    }
-    
-    public void AddGearAtPlaceholderPosition(GearCard gearCard)
-    {
-        if (placeholderIndex >= 0 && placeholderIndex < extraGear.Count)
-        {
-            extraGear[placeholderIndex] = gearCard;
-            Debug.Log($"Added {gearCard.gearName} at placeholder position {placeholderIndex}");
-            ClearPlaceholder();
-        }
-        else
-        {
-            // No placeholder, add to end
-            extraGear.Add(gearCard);
-            Debug.Log($"Added {gearCard.gearName} to end of inventory");
-        }
-    }
-    
-    void ClearPlaceholder()
-    {
-        dragPlaceholder = null;
-        placeholderIndex = -1;
-    }
-    
-    public bool HasActivePlaceholder()
-    {
-        return dragPlaceholder != null;
-    }
-    
-    // Helper method to add gear to tackle box (maintains existing functionality)
-    public void AddToTackleBox(GearCard gearCard)
-    {
-        if (!extraGear.Contains(gearCard))
-        {
-            extraGear.Add(gearCard);
-        }
-    }
-    
-    // Helper method to remove gear from tackle box
-    public void RemoveFromTackleBox(GearCard gearCard)
-    {
-        extraGear.Remove(gearCard);
     }
 }

@@ -28,8 +28,6 @@ public class InventoryDisplay : MonoBehaviour
     public float cardSpacing = 10f;
     
     private List<GameObject> displayedCards = new List<GameObject>();
-    private bool isDragging = false;
-    private GridLayoutGroup tackleBoxGrid;
     
     void Start()
     {
@@ -38,32 +36,13 @@ public class InventoryDisplay : MonoBehaviour
             CreateCardDisplayPrefab();
         }
         
-        // Get reference to the grid layout group
-        if (tackleBoxPanel != null)
+        // Use the persistent PlayerInventory if available
+        if (PlayerInventory.Instance != null)
         {
-            tackleBoxGrid = tackleBoxPanel.GetComponent<GridLayoutGroup>();
-        }
-        
-        // Clean up any null entries that might exist
-        if (playerInventory != null)
-        {
-            playerInventory.CleanupNullEntries();
+            playerInventory = PlayerInventory.Instance;
         }
         
         UpdateDisplay();
-    }
-    
-    // Public method to notify when dragging starts/stops
-    public void SetDragging(bool dragging)
-    {
-        isDragging = dragging;
-        
-        // Disable/enable grid layout during dragging
-        if (tackleBoxGrid != null)
-        {
-            tackleBoxGrid.enabled = !dragging;
-            Debug.Log($"Grid Layout Group enabled: {!dragging}");
-        }
     }
     
     void CreateCardDisplayPrefab()
@@ -123,9 +102,6 @@ public class InventoryDisplay : MonoBehaviour
     
     public void UpdateDisplay()
     {
-        // Don't update display while dragging to preserve placeholders
-        if (isDragging) return;
-        
         // Clear existing displayed cards
         ClearDisplay();
         
@@ -134,8 +110,11 @@ public class InventoryDisplay : MonoBehaviour
         // Display equipped gear
         DisplayEquippedGear();
         
-        // Display tackle box gear
-        DisplayTackleBoxGear();
+        // Display tackle box gear (only if panel exists)
+        if (tackleBoxPanel != null)
+        {
+            DisplayTackleBoxGear();
+        }
         
         // Display action cards
         DisplayActionCards();
@@ -180,24 +159,14 @@ public class InventoryDisplay : MonoBehaviour
     
     void DisplayTackleBoxGear()
     {
+        Debug.Log($"DisplayTackleBoxGear called. Extra gear count: {playerInventory.extraGear.Count}");
+        
         Vector2 position = new Vector2(10, -10); // Start from top-left
         
-        // Display tackle box gear, including null placeholders
-        for (int i = 0; i < playerInventory.extraGear.Count; i++)
+        foreach (GearCard gear in playerInventory.extraGear)
         {
-            GearCard gear = playerInventory.extraGear[i];
-            
-            if (gear == null)
-            {
-                // Create empty placeholder slot
-                CreatePlaceholderSlot(position);
-            }
-            else
-            {
-                // Create normal gear card
-                CreateCardDisplay(gear, null, null, tackleBoxPanel, position, true);
-            }
-            
+            Debug.Log($"Displaying gear in tackle box: {gear.gearName}");
+            CreateCardDisplay(gear, null, null, tackleBoxPanel, position, true); // Use grid positioning
             position.x += cardWidth + cardSpacing;
             
             // Wrap to next row if needed
@@ -207,27 +176,6 @@ public class InventoryDisplay : MonoBehaviour
                 position.y -= cardHeight + cardSpacing;
             }
         }
-    }
-    
-    void CreatePlaceholderSlot(Vector2 position)
-    {
-        // Create an empty slot to hold the space
-        GameObject placeholderObj = new GameObject("PlaceholderSlot");
-        placeholderObj.transform.SetParent(tackleBoxPanel, false);
-        
-        // Add RectTransform and Image for visual feedback
-        RectTransform placeholderRect = placeholderObj.AddComponent<RectTransform>();
-        placeholderRect.sizeDelta = new Vector2(cardWidth, cardHeight);
-        placeholderRect.anchorMin = new Vector2(0, 1);
-        placeholderRect.anchorMax = new Vector2(0, 1);
-        placeholderRect.pivot = new Vector2(0, 1);
-        placeholderRect.anchoredPosition = position;
-        
-        Image placeholderImage = placeholderObj.AddComponent<Image>();
-        placeholderImage.color = new Color(0.5f, 0.5f, 0.5f, 0.3f); // Semi-transparent gray
-        
-        // Track for cleanup
-        displayedCards.Add(placeholderObj);
     }
     
     void DisplayActionCards()

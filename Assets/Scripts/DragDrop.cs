@@ -17,7 +17,6 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     private Vector2 originalPosition;
     private Transform originalParent;
     private InventoryDisplay inventoryDisplay;
-    private bool draggedFromInventory = false;
     
     void Awake()
     {
@@ -54,21 +53,6 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         originalPosition = rectTransform.anchoredPosition;
         originalParent = transform.parent;
         
-        // Check if we're dragging from the inventory grid
-        draggedFromInventory = IsInInventoryGrid();
-        
-        // Notify inventory display that dragging started
-        if (inventoryDisplay != null)
-        {
-            inventoryDisplay.SetDragging(true);
-        }
-        
-        // If dragging from inventory, create a placeholder
-        if (draggedFromInventory && inventoryDisplay.playerInventory != null)
-        {
-            inventoryDisplay.playerInventory.CreatePlaceholder(gearCard);
-        }
-        
         // Make the card semi-transparent while dragging
         canvasGroup.alpha = 0.6f;
         canvasGroup.blocksRaycasts = false;
@@ -76,7 +60,7 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         // Move to top of hierarchy so it renders on top
         transform.SetParent(canvas.transform, true);
         
-        Debug.Log($"Started dragging {gearCard.gearName} (from inventory: {draggedFromInventory})");
+        Debug.Log($"Started dragging {gearCard.gearName}");
     }
     
     public void OnDrag(PointerEventData eventData)
@@ -101,14 +85,14 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         if (dropZone != null && dropZone.CanAcceptCard(gearCard))
         {
             // Valid drop - handle the gear movement
-            HandleValidDrop(dropZone);
-            Debug.Log($"Valid drop: {gearCard.gearName} on {dropZone.zoneName}");
+            HandleGearMove(dropZone);
+            Debug.Log($"Dropped {gearCard.gearName} on {dropZone.zoneName}");
         }
         else
         {
-            // Invalid drop - restore everything
-            HandleInvalidDrop();
-            Debug.Log($"Invalid drop for {gearCard.gearName}, restoring to original position");
+            // Invalid drop - return to original position
+            ReturnToOriginalPosition();
+            Debug.Log($"Invalid drop for {gearCard.gearName}, returning to original position");
         }
         
         // Refresh the inventory display after a short delay
@@ -121,146 +105,7 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     System.Collections.IEnumerator RefreshAfterDrop()
     {
         yield return new WaitForEndOfFrame();
-        
-        // Notify inventory display that dragging ended
-        if (inventoryDisplay != null)
-        {
-            inventoryDisplay.SetDragging(false);
-        }
-        
         inventoryDisplay.RefreshDisplay();
-        
-        // Update the gear comparison totals if it exists
-        GearComparisonDisplay comparisonDisplay = FindFirstObjectByType<GearComparisonDisplay>();
-        if (comparisonDisplay != null)
-        {
-            comparisonDisplay.UpdateTotalEquippedDisplay();
-        }
-    }
-    
-    void HandleValidDrop(DropZone dropZone)
-    {
-        PlayerInventory inventory = inventoryDisplay.playerInventory;
-        
-        if (dropZone.zoneType == DropZone.DropZoneType.TackleBox)
-        {
-            // Dropping into tackle box
-            if (draggedFromInventory)
-            {
-                // Moving within inventory - commit the placeholder removal
-                inventory.CommitPlaceholderRemoval();
-                inventory.AddToTackleBox(gearCard);
-            }
-            else
-            {
-                // Moving from equipped to inventory
-                RemoveFromEquippedSlots();
-                inventory.AddToTackleBox(gearCard);
-            }
-        }
-        else
-        {
-            // Dropping into an equipped slot
-            GearCard previouslyEquipped = GetCurrentlyEquippedGear(dropZone);
-            
-            // Remove from current location first
-            if (draggedFromInventory)
-            {
-                // Don't commit placeholder removal yet - we might need the spot for swapping
-                inventory.extraGear.Remove(gearCard); // Remove without affecting placeholder
-            }
-            else
-            {
-                RemoveFromEquippedSlots();
-            }
-            
-            // Equip the new gear
-            EquipGear(dropZone, gearCard);
-            
-            // Handle the previously equipped gear
-            if (previouslyEquipped != null)
-            {
-                if (draggedFromInventory && inventory.HasActivePlaceholder())
-                {
-                    // Put the previously equipped gear in the placeholder spot
-                    Debug.Log($"Swapping: {previouslyEquipped.gearName} goes to placeholder position");
-                    inventory.AddGearAtPlaceholderPosition(previouslyEquipped);
-                }
-                else
-                {
-                    // Add to end of inventory
-                    inventory.AddToTackleBox(previouslyEquipped);
-                }
-            }
-            else if (draggedFromInventory && inventory.HasActivePlaceholder())
-            {
-                // No swap happened, just commit the placeholder removal
-                inventory.CommitPlaceholderRemoval();
-            }
-        }
-        
-        // Return to original parent temporarily for positioning
-        transform.SetParent(originalParent, true);
-    }
-    
-    void HandleInvalidDrop()
-    {
-        PlayerInventory inventory = inventoryDisplay.playerInventory;
-        
-        // If we had a placeholder, restore it
-        if (draggedFromInventory && inventory.HasActivePlaceholder())
-        {
-            inventory.RestorePlaceholder();
-        }
-        
-        // Return to original position
-        ReturnToOriginalPosition();
-    }
-    
-    bool IsInInventoryGrid()
-    {
-        // Check if our parent is the RightPanel (inventory grid)
-        Transform checkParent = originalParent;
-        while (checkParent != null)
-        {
-            if (checkParent.name == "RightPanel")
-                return true;
-            checkParent = checkParent.parent;
-        }
-        return false;
-    }
-    
-    GearCard GetCurrentlyEquippedGear(DropZone dropZone)
-    {
-        PlayerInventory inventory = inventoryDisplay.playerInventory;
-        
-        switch (dropZone.zoneType)
-        {
-            case DropZone.DropZoneType.EquippedRod: return inventory.equippedRod;
-            case DropZone.DropZoneType.EquippedReel: return inventory.equippedReel;
-            case DropZone.DropZoneType.EquippedLine: return inventory.equippedLine;
-            case DropZone.DropZoneType.EquippedLure: return inventory.equippedLure;
-            case DropZone.DropZoneType.EquippedBait: return inventory.equippedBait;
-            case DropZone.DropZoneType.EquippedExtra1: return inventory.equippedExtra1;
-            case DropZone.DropZoneType.EquippedExtra2: return inventory.equippedExtra2;
-            default: return null;
-        }
-    }
-    
-    void EquipGear(DropZone dropZone, GearCard gear)
-    {
-        PlayerInventory inventory = inventoryDisplay.playerInventory;
-        
-        switch (dropZone.zoneType)
-        {
-            case DropZone.DropZoneType.EquippedRod: inventory.equippedRod = gear; break;
-            case DropZone.DropZoneType.EquippedReel: inventory.equippedReel = gear; break;
-            case DropZone.DropZoneType.EquippedLine: inventory.equippedLine = gear; break;
-            case DropZone.DropZoneType.EquippedLure: inventory.equippedLure = gear; break;
-            case DropZone.DropZoneType.EquippedBait: inventory.equippedBait = gear; break;
-            case DropZone.DropZoneType.EquippedExtra1: inventory.equippedExtra1 = gear; break;
-            case DropZone.DropZoneType.EquippedExtra2: inventory.equippedExtra2 = gear; break;
-        }
     }
     
     DropZone GetDropZone(PointerEventData eventData)
@@ -281,7 +126,21 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         return null;
     }
     
-    void RemoveFromEquippedSlots()
+    void HandleGearMove(DropZone dropZone)
+    {
+        PlayerInventory inventory = inventoryDisplay.playerInventory;
+        
+        // Remove from current location
+        RemoveFromCurrentLocation();
+        
+        // Add to new location
+        dropZone.AcceptCard(gearCard);
+        
+        // Return to original parent temporarily to fix positioning
+        transform.SetParent(originalParent, true);
+    }
+    
+    void RemoveFromCurrentLocation()
     {
         PlayerInventory inventory = inventoryDisplay.playerInventory;
         
@@ -293,6 +152,12 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         else if (inventory.equippedBait == gearCard) inventory.equippedBait = null;
         else if (inventory.equippedExtra1 == gearCard) inventory.equippedExtra1 = null;
         else if (inventory.equippedExtra2 == gearCard) inventory.equippedExtra2 = null;
+        
+        // Check tackle box (if it still exists in the inventory)
+        else if (inventory.extraGear.Contains(gearCard))
+        {
+            inventory.extraGear.Remove(gearCard);
+        }
     }
     
     void ReturnToOriginalPosition()
