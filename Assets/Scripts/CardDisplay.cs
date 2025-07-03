@@ -1,16 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 using TMPro;
 
-public class CardDisplay : MonoBehaviour, IPointerClickHandler
+public class CardDisplay : MonoBehaviour
 {
     [Header("UI References")]
     public TextMeshProUGUI cardNameText;
     public TextMeshProUGUI cardTypeText;
     public TextMeshProUGUI statsText;
-    public TextMeshProUGUI powerText;      // Separate field for power
-    public TextMeshProUGUI durabilityText; // Separate field for durability
+    public TextMeshProUGUI powerText;      // For gear: power, For actions: player effect
+    public TextMeshProUGUI durabilityText; // For gear: durability, For actions: fish effect
     public Image cardBackground;
     public Image cardArtwork;
     
@@ -19,18 +18,9 @@ public class CardDisplay : MonoBehaviour, IPointerClickHandler
     public FishCard fishCard;
     public ActionCard actionCard;
     
-    [Header("Comparison System")]
-    public static GearComparisonDisplay gearComparison;
-    
     void Start()
     {
         DisplayCard();
-        
-        // Find the comparison system if not set
-        if (gearComparison == null)
-        {
-            gearComparison = FindFirstObjectByType<GearComparisonDisplay>();
-        }
     }
     
     // This will update the display whenever we change the card in the inspector
@@ -57,6 +47,7 @@ public class CardDisplay : MonoBehaviour, IPointerClickHandler
         }
         else if (actionCard != null)
         {
+            Debug.Log("Displaying action card: " + actionCard.actionName);
             DisplayActionCard();
         }
         else
@@ -107,22 +98,23 @@ public class CardDisplay : MonoBehaviour, IPointerClickHandler
         if (cardNameText != null) cardNameText.text = actionCard.actionName;
         if (cardTypeText != null) cardTypeText.text = "Action";
         
-        string stats = $"Player Effect: {actionCard.playerEffect}\n";
-        stats += $"Fish Effect: {actionCard.fishEffect}\n";
-        stats += $"Description: {actionCard.description}";
-        
-        if (statsText != null) statsText.text = stats;
-        if (cardArtwork != null) cardArtwork.sprite = actionCard.actionImage;
-    }
-    
-    // Handle clicks on the card
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        // Only handle gear card clicks for now
-        if (gearCard != null && gearComparison != null)
+        // Use the separate fields for action card effects
+        if (powerText != null) 
         {
-            Debug.Log($"Clicked on {gearCard.gearName}");
-            gearComparison.ShowGearComparison(gearCard);
+            powerText.text = $"{actionCard.playerEffect:+0;-#;0}";
         }
+        
+        if (durabilityText != null) 
+        {
+            durabilityText.text = $"{actionCard.fishEffect:+0;-#;0}";
+        }
+        
+        // Use statsText for description
+        if (statsText != null) 
+        {
+            statsText.text = actionCard.description;
+        }
+        
+        if (cardArtwork != null) cardArtwork.sprite = actionCard.actionImage;
     }
 }

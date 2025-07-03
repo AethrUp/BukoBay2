@@ -3760,6 +3760,7 @@ MonoBehaviour:
   lurePanel: {fileID: 1370739150}
   baitPanel: {fileID: 1613562621}
   cardDisplayPrefab: {fileID: 6458836799170135447, guid: 12550df5a68506c42a60feb337592931, type: 3}
+  actionCardDisplayPrefab: {fileID: 0}
   playerInventory: {fileID: 0}
   cardWidth: 120
   cardHeight: 120

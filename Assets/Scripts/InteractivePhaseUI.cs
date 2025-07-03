@@ -211,8 +211,7 @@ public class InteractivePhaseUI : MonoBehaviour
         }
     }
     
-    void UpdateInteractiveUI()
-    {
+    public void UpdateInteractiveUI()    {
         if (fishingManager == null) return;
         
         // Update round display
