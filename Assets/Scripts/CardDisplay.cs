@@ -10,6 +10,8 @@ public class CardDisplay : MonoBehaviour
     public TextMeshProUGUI statsText;
     public TextMeshProUGUI powerText;      // For gear: power, For actions: player effect
     public TextMeshProUGUI durabilityText; // For gear: durability, For actions: fish effect
+    public TextMeshProUGUI priceText;      // For shop items: price
+    public TextMeshProUGUI quantityText;   // For shop items: quantity
     public Image cardBackground;
     public Image cardArtwork;
     
@@ -17,6 +19,11 @@ public class CardDisplay : MonoBehaviour
     public GearCard gearCard;
     public FishCard fishCard;
     public ActionCard actionCard;
+    
+    [Header("Shop Data")]
+    public int itemPrice = 0;
+    public int itemQuantity = 0;
+    public bool isShopItem = false;
     
     void Start()
     {
@@ -53,6 +60,37 @@ public class CardDisplay : MonoBehaviour
         else
         {
             Debug.Log("No card assigned");
+        }
+        
+        // Display shop information if this is a shop item
+        if (isShopItem)
+        {
+            DisplayShopInfo();
+        }
+    }
+    
+    void DisplayShopInfo()
+    {
+        Debug.Log($"DisplayShopInfo called - isShopItem: {isShopItem}, price: {itemPrice}, quantity: {itemQuantity}");
+        
+        if (priceText != null)
+        {
+            priceText.text = $"${itemPrice}";
+            Debug.Log($"Set price text to: ${itemPrice}");
+        }
+        else
+        {
+            Debug.Log("PriceText is null!");
+        }
+        
+        if (quantityText != null)
+        {
+            quantityText.text = $"Qty: {itemQuantity}";
+            Debug.Log($"Set quantity text to: Qty: {itemQuantity}");
+        }
+        else
+        {
+            Debug.Log("QuantityText is null!");
         }
     }
     

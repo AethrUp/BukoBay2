@@ -389,8 +389,8 @@ public class InventoryDisplay : MonoBehaviour
         cardDisplay.fishCard = fishCard;
         cardDisplay.actionCard = actionCard;
         
-        // Add drag and drop functionality for gear cards only
-        if (gearCard != null)
+        // Add drag and drop functionality for both gear cards and action cards
+        if (gearCard != null || actionCard != null)
         {
             CardDragDrop dragDrop = cardObj.GetComponent<CardDragDrop>();
             if (dragDrop == null)
@@ -399,6 +399,7 @@ public class InventoryDisplay : MonoBehaviour
             }
             
             dragDrop.gearCard = gearCard;
+            dragDrop.actionCard = actionCard;  // Set action card reference too
             dragDrop.canvas = GetComponentInParent<Canvas>();
             dragDrop.raycaster = dragDrop.canvas.GetComponent<GraphicRaycaster>();
         }

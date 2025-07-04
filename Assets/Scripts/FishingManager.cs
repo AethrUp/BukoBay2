@@ -32,13 +32,33 @@ public class FishingManager : MonoBehaviour
     public int totalPlayerBuffs = 0;
     public int totalFishBuffs = 0;
     public List<string> appliedEffects = new List<string>();
+
+    [Header("Battle State")]
+    public bool battleEnded = false;
     
     [Header("UI References")]
     public InteractivePhaseUI interactiveUI;
-    
+
     void Start()
     {
+         Debug.Log("FishingManager Start() called");
+
         LoadAllFishCards();
+        // Debug: Check what PlayerInventory objects exist
+PlayerInventory[] allInventories = FindObjectsByType<PlayerInventory>(FindObjectsSortMode.None);
+Debug.Log($"Found {allInventories.Length} PlayerInventory objects in scene");
+Debug.Log($"PlayerInventory.Instance = {(PlayerInventory.Instance != null ? PlayerInventory.Instance.name : "NULL")}");
+        
+        // Find the persistent PlayerInventory if not assigned
+        if (currentPlayer == null)
+        {
+            currentPlayer = FindFirstObjectByType<PlayerInventory>();
+            if (currentPlayer == null && PlayerInventory.Instance != null)
+            {
+                currentPlayer = PlayerInventory.Instance;
+            }
+            Debug.Log($"FishingManager found PlayerInventory: {(currentPlayer != null ? currentPlayer.name : "NOT FOUND")}");
+        }
     }
     
     void LoadAllFishCards()
@@ -67,6 +87,8 @@ public class FishingManager : MonoBehaviour
     
     public void SetupFishing()
     {
+        currentPlayer = FindFirstObjectByType<PlayerInventory>();
+
         if (currentPlayer == null) return;
         
         // Count equipped gear pieces
@@ -157,6 +179,8 @@ public class FishingManager : MonoBehaviour
     
     void StartRoundBasedBattle()
     {
+        battleEnded = false; // Reset for new battle
+
         Debug.Log($"=== ROUND-BASED BATTLE STARTED ===");
         Debug.Log($"Fighting {currentFish.fishName} (Power: {currentFish.power})");
         
@@ -326,10 +350,13 @@ public class FishingManager : MonoBehaviour
     // Make these public so UI can access them
     public int CalculatePlayerPower()
     {
+        Debug.Log($"CalculatePlayerPower called. currentPlayer = {(currentPlayer != null ? currentPlayer.name : "NULL")}");
         if (currentPlayer == null || currentFish == null) return 0;
         
         // Start with base gear power
         int basePower = currentPlayer.GetTotalPower();
+
+        Debug.Log($"GetTotalPower() returned: {basePower}");
         
         // Apply material bonuses/penalties from fish
         int materialModifier = CalculateMaterialModifier();
@@ -441,6 +468,8 @@ public class FishingManager : MonoBehaviour
     
     void UpdateStaminaDrain()
     {
+         if (battleEnded) return; // Don't continue if battle already ended
+
         // Calculate how much time has passed since last update
         float deltaTime = Time.time - lastStaminaUpdate;
         
@@ -491,38 +520,141 @@ public class FishingManager : MonoBehaviour
             lastStaminaUpdate = Time.time;
         }
     }
-    
+
     // Remove the old Update method that handled timer
     // void Update() - REMOVED
-    
+
     void HandleSuccess()
+{
+    if (battleEnded) return; // Prevent multiple calls
+
+    battleEnded = true; // Mark battle as ended
+    Debug.Log($"SUCCESS! Player catches {currentFish.fishName}!");
+    Debug.Log($"Received {currentFish.coins} coins!");
+    
+    // Add coins to player inventory
+    if (currentPlayer != null)
     {
-        Debug.Log($"SUCCESS! Player catches {currentFish.fishName}!");
-        Debug.Log($"Received {currentFish.coins} coins!");
-        
-        // Hide UI
-        if (interactiveUI != null)
-        {
-            interactiveUI.OnInteractivePhaseEnd();
-        }
-        
-        // TODO: Add coins to player inventory
-        // TODO: Distribute rewards to helpers
+        currentPlayer.AddCoins(currentFish.coins);
     }
     
-    void HandleFailure()
+    // Hide UI
+    if (interactiveUI != null)
     {
-        Debug.Log($"FAILURE! Player fails to catch {currentFish.fishName}!");
-        Debug.Log("Gear takes damage...");
+        interactiveUI.OnInteractivePhaseEnd();
+    }
+    
+    // Reset fishing state
+    isInteractionPhase = false;
+    currentFish = null;
+    
+    Debug.Log("Fishing phase ended successfully!");
+}
+    
+    void HandleFailure()
+{
+    if (battleEnded) return; // Prevent multiple calls
+    battleEnded = true; // Mark battle as ended
+    
+    Debug.Log($"FAILURE! Player fails to catch {currentFish.fishName}!");
+    Debug.Log("Gear takes damage...");
+    
+    // Apply gear damage based on fish's damage values
+    if (currentPlayer != null && currentFish != null)
+    {
+        ApplyGearDamage();
         
-        // Hide UI
-        if (interactiveUI != null)
+        // Refresh the inventory display to show updated durability
+        InventoryDisplay inventoryDisplay = FindFirstObjectByType<InventoryDisplay>();
+        if (inventoryDisplay != null)
         {
-            interactiveUI.OnInteractivePhaseEnd();
+            inventoryDisplay.RefreshDisplay();
+            Debug.Log("Refreshed inventory display to show gear damage");
+        }
+    }
+    
+    // Hide UI
+    if (interactiveUI != null)
+    {
+        interactiveUI.OnInteractivePhaseEnd();
+    }
+    
+    // Reset fishing state
+    isInteractionPhase = false;
+    currentFish = null;
+    
+    Debug.Log("Fishing phase ended in failure!");
+}
+    
+    void ApplyGearDamage()
+    {
+        Debug.Log("=== APPLYING GEAR DAMAGE ===");
+        
+        // Get all equipped gear pieces in order
+        List<GearCard> equippedGear = GetAllEquippedGear();
+        
+        if (equippedGear.Count == 0)
+        {
+            Debug.Log("No gear equipped to damage!");
+            return;
         }
         
-        // TODO: Apply gear damage
-        // TODO: Distribute rewards to opponents
+        Debug.Log($"Player has {equippedGear.Count} gear pieces equipped");
+        
+        // Apply damage based on fish's gear damage values
+        int[] fishDamageValues = {
+            currentFish.gear1Damage,
+            currentFish.gear2Damage,
+            currentFish.gear3Damage,
+            currentFish.gear4Damage,
+            currentFish.gear5Damage
+        };
+        
+        // Apply damage to each gear piece in order
+        for (int i = 0; i < equippedGear.Count && i < fishDamageValues.Length; i++)
+        {
+            int damageAmount = fishDamageValues[i];
+            
+            if (damageAmount > 0)
+            {
+                GearCard targetGear = equippedGear[i];
+                DamageGearPiece(targetGear, damageAmount);
+            }
+            else
+            {
+                Debug.Log($"Gear slot {i + 1}: No damage (0 damage)");
+            }
+        }
+        
+        Debug.Log("=== GEAR DAMAGE COMPLETE ===");
+    }
+    
+    List<GearCard> GetAllEquippedGear()
+    {
+        List<GearCard> gearList = new List<GearCard>();
+        
+        if (currentPlayer.equippedRod != null) gearList.Add(currentPlayer.equippedRod);
+        if (currentPlayer.equippedReel != null) gearList.Add(currentPlayer.equippedReel);
+        if (currentPlayer.equippedLine != null) gearList.Add(currentPlayer.equippedLine);
+        if (currentPlayer.equippedLure != null) gearList.Add(currentPlayer.equippedLure);
+        if (currentPlayer.equippedBait != null) gearList.Add(currentPlayer.equippedBait);
+        if (currentPlayer.equippedExtra1 != null) gearList.Add(currentPlayer.equippedExtra1);
+        if (currentPlayer.equippedExtra2 != null) gearList.Add(currentPlayer.equippedExtra2);
+        
+        return gearList;
+    }
+    
+    void DamageGearPiece(GearCard gear, int damageAmount)
+    {
+        int originalDurability = gear.durability;
+        gear.durability = Mathf.Max(0, gear.durability - damageAmount);
+        
+        Debug.Log($"Damaged {gear.gearName}: {originalDurability} → {gear.durability} durability (-{damageAmount})");
+        
+        if (gear.durability <= 0)
+        {
+            Debug.Log($"⚠️ {gear.gearName} is BROKEN! (0 durability)");
+        }
     }
     
     // Public function to play action cards during interactive phase

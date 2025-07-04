@@ -16,6 +16,9 @@ public class PlayerInventory : MonoBehaviour
     public List<GearCard> extraGear = new List<GearCard>();
     public List<ActionCard> actionCards = new List<ActionCard>();
     
+    [Header("Currency")]
+    public int coins = 0;
+    
     // Static instance to persist across scenes
     public static PlayerInventory Instance;
     
@@ -51,6 +54,7 @@ public class PlayerInventory : MonoBehaviour
     public int GetTotalPower()
     {
         int totalPower = 0;
+        Debug.Log($"Calculating total power...");
         
         if (equippedRod != null) totalPower += equippedRod.power;
         if (equippedReel != null) totalPower += equippedReel.power;
@@ -60,6 +64,14 @@ public class PlayerInventory : MonoBehaviour
         if (equippedExtra1 != null) totalPower += equippedExtra1.power;
         if (equippedExtra2 != null) totalPower += equippedExtra2.power;
         
+        Debug.Log($"Total power calculated: {totalPower}");
         return totalPower;
+    }
+    
+    // Function to add coins
+    public void AddCoins(int amount)
+    {
+        coins += amount;
+        Debug.Log($"Player received {amount} coins! Total: {coins}");
     }
 }

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Rattler Venom
   m_EditorClassIdentifier: 
   actionName: Rattler Venom
+  actionImage: {fileID: -8773278719102169616, guid: c8100aa3dbd65ce459b7dbbe0c6203d4, type: 3}
   playerEffect: 0
   fishEffect: -3
   canTargetPlayer: 0
