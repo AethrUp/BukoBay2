@@ -23,41 +23,40 @@ public class PurchaseDropZone : MonoBehaviour, IDropHandler
         ShopItemData shopData = draggedObject.GetComponent<ShopItemData>();
         if (shopData == null || shopData.shopItem == null)
         {
-            Debug.Log("No shop item data found");
+            Debug.Log("No shop item data found on dragged object");
             return;
         }
         
-        // Check if it's draggable (has CardDragDrop)
-        CardDragDrop dragDrop = draggedObject.GetComponent<CardDragDrop>();
-        if (dragDrop == null)
+        // Check if it has the shop drag component
+        ShopItemDragDrop shopDragDrop = draggedObject.GetComponent<ShopItemDragDrop>();
+        if (shopDragDrop == null)
         {
-            Debug.Log("No CardDragDrop component found");
+            Debug.Log("No ShopItemDragDrop component found");
             return;
         }
         
-        Debug.Log($"Attempting to purchase {shopData.shopItem.itemName}");
+        Debug.Log($"Valid shop item dropped: {shopData.shopItem.itemName}");
         
-        // Try to purchase the item
+        // Add item to cart instead of purchasing immediately
         if (shopManager != null)
         {
-            bool success = shopManager.PurchaseItem(shopData.shopItem, draggedObject);
-            if (!success)
+            bool addedToCart = shopManager.AddToCart(shopData.shopItem, draggedObject);
+            if (!addedToCart)
             {
-                // Return to original position if purchase failed
-                ReturnToOriginalPosition(draggedObject);
+                Debug.Log($"Failed to add {shopData.shopItem.itemName} to cart");
+                // Return the card to its original position using SendMessage
+                draggedObject.SendMessage("ReturnToOriginalPosition", SendMessageOptions.DontRequireReceiver);
+            }
+            else
+            {
+                Debug.Log($"Successfully added {shopData.shopItem.itemName} to cart");
             }
         }
         else
         {
             Debug.LogError("No ShopManager assigned to PurchaseDropZone!");
-            ReturnToOriginalPosition(draggedObject);
+            // Return the card to its original position using SendMessage
+            draggedObject.SendMessage("ReturnToOriginalPosition", SendMessageOptions.DontRequireReceiver);
         }
-    }
-    
-    void ReturnToOriginalPosition(GameObject draggedObject)
-    {
-        // This is a simple return - the CardDragDrop should handle this better
-        // but for now this prevents the item from disappearing
-        Debug.Log("Returning item to original position");
     }
 }

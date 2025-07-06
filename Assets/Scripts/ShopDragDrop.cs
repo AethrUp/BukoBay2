@@ -10,11 +10,14 @@ public class ShopItemDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     [Header("Drag Settings")]
     public Canvas canvas;
     public GraphicRaycaster raycaster;
-    
     private RectTransform rectTransform;
     private CanvasGroup canvasGroup;
     private Vector2 originalPosition;
     private Transform originalParent;
+    private int originalSiblingIndex;
+    
+    // Public property so other scripts can access the original parent
+    public Transform OriginalParent => originalParent;
     
     void Awake()
     {
@@ -71,8 +74,10 @@ public class ShopItemDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         // Store original position and parent
         originalPosition = rectTransform.anchoredPosition;
         originalParent = transform.parent;
+        originalSiblingIndex = transform.GetSiblingIndex();
         
-        Debug.Log($"Stored original position: {originalPosition}, parent: {originalParent.name}");
+        Debug.Log($"Stored original position: {originalPosition}, parent: {originalParent.name}, sibling index: {originalSiblingIndex}");
+        Debug.Log($"Original parent contains '_Stack': {originalParent.name.Contains("_Stack")}");
         
         // Make the card semi-transparent while dragging
         canvasGroup.alpha = 0.6f;
@@ -83,6 +88,7 @@ public class ShopItemDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         {
             transform.SetParent(canvas.transform, true);
             Debug.Log($"Moved to canvas: {canvas.name}");
+            Debug.Log($"After move - current parent: {transform.parent.name}, original parent still: {originalParent.name}");
         }
         else
         {
@@ -118,7 +124,13 @@ public class ShopItemDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (shopItem == null) return;
+        Debug.Log($"OnEndDrag called for {(shopItem != null ? shopItem.itemName : "NULL")}");
+        
+        if (shopItem == null) 
+        {
+            ReturnToOriginalPosition();
+            return;
+        }
         
         // Restore appearance
         canvasGroup.alpha = 1f;
@@ -130,13 +142,40 @@ public class ShopItemDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         if (purchaseZone != null)
         {
             Debug.Log($"Dropped {shopItem.itemName} on purchase zone");
-            purchaseZone.OnDrop(eventData);
+            
+            // The purchase zone will handle the actual purchase
+            // We need to check if the purchase was successful
+            ShopManager shopManager = purchaseZone.shopManager;
+            if (shopManager != null)
+            {
+                Debug.Log($"About to call PurchaseItem with originalParent: {(originalParent != null ? originalParent.name : "NULL")}");
+                
+                // IMPORTANT: Pass the original parent (stack container) to the shop manager
+                bool purchaseSuccessful = shopManager.PurchaseItem(shopItem, gameObject, originalParent);
+                
+                if (purchaseSuccessful)
+                {
+                    Debug.Log($"Purchase successful! Card will be destroyed by ShopManager.");
+                    // Don't return to position - the card will be destroyed
+                    // The ShopManager handles making the next card draggable
+                }
+                else
+                {
+                    Debug.Log($"Purchase failed, returning to original position");
+                    ReturnToOriginalPosition();
+                }
+            }
+            else
+            {
+                Debug.LogError("ShopManager not found on PurchaseDropZone!");
+                ReturnToOriginalPosition();
+            }
         }
         else
         {
             // Invalid drop - return to original position
-            ReturnToOriginalPosition();
             Debug.Log($"Invalid drop for {shopItem.itemName}, returning to original position");
+            ReturnToOriginalPosition();
         }
     }
     
@@ -165,8 +204,31 @@ public class ShopItemDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     
     void ReturnToOriginalPosition()
     {
+        Debug.Log($"Returning {gameObject.name} to original position");
+        
         // Return to original parent and position
-        transform.SetParent(originalParent, true);
-        rectTransform.anchoredPosition = originalPosition;
+        if (originalParent != null)
+        {
+            transform.SetParent(originalParent, true);
+            transform.SetSiblingIndex(originalSiblingIndex); // Restore original order in stack
+            
+            if (rectTransform != null)
+            {
+                rectTransform.anchoredPosition = originalPosition;
+            }
+            
+            // Restore full opacity and interactability
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = 1f;
+                canvasGroup.blocksRaycasts = true;
+            }
+            
+            Debug.Log($"Returned {gameObject.name} to parent {originalParent.name} at position {originalPosition}");
+        }
+        else
+        {
+            Debug.LogError("Original parent is null! Cannot return to position.");
+        }
     }
 }

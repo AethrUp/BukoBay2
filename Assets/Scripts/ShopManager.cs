@@ -11,8 +11,8 @@ public class ShopManager : MonoBehaviour
     public Transform playerInfoPanel;
     
     [Header("Item Display")]
-    public GameObject gearCardPrefab;     // Prefab for displaying gear cards
-    public GameObject actionCardPrefab;   // Prefab for displaying action cards
+    public GameObject gearCardPrefab;
+    public GameObject actionCardPrefab;
     public float itemSpacing = 10f;
     
     [Header("Player Info")]
@@ -25,43 +25,38 @@ public class ShopManager : MonoBehaviour
     
     [Header("Shopping Cart")]
     public List<ShopItem> cartItems = new List<ShopItem>();
+    public List<GameObject> cartItemDisplays = new List<GameObject>();
     public Button checkoutButton;
+    public TextMeshProUGUI cartTotalText;
+    public TextMeshProUGUI cartItemCountText;
     
     void Start()
     {
-        // Find player inventory if not assigned
         if (playerInventory == null)
         {
             playerInventory = FindFirstObjectByType<PlayerInventory>();
         }
         
-        // Set up checkout button
         if (checkoutButton != null)
         {
             checkoutButton.onClick.AddListener(Checkout);
         }
         
-        // Initialize shop
         SetupShop();
         UpdatePlayerInfo();
     }
     
-    void SetupShop()
+  void SetupShop()
     {
         Debug.Log("Setting up shop...");
-        
-        // Load real items from assets
         LoadRealGearItems();
         LoadRealActionItems();
-        
-        // Display items in the shop
         DisplayShopItems();
     }
     
     void LoadRealGearItems()
     {
         #if UNITY_EDITOR
-        // Find all GearCard assets in the project
         string[] gearGuids = UnityEditor.AssetDatabase.FindAssets("t:GearCard");
         
         List<GearCard> allGearCards = new List<GearCard>();
@@ -75,7 +70,6 @@ public class ShopManager : MonoBehaviour
             }
         }
         
-        // Randomly select 8 gear cards for the shop
         List<GearCard> selectedGear = new List<GearCard>();
         while (selectedGear.Count < 8 && allGearCards.Count > 0)
         {
@@ -84,19 +78,17 @@ public class ShopManager : MonoBehaviour
             allGearCards.RemoveAt(randomIndex);
         }
         
-        // Convert to shop items
         foreach (GearCard gear in selectedGear)
         {
             ShopItem shopItem = new ShopItem();
             shopItem.itemName = gear.gearName;
-            shopItem.price = Mathf.RoundToInt(gear.price); // Use the gear's price
-            shopItem.quantity = Random.Range(1, 4); // Random quantity 1-3
+            shopItem.price = Mathf.RoundToInt(gear.price);
+            shopItem.quantity = Random.Range(1, 4);
             shopItem.itemType = ShopItem.ItemType.Gear;
             shopItem.gearCard = gear;
             shopGearItems.Add(shopItem);
         }
         #else
-        // For builds, create fallback test items
         for (int i = 0; i < 8; i++)
         {
             ShopItem gearItem = new ShopItem();
@@ -112,7 +104,6 @@ public class ShopManager : MonoBehaviour
     void LoadRealActionItems()
     {
         #if UNITY_EDITOR
-        // Find all ActionCard assets in the project
         string[] actionGuids = UnityEditor.AssetDatabase.FindAssets("t:ActionCard");
         
         List<ActionCard> allActionCards = new List<ActionCard>();
@@ -126,7 +117,6 @@ public class ShopManager : MonoBehaviour
             }
         }
         
-        // Randomly select 8 action cards for the shop
         List<ActionCard> selectedActions = new List<ActionCard>();
         while (selectedActions.Count < 8 && allActionCards.Count > 0)
         {
@@ -135,19 +125,17 @@ public class ShopManager : MonoBehaviour
             allActionCards.RemoveAt(randomIndex);
         }
         
-        // Convert to shop items
         foreach (ActionCard action in selectedActions)
         {
             ShopItem shopItem = new ShopItem();
             shopItem.itemName = action.actionName;
-            shopItem.price = 25; // Fixed price for action cards, or add price field to ActionCard
-            shopItem.quantity = Random.Range(2, 6); // Random quantity 2-5
+            shopItem.price = 25;
+            shopItem.quantity = Random.Range(2, 6);
             shopItem.itemType = ShopItem.ItemType.Action;
             shopItem.actionCard = action;
             shopActionItems.Add(shopItem);
         }
         #else
-        // For builds, create fallback test items
         for (int i = 0; i < 8; i++)
         {
             ShopItem actionItem = new ShopItem();
@@ -162,17 +150,13 @@ public class ShopManager : MonoBehaviour
     
     void DisplayShopItems()
     {
-        // Clear existing displays
         ClearShopDisplay();
-        
         Vector2 currentPosition = Vector2.zero;
         
-        // Display gear items in a grid
         for (int i = 0; i < shopGearItems.Count; i++)
         {
             CreateShopItemStack(shopGearItems[i], currentPosition);
             
-            // Move to next position (4 items per row)
             if ((i + 1) % 4 == 0)
             {
                 currentPosition.x = 0;
@@ -184,15 +168,13 @@ public class ShopManager : MonoBehaviour
             }
         }
         
-        // Continue with action items
-        currentPosition.y -= 140; // Add space between gear and actions
+        currentPosition.y -= 140;
         currentPosition.x = 0;
         
         for (int i = 0; i < shopActionItems.Count; i++)
         {
             CreateShopItemStack(shopActionItems[i], currentPosition);
             
-            // Move to next position (4 items per row)
             if ((i + 1) % 4 == 0)
             {
                 currentPosition.x = 0;
@@ -207,24 +189,18 @@ public class ShopManager : MonoBehaviour
     
     void CreateShopItemStack(ShopItem item, Vector2 position)
     {
-        Debug.Log($"*** CREATING STACKED SHOP ITEM: {item.itemName} with quantity: {item.quantity} ***");
-        
-        // Create a container for this item's stack
         GameObject stackContainer = new GameObject($"{item.itemName}_Stack");
         stackContainer.transform.SetParent(shopItemsPanel, false);
         
-        // The Grid Layout will position this container
         RectTransform containerRect = stackContainer.AddComponent<RectTransform>();
-        containerRect.sizeDelta = new Vector2(140, 100); // Match grid cell size
+        containerRect.sizeDelta = new Vector2(140, 100);
         
-        // Create multiple card displays based on quantity (max 5 visual cards)
         int cardsToShow = Mathf.Min(item.quantity, 5);
         
         for (int i = 0; i < cardsToShow; i++)
         {
             GameObject cardDisplay = null;
             
-            // Use the appropriate prefab based on item type
             if (item.itemType == ShopItem.ItemType.Gear && gearCardPrefab != null)
             {
                 cardDisplay = Instantiate(gearCardPrefab, stackContainer.transform);
@@ -234,41 +210,34 @@ public class ShopManager : MonoBehaviour
                 cardDisplay = Instantiate(actionCardPrefab, stackContainer.transform);
             }
             
-            if (cardDisplay == null)
-            {
-                Debug.LogError("No prefab assigned for item type: " + item.itemType);
-                return;
-            }
+            if (cardDisplay == null) return;
             
-            // Position each card with slight offset for stacking effect
+            cardDisplay.name = $"{item.itemName}_Card_{i}";
+            
             RectTransform cardRect = cardDisplay.GetComponent<RectTransform>();
-            Vector2 stackOffset = new Vector2(i * 3f, -i * 3f); // Offset each card slightly
+            Vector2 stackOffset = new Vector2(i * 3f, -i * 3f);
             cardRect.anchoredPosition = stackOffset;
             cardRect.anchorMin = Vector2.zero;
             cardRect.anchorMax = Vector2.zero;
             cardRect.pivot = Vector2.zero;
             
-            // Set up the card display data
-            SetupCardDisplay(cardDisplay, item, i == cardsToShow - 1); // Only top card is draggable
+            bool isTopCard = (i == cardsToShow - 1);
             
-            // Add shadow effect to cards behind the top one
-            if (i < cardsToShow - 1)
+            SetupCardDisplay(cardDisplay, item, isTopCard);
+            
+            if (!isTopCard)
             {
                 AddShadowEffect(cardDisplay);
                 MakeCardNonInteractable(cardDisplay);
             }
-            
-            Debug.Log($"Created card {i + 1} of {cardsToShow} for {item.itemName} at offset {stackOffset}");
         }
     }
     
     void SetupCardDisplay(GameObject cardDisplay, ShopItem item, bool isDraggable)
     {
-        // Get the CardDisplay component and set the card data
         CardDisplay cardDisplayComponent = cardDisplay.GetComponent<CardDisplay>();
         if (cardDisplayComponent != null)
         {
-            // Set the appropriate card based on item type
             if (item.itemType == ShopItem.ItemType.Gear)
             {
                 cardDisplayComponent.gearCard = item.gearCard;
@@ -282,16 +251,13 @@ public class ShopManager : MonoBehaviour
                 cardDisplayComponent.actionCard = item.actionCard;
             }
             
-            // Set shop-specific data
             cardDisplayComponent.isShopItem = true;
             cardDisplayComponent.itemPrice = item.price;
             cardDisplayComponent.itemQuantity = item.quantity;
             
-            // Force the card to display
             cardDisplayComponent.SendMessage("DisplayCard", SendMessageOptions.DontRequireReceiver);
         }
         
-        // Only add drag functionality to the top card
         if (isDraggable)
         {
             SetupDragFunctionality(cardDisplay, item);
@@ -300,52 +266,51 @@ public class ShopManager : MonoBehaviour
     
     void SetupDragFunctionality(GameObject cardDisplay, ShopItem item)
     {
-        // Store the shop item data FIRST
         ShopItemData shopData = cardDisplay.GetComponent<ShopItemData>();
         if (shopData == null)
             shopData = cardDisplay.AddComponent<ShopItemData>();
         shopData.shopItem = item;
         
-        // Remove any existing CardDragDrop component (from inventory prefabs)
-        CardDragDrop existingDragDrop = cardDisplay.GetComponent<CardDragDrop>();
-        if (existingDragDrop != null)
+        CardDragDrop existingCardDrag = cardDisplay.GetComponent<CardDragDrop>();
+        if (existingCardDrag != null)
         {
-            DestroyImmediate(existingDragDrop);
+            DestroyImmediate(existingCardDrag);
         }
         
-        // Add shop-specific drag and drop functionality
-        ShopItemDragDrop shopDragDrop = cardDisplay.GetComponent<ShopItemDragDrop>();
-        if (shopDragDrop == null)
-            shopDragDrop = cardDisplay.AddComponent<ShopItemDragDrop>();
+        ShopItemDragDrop existingShopDrag = cardDisplay.GetComponent<ShopItemDragDrop>();
+        if (existingShopDrag != null)
+        {
+            DestroyImmediate(existingShopDrag);
+        }
         
-        // Manually set the shop item reference
+        ShopItemDragDrop shopDragDrop = cardDisplay.AddComponent<ShopItemDragDrop>();
         shopDragDrop.shopItem = item;
         
-        // Set up canvas references for dragging
         Canvas parentCanvas = shopItemsPanel.GetComponentInParent<Canvas>();
         if (parentCanvas == null)
         {
             parentCanvas = GetComponentInParent<Canvas>();
         }
         
-        shopDragDrop.canvas = parentCanvas;
-        if (shopDragDrop.canvas != null)
+        if (parentCanvas != null)
         {
-            shopDragDrop.raycaster = shopDragDrop.canvas.GetComponent<GraphicRaycaster>();
+            shopDragDrop.canvas = parentCanvas;
+            shopDragDrop.raycaster = parentCanvas.GetComponent<GraphicRaycaster>();
         }
         
-        // Make sure required components exist
-        if (cardDisplay.GetComponent<CanvasGroup>() == null)
+        CanvasGroup canvasGroup = cardDisplay.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
         {
-            cardDisplay.AddComponent<CanvasGroup>();
+            canvasGroup = cardDisplay.AddComponent<CanvasGroup>();
         }
         
-        Debug.Log($"Shop item will use canvas: {(parentCanvas != null ? parentCanvas.name : "NULL")}");
+        canvasGroup.alpha = 1f;
+        canvasGroup.blocksRaycasts = true;
+        canvasGroup.interactable = true;
     }
     
     void AddShadowEffect(GameObject cardDisplay)
     {
-        // Darken the card to create shadow effect
         Image cardBg = cardDisplay.GetComponent<Image>();
         if (cardBg != null)
         {
@@ -356,11 +321,10 @@ public class ShopManager : MonoBehaviour
             cardBg.color = shadowColor;
         }
         
-        // Also darken any child images
         Image[] childImages = cardDisplay.GetComponentsInChildren<Image>();
         foreach (Image img in childImages)
         {
-            if (img != cardBg) // Don't double-darken the main background
+            if (img != cardBg)
             {
                 Color shadowColor = img.color;
                 shadowColor.r *= 0.8f;
@@ -373,7 +337,6 @@ public class ShopManager : MonoBehaviour
     
     void MakeCardNonInteractable(GameObject cardDisplay)
     {
-        // Remove any interaction components from shadow cards
         CanvasGroup canvasGroup = cardDisplay.GetComponent<CanvasGroup>();
         if (canvasGroup == null)
         {
@@ -384,165 +347,286 @@ public class ShopManager : MonoBehaviour
     
     void ClearShopDisplay()
     {
-        // Clear all child objects from shop items panel
         for (int i = shopItemsPanel.childCount - 1; i >= 0; i--)
         {
             DestroyImmediate(shopItemsPanel.GetChild(i).gameObject);
         }
     }
     
-    public bool PurchaseItem(ShopItem item, GameObject itemDisplay)
+    public bool AddToCart(ShopItem item, GameObject itemDisplay)
     {
-        // Check if item is available
         if (item.quantity <= 0)
         {
             Debug.Log($"{item.itemName} is out of stock!");
             return false;
         }
         
-        // Check if player has enough coins
-        if (playerInventory.coins < item.price)
-        {
-            Debug.Log($"Not enough coins! Need {item.price}, have {playerInventory.coins}");
-            return false;
-        }
+        Debug.Log($"Adding {item.itemName} to cart");
         
-        Debug.Log($"Purchasing {item.itemName} for {item.price} coins");
+        cartItems.Add(item);
+        cartItemDisplays.Add(itemDisplay);
         
-        // Deduct coins
-        playerInventory.coins -= item.price;
+        RemoveTopCardFromStack(item, itemDisplay);
+        MoveCardToCart(itemDisplay);
+        UpdateShoppingCart();
         
-        // Reduce quantity
-        item.quantity--;
-        
-        // Add item to player inventory
-        if (item.itemType == ShopItem.ItemType.Gear && item.gearCard != null)
-        {
-            playerInventory.extraGear.Add(item.gearCard);
-            Debug.Log($"Added {item.gearCard.gearName} to player's gear");
-        }
-        else if (item.itemType == ShopItem.ItemType.Action && item.actionCard != null)
-        {
-            playerInventory.actionCards.Add(item.actionCard);
-            Debug.Log($"Added {item.actionCard.actionName} to player's actions");
-        }
-        
-        // Update player info
-        UpdatePlayerInfo();
-        
-        // Remove just the purchased card (top card) and make the next one draggable
-        RemoveTopCardAndActivateNext(item, itemDisplay);
-        
-        Debug.Log($"Purchase successful! Player now has {playerInventory.coins} coins");
+        Debug.Log($"Successfully added {item.itemName} to cart");
         return true;
     }
     
-    void RemoveTopCardAndActivateNext(ShopItem item, GameObject purchasedCard)
+    void RemoveTopCardFromStack(ShopItem item, GameObject cardDisplay)
     {
-        // Find the stack container for this item
-        Transform stackContainer = purchasedCard.transform.parent;
-        
-        if (stackContainer == null)
+        ShopItemDragDrop dragComponent = cardDisplay.GetComponent<ShopItemDragDrop>();
+        if (dragComponent != null && dragComponent.OriginalParent != null)
         {
-            Debug.LogError("Could not find stack container!");
-            return;
+            Transform stackContainer = dragComponent.OriginalParent;
+            Debug.Log($"Removing card from stack: {stackContainer.name}");
+            
+            StartCoroutine(ActivateNextCardAfterMove(stackContainer, item));
         }
+        else
+        {
+            Debug.LogWarning("Could not find original parent to activate next card");
+        }
+    }
+    
+    System.Collections.IEnumerator ActivateNextCardAfterMove(Transform stackContainer, ShopItem item)
+    {
+        yield return null;
         
-        // Destroy the purchased card (should be the top one)
-        Destroy(purchasedCard);
+        Debug.Log($"Checking for next card in stack: {stackContainer.name}, children: {stackContainer.childCount}");
         
-        // If there are still cards in the stack, make the new top card draggable
         if (stackContainer.childCount > 0)
         {
-            // Find the new top card (highest index, since we stack from 0 up)
-            GameObject newTopCard = null;
-            float highestZ = float.MinValue;
-            
-            for (int i = 0; i < stackContainer.childCount; i++)
-            {
-                Transform child = stackContainer.GetChild(i);
-                if (child.localPosition.z > highestZ)
-                {
-                    highestZ = child.localPosition.z;
-                    newTopCard = child.gameObject;
-                }
-            }
-            
-            // Actually, let's use a simpler approach - the last child should be the top card
-            if (stackContainer.childCount > 0)
-            {
-                newTopCard = stackContainer.GetChild(stackContainer.childCount - 1).gameObject;
-            }
+            GameObject newTopCard = FindTopCard(stackContainer);
             
             if (newTopCard != null)
             {
-                // Remove shadow effect from the new top card
+                Debug.Log($"Found new top card: {newTopCard.name}");
+                
                 RemoveShadowEffect(newTopCard);
+                MakeCardInteractable(newTopCard);
                 
-                // Make it draggable
-                MakeCardDraggable(newTopCard, item);
+                ShopItemDragDrop existingDrag = newTopCard.GetComponent<ShopItemDragDrop>();
+                if (existingDrag != null)
+                {
+                    DestroyImmediate(existingDrag);
+                }
                 
-                Debug.Log($"Made next card draggable for {item.itemName}. Remaining quantity: {item.quantity}");
+                SetupDragFunctionality(newTopCard, item);
+                
+                Debug.Log($"Next card {newTopCard.name} is now draggable");
             }
         }
         else
         {
-            Debug.Log($"No more {item.itemName} cards available - out of stock!");
+            Debug.Log($"No more cards in stack {stackContainer.name}");
         }
+    }
+    
+    void MoveCardToCart(GameObject cardDisplay)
+    {
+        if (shoppingCartPanel != null)
+        {
+            cardDisplay.transform.SetParent(shoppingCartPanel, false);
+            
+            RectTransform cardRect = cardDisplay.GetComponent<RectTransform>();
+            int cardIndex = cartItemDisplays.Count - 1;
+            
+            float cardWidth = 120f;
+            float cardHeight = 80f;
+            float spacing = 10f;
+            
+            int row = cardIndex / 2;
+            int col = cardIndex % 2;
+            
+            Vector2 cartPosition = new Vector2(
+                col * (cardWidth + spacing) + spacing,
+                -(row * (cardHeight + spacing) + spacing)
+            );
+            
+            cardRect.anchorMin = new Vector2(0, 1);
+            cardRect.anchorMax = new Vector2(0, 1);
+            cardRect.pivot = new Vector2(0, 1);
+            cardRect.sizeDelta = new Vector2(cardWidth, cardHeight);
+            cardRect.anchoredPosition = cartPosition;
+            
+            ShopItemDragDrop shopDrag = cardDisplay.GetComponent<ShopItemDragDrop>();
+            if (shopDrag != null) Destroy(shopDrag);
+            
+            CartItemDragDrop cartDrag = cardDisplay.AddComponent<CartItemDragDrop>();
+            Canvas parentCanvas = shoppingCartPanel.GetComponentInParent<Canvas>();
+            if (parentCanvas != null)
+            {
+                cartDrag.canvas = parentCanvas;
+                cartDrag.raycaster = parentCanvas.GetComponent<GraphicRaycaster>();
+            }
+            
+            Debug.Log($"Moved {cardDisplay.name} to cart at position {cartPosition}");
+        }
+        else
+        {
+            Debug.LogError("Shopping cart panel not assigned!");
+        }
+    }
+    
+    public void RemoveFromCart(ShopItem item, GameObject itemDisplay)
+    {
+        Debug.Log($"Removing {item.itemName} from cart");
+        
+        int itemIndex = -1;
+        for (int i = 0; i < cartItems.Count; i++)
+        {
+            if (cartItems[i] == item && cartItemDisplays[i] == itemDisplay)
+            {
+                itemIndex = i;
+                break;
+            }
+        }
+        
+        if (itemIndex >= 0)
+        {
+            cartItems.RemoveAt(itemIndex);
+            cartItemDisplays.RemoveAt(itemIndex);
+            
+            ReturnCardToStack(item, itemDisplay);
+            UpdateShoppingCart();
+            RearrangeCartItems();
+            
+            Debug.Log($"Successfully removed {item.itemName} from cart");
+        }
+        else
+        {
+            Debug.LogWarning($"Could not find {item.itemName} in cart to remove");
+        }
+    }
+    
+    void ReturnCardToStack(ShopItem item, GameObject cardDisplay)
+    {
+        Debug.Log($"Returning {cardDisplay.name} to its original stack");
+        
+        string stackName = $"{item.itemName}_Stack";
+        Transform stackContainer = shopItemsPanel.Find(stackName);
+        
+        if (stackContainer != null)
+        {
+            CartItemDragDrop cartDrag = cardDisplay.GetComponent<CartItemDragDrop>();
+            if (cartDrag != null)
+            {
+                Destroy(cartDrag);
+            }
+            
+            cardDisplay.transform.SetParent(stackContainer, false);
+            
+            int currentStackCount = stackContainer.childCount - 1;
+            Vector2 stackOffset = new Vector2(currentStackCount * 3f, -currentStackCount * 3f);
+            
+            RectTransform cardRect = cardDisplay.GetComponent<RectTransform>();
+            cardRect.anchoredPosition = stackOffset;
+            cardRect.anchorMin = Vector2.zero;
+            cardRect.anchorMax = Vector2.zero;
+            cardRect.pivot = Vector2.zero;
+            cardRect.sizeDelta = new Vector2(140, 100);
+            
+            SetupDragFunctionality(cardDisplay, item);
+            
+            Debug.Log($"Returned {cardDisplay.name} to stack {stackName}");
+        }
+        else
+        {
+            Debug.LogWarning($"Could not find stack container {stackName}");
+            Destroy(cardDisplay);
+        }
+    }
+    
+    void RearrangeCartItems()
+    {
+        for (int i = 0; i < cartItemDisplays.Count; i++)
+        {
+            GameObject cardDisplay = cartItemDisplays[i];
+            if (cardDisplay != null)
+            {
+                RectTransform cardRect = cardDisplay.GetComponent<RectTransform>();
+                
+                float cardWidth = 120f;
+                float cardHeight = 80f;
+                float spacing = 10f;
+                
+                int row = i / 2;
+                int col = i % 2;
+                
+                Vector2 cartPosition = new Vector2(
+                    col * (cardWidth + spacing) + spacing,
+                    -(row * (cardHeight + spacing) + spacing)
+                );
+                
+                cardRect.anchoredPosition = cartPosition;
+            }
+        }
+        
+        Debug.Log($"Rearranged {cartItemDisplays.Count} items in cart");
+    }
+    
+    GameObject FindTopCard(Transform stackContainer)
+    {
+        GameObject topCard = null;
+        float highestX = float.MinValue;
+        
+        for (int i = 0; i < stackContainer.childCount; i++)
+        {
+            Transform child = stackContainer.GetChild(i);
+            RectTransform childRect = child.GetComponent<RectTransform>();
+            if (childRect != null)
+            {
+                float cardX = childRect.anchoredPosition.x;
+                if (cardX > highestX)
+                {
+                    highestX = cardX;
+                    topCard = child.gameObject;
+                }
+            }
+        }
+        
+        return topCard;
+    }
+    
+    void MakeCardInteractable(GameObject cardDisplay)
+    {
+        CanvasGroup canvasGroup = cardDisplay.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = cardDisplay.AddComponent<CanvasGroup>();
+        }
+        canvasGroup.blocksRaycasts = true;
     }
     
     void RemoveShadowEffect(GameObject cardDisplay)
     {
-        // Restore normal colors
         Image cardBg = cardDisplay.GetComponent<Image>();
         if (cardBg != null)
         {
             Color normalColor = cardBg.color;
-            normalColor.r /= 0.7f; // Reverse the darkening
-            normalColor.g /= 0.7f;
-            normalColor.b /= 0.7f;
+            normalColor.r = Mathf.Min(1f, normalColor.r / 0.7f);
+            normalColor.g = Mathf.Min(1f, normalColor.g / 0.7f);
+            normalColor.b = Mathf.Min(1f, normalColor.b / 0.7f);
             cardBg.color = normalColor;
         }
         
-        // Restore child images
         Image[] childImages = cardDisplay.GetComponentsInChildren<Image>();
         foreach (Image img in childImages)
         {
             if (img != cardBg)
             {
                 Color normalColor = img.color;
-                normalColor.r /= 0.8f; // Reverse the darkening
-                normalColor.g /= 0.8f;
-                normalColor.b /= 0.8f;
+                normalColor.r = Mathf.Min(1f, normalColor.r / 0.8f);
+                normalColor.g = Mathf.Min(1f, normalColor.g / 0.8f);
+                normalColor.b = Mathf.Min(1f, normalColor.b / 0.8f);
                 img.color = normalColor;
             }
         }
     }
     
-    void MakeCardDraggable(GameObject cardDisplay, ShopItem item)
-    {
-        // Enable raycast blocking
-        CanvasGroup canvasGroup = cardDisplay.GetComponent<CanvasGroup>();
-        if (canvasGroup != null)
-        {
-            canvasGroup.blocksRaycasts = true;
-        }
-        
-        // Add drag functionality if it doesn't exist
-        ShopItemDragDrop shopDragDrop = cardDisplay.GetComponent<ShopItemDragDrop>();
-        if (shopDragDrop == null)
-        {
-            SetupDragFunctionality(cardDisplay, item);
-        }
-        
-        Debug.Log($"Card is now draggable: {item.itemName}");
-    }
     
-    void UpdateShoppingCart()
-    {
-        // TODO: Display cart items in shopping cart panel
-        Debug.Log($"Cart has {cartItems.Count} items");
-    }
     
     void UpdatePlayerInfo()
     {
@@ -552,27 +636,100 @@ public class ShopManager : MonoBehaviour
         }
     }
     
-    public void Checkout()
+    void UpdateShoppingCart()
     {
+        if (cartItemCountText != null)
+        {
+            cartItemCountText.text = $"Items: {cartItems.Count}";
+        }
+        
         int totalCost = 0;
         foreach (ShopItem item in cartItems)
         {
             totalCost += item.price;
         }
         
-        if (playerInventory.coins >= totalCost)
+        if (cartTotalText != null)
         {
-            // TODO: Add items to player inventory
-            // TODO: Deduct coins
-            Debug.Log($"Checkout successful! Total cost: {totalCost}");
-            cartItems.Clear();
-            UpdateShoppingCart();
-            UpdatePlayerInfo();
+            cartTotalText.text = $"Total: ${totalCost}";
         }
-        else
+        
+        if (checkoutButton != null)
+        {
+            bool canCheckout = cartItems.Count > 0 && playerInventory.coins >= totalCost;
+            checkoutButton.interactable = canCheckout;
+        }
+        
+        Debug.Log($"Cart updated: {cartItems.Count} items, total cost: ${totalCost}");
+    }
+    
+    public void Checkout()
+    {
+        if (cartItems.Count == 0)
+        {
+            Debug.Log("Cart is empty!");
+            return;
+        }
+        
+        int totalCost = 0;
+        foreach (ShopItem item in cartItems)
+        {
+            totalCost += item.price;
+        }
+        
+        if (playerInventory.coins < totalCost)
         {
             Debug.Log($"Not enough coins! Need {totalCost}, have {playerInventory.coins}");
+            return;
         }
+        
+        Debug.Log($"Processing checkout: {cartItems.Count} items for ${totalCost}");
+        
+        playerInventory.coins -= totalCost;
+        
+        foreach (ShopItem item in cartItems)
+        {
+            item.quantity--;
+            
+            if (item.itemType == ShopItem.ItemType.Gear && item.gearCard != null)
+            {
+                playerInventory.extraGear.Add(item.gearCard);
+                Debug.Log($"Added {item.gearCard.gearName} to player's gear");
+            }
+            else if (item.itemType == ShopItem.ItemType.Action && item.actionCard != null)
+            {
+                playerInventory.actionCards.Add(item.actionCard);
+                Debug.Log($"Added {item.actionCard.actionName} to player's actions");
+            }
+        }
+        
+        ClearCart();
+        UpdatePlayerInfo();
+        UpdateShoppingCart();
+        
+        Debug.Log($"Checkout successful! Player now has {playerInventory.coins} coins");
+    }
+    
+    public void ClearCart()
+    {
+        foreach (GameObject cardDisplay in cartItemDisplays)
+        {
+            if (cardDisplay != null)
+            {
+                Destroy(cardDisplay);
+            }
+        }
+        
+        cartItems.Clear();
+        cartItemDisplays.Clear();
+        
+        Debug.Log("Shopping cart cleared");
+    }
+    
+    public bool PurchaseItem(ShopItem item, GameObject itemDisplay, Transform originalStackContainer = null)
+    {
+        Debug.Log($"PurchaseItem called for {item.itemName}, redirecting to AddToCart");
+        return AddToCart(item, itemDisplay);
     }
 }
 
@@ -583,8 +740,8 @@ public class ShopItem
     public int price;
     public int quantity;
     public ItemType itemType;
-    public GearCard gearCard;      // For gear items
-    public ActionCard actionCard;  // For action items
+    public GearCard gearCard;
+    public ActionCard actionCard;
     
     public enum ItemType
     {
