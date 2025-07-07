@@ -39,50 +39,52 @@ public class DepthEffectsDisplay : MonoBehaviour
     }
     
     GameObject CreateDepthBox(int depthNumber)
-    {
-        // Create the box container
-        GameObject boxObj = new GameObject($"DepthBox_{depthNumber}");
-        boxObj.transform.SetParent(transform, false);
-        
-        // Add RectTransform for UI positioning
-        RectTransform boxRect = boxObj.AddComponent<RectTransform>();
-        boxRect.sizeDelta = new Vector2(boxWidth, boxHeight);
-        boxRect.anchorMin = new Vector2(0, 0.5f);
-        boxRect.anchorMax = new Vector2(0, 0.5f);
-        boxRect.pivot = new Vector2(0, 0.5f);
-        
-        // Position the box (left to right)
-        float xPos = (depthNumber - 1) * (boxWidth + spacing);
-        boxRect.anchoredPosition = new Vector2(xPos, 0);
-        
-        // Add background image
-        Image backgroundImage = boxObj.AddComponent<Image>();
-        backgroundImage.color = neutralColor;
-        depthBackgrounds.Add(backgroundImage);
-        
-        // Create text child object
-        GameObject textObj = new GameObject("Text");
-        textObj.transform.SetParent(boxObj.transform, false);
-        
-        // Add text component
-        TextMeshProUGUI textComponent = textObj.AddComponent<TextMeshProUGUI>();
-        textComponent.text = "0";
-        textComponent.fontSize = 16;
-        textComponent.color = textColor;
-        textComponent.alignment = TextAlignmentOptions.Center;
-        textComponent.fontStyle = FontStyles.Bold;
-        
-        // Position text to fill the box
-        RectTransform textRect = textObj.GetComponent<RectTransform>();
-        textRect.anchorMin = Vector2.zero;
-        textRect.anchorMax = Vector2.one;
-        textRect.sizeDelta = Vector2.zero;
-        textRect.anchoredPosition = Vector2.zero;
-        
-        depthTexts.Add(textComponent);
-        
-        return boxObj;
-    }
+{
+    // Create the box container
+    GameObject boxObj = new GameObject($"DepthBox_{depthNumber}");
+    boxObj.transform.SetParent(transform, false);
+    
+    // Add RectTransform for UI positioning
+    RectTransform boxRect = boxObj.AddComponent<RectTransform>();
+    
+    // Set anchors and pivot properly for UI
+    boxRect.anchorMin = new Vector2(0, 0.5f);
+    boxRect.anchorMax = new Vector2(0, 0.5f);
+    boxRect.pivot = new Vector2(0, 0.5f);
+    boxRect.sizeDelta = new Vector2(boxWidth, boxHeight);
+    
+    // Position the box (left to right)
+    float xPos = (depthNumber - 1) * (boxWidth + spacing);
+    boxRect.anchoredPosition = new Vector2(xPos, 0);
+    
+    // Add background image
+    Image backgroundImage = boxObj.AddComponent<Image>();
+    backgroundImage.color = neutralColor;
+    depthBackgrounds.Add(backgroundImage);
+    
+    // Create text child object
+    GameObject textObj = new GameObject("Text");
+    textObj.transform.SetParent(boxObj.transform, false);
+    
+    // Add text component
+    TextMeshProUGUI textComponent = textObj.AddComponent<TextMeshProUGUI>();
+    textComponent.text = "0";
+    textComponent.fontSize = 16;
+    textComponent.color = textColor;
+    textComponent.alignment = TextAlignmentOptions.Center;
+    textComponent.fontStyle = FontStyles.Bold;
+    
+    // Position text to fill the box
+    RectTransform textRect = textObj.GetComponent<RectTransform>();
+    textRect.anchorMin = Vector2.zero;
+    textRect.anchorMax = Vector2.one;
+    textRect.sizeDelta = Vector2.zero;
+    textRect.anchoredPosition = Vector2.zero;
+    
+    depthTexts.Add(textComponent);
+    
+    return boxObj;
+}
     
     public void DisplayGearDepthEffects(GearCard gearCard)
     {
