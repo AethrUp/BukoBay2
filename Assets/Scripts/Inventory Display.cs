@@ -336,80 +336,81 @@ public class InventoryDisplay : MonoBehaviour
     }
     
     void CreateCardDisplay(GearCard gearCard, FishCard fishCard, ActionCard actionCard, Transform parent, Vector2 position, bool useGridPositioning = false)
+{
+    Debug.Log($"CreateCardDisplay called - Gear: {(gearCard?.gearName ?? "NULL")}, Fish: {(fishCard?.fishName ?? "NULL")}, Action: {(actionCard?.actionName ?? "NULL")}, Parent: {(parent?.name ?? "NULL")}");
+    
+    // Skip if no card to display
+    if (gearCard == null && fishCard == null && actionCard == null) 
     {
-        Debug.Log($"CreateCardDisplay called - Gear: {(gearCard?.gearName ?? "NULL")}, Fish: {(fishCard?.fishName ?? "NULL")}, Action: {(actionCard?.actionName ?? "NULL")}, Parent: {(parent?.name ?? "NULL")}");
-        
-        // Skip if no card to display
-        if (gearCard == null && fishCard == null && actionCard == null) 
-        {
-            Debug.Log("Skipping - no card to display");
-            return;
-        }
-        
-        // Choose the right prefab based on card type
-        GameObject prefabToUse;
-        if (actionCard != null)
-        {
-            prefabToUse = actionCardDisplayPrefab;
-        }
-        else
-        {
-            prefabToUse = cardDisplayPrefab;  // Use for gear cards
-        }
-        
-        // Create card display instance
-        GameObject cardObj = Instantiate(prefabToUse, parent);
-        cardObj.SetActive(true);
-        
-        // Ensure proper RectTransform setup for UI parenting
-        RectTransform cardRect = cardObj.GetComponent<RectTransform>();
-        cardRect.sizeDelta = new Vector2(cardWidth, cardHeight);
-        
-        if (useGridPositioning)
-        {
-            // Grid positioning for tackle box (top-left anchoring)
-            cardRect.anchorMin = new Vector2(0, 1);
-            cardRect.anchorMax = new Vector2(0, 1);
-            cardRect.pivot = new Vector2(0, 1);
-        }
-        else
-        {
-            // Center positioning for individual slots
-            cardRect.anchorMin = new Vector2(0.5f, 0.5f);
-            cardRect.anchorMax = new Vector2(0.5f, 0.5f);
-            cardRect.pivot = new Vector2(0.5f, 0.5f);
-        }
-        
-        // Position relative to parent
-        cardRect.anchoredPosition = position;
-        
-        // Set up the card display
-        CardDisplay cardDisplay = cardObj.GetComponent<CardDisplay>();
-        cardDisplay.gearCard = gearCard;
-        cardDisplay.fishCard = fishCard;
-        cardDisplay.actionCard = actionCard;
-        
-        // Add drag and drop functionality for both gear cards and action cards
-        if (gearCard != null || actionCard != null)
-        {
-            CardDragDrop dragDrop = cardObj.GetComponent<CardDragDrop>();
-            if (dragDrop == null)
-            {
-                dragDrop = cardObj.AddComponent<CardDragDrop>();
-            }
-            
-            dragDrop.gearCard = gearCard;
-            dragDrop.actionCard = actionCard;  // Set action card reference too
-            dragDrop.canvas = GetComponentInParent<Canvas>();
-            dragDrop.raycaster = dragDrop.canvas.GetComponent<GraphicRaycaster>();
-        }
-        
-        // Force update the display
-        cardDisplay.SendMessage("DisplayCard", SendMessageOptions.DontRequireReceiver);
-        
-        // Track for cleanup
-        displayedCards.Add(cardObj);
+        Debug.Log("Skipping - no card to display");
+        return;
     }
+    
+    // Choose the right prefab based on card type
+    GameObject prefabToUse;
+    if (actionCard != null)
+    {
+        prefabToUse = actionCardDisplayPrefab;
+    }
+    else
+    {
+        prefabToUse = cardDisplayPrefab;  // Use for gear cards
+    }
+    
+    // Create card display instance
+    GameObject cardObj = Instantiate(prefabToUse, parent);
+    cardObj.SetActive(true);
+    
+    // Ensure proper RectTransform setup for UI parenting
+    RectTransform cardRect = cardObj.GetComponent<RectTransform>();
+    cardRect.sizeDelta = new Vector2(cardWidth, cardHeight);
+    
+    if (useGridPositioning)
+    {
+        // Grid positioning for tackle box (top-left anchoring)
+        cardRect.anchorMin = new Vector2(0, 1);
+        cardRect.anchorMax = new Vector2(0, 1);
+        cardRect.pivot = new Vector2(0, 1);
+    }
+    else
+    {
+        // Center positioning for individual slots
+        cardRect.anchorMin = new Vector2(0.5f, 0.5f);
+        cardRect.anchorMax = new Vector2(0.5f, 0.5f);
+        cardRect.pivot = new Vector2(0.5f, 0.5f);
+    }
+    
+    // Position relative to parent
+    cardRect.anchoredPosition = position;
+    
+    // Set up the card display
+    CardDisplay cardDisplay = cardObj.GetComponent<CardDisplay>();
+    cardDisplay.gearCard = gearCard;
+    cardDisplay.fishCard = fishCard;
+    cardDisplay.actionCard = actionCard;
+    
+    // Add drag and drop functionality for both gear cards and action cards
+    if (gearCard != null || actionCard != null)
+    {
+        CardDragDrop dragDrop = cardObj.GetComponent<CardDragDrop>();
+        if (dragDrop == null)
+        {
+            dragDrop = cardObj.AddComponent<CardDragDrop>();
+        }
+        
+        // Assign cards immediately
+        dragDrop.gearCard = gearCard;
+        dragDrop.actionCard = actionCard;
+        dragDrop.canvas = GetComponentInParent<Canvas>();
+        dragDrop.raycaster = dragDrop.canvas.GetComponent<GraphicRaycaster>();
+    }
+    
+    // Force update the display
+    cardDisplay.SendMessage("DisplayCard", SendMessageOptions.DontRequireReceiver);
+    
+    // Track for cleanup
+    displayedCards.Add(cardObj);
+}
     
     // Function to refresh display when inventory changes
     [ContextMenu("Refresh Display")]

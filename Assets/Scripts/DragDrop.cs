@@ -7,7 +7,10 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     [Header("Card References")]
     public GearCard gearCard;
     public ActionCard actionCard;
-    
+
+    [Header("Game References")]  // Add this new section
+    private PlayerInventory playerInventory;   
+
     [Header("Drag Settings")]
     public Canvas canvas;
     public GraphicRaycaster raycaster;
@@ -19,37 +22,53 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     private InventoryDisplay inventoryDisplay;
     
     void Awake()
+{
+    Debug.Log($"CardDragDrop Awake called on {gameObject.name}");
+    
+    rectTransform = GetComponent<RectTransform>();
+    canvasGroup = GetComponent<CanvasGroup>();
+    
+    // Add CanvasGroup if it doesn't exist
+    if (canvasGroup == null)
     {
-        rectTransform = GetComponent<RectTransform>();
-        canvasGroup = GetComponent<CanvasGroup>();
-        
-        // Add CanvasGroup if it doesn't exist
-        if (canvasGroup == null)
-        {
-            canvasGroup = gameObject.AddComponent<CanvasGroup>();
-        }
-        
-        // Find the canvas and raycaster automatically
-        if (canvas == null)
-        {
-            canvas = GetComponentInParent<Canvas>();
-        }
-        
-        if (raycaster == null && canvas != null)
-        {
-            raycaster = canvas.GetComponent<GraphicRaycaster>();
-        }
-        
-        // Find the inventory display - but don't fail if it's not found yet
+        canvasGroup = gameObject.AddComponent<CanvasGroup>();
+    }
+    
+    // Find the canvas and raycaster automatically
+    if (canvas == null)
+    {
+        canvas = GetComponentInParent<Canvas>();
+    }
+    
+    if (raycaster == null && canvas != null)
+    {
+        raycaster = canvas.GetComponent<GraphicRaycaster>();
+    }
+    
+    // Find the PlayerInventory component in the scene
+    playerInventory = FindFirstObjectByType<PlayerInventory>();
+    
+    if (playerInventory == null)
+    {
+        Debug.LogError("Could not find PlayerInventory in scene!");
+    }
+    else
+    {
+        Debug.Log("Found PlayerInventory successfully!");
+    }
+    
+    // Find the inventory display - but don't fail if it's not found yet
+    if (inventoryDisplay == null)
+    {
+        inventoryDisplay = FindFirstObjectByType<InventoryDisplay>();
         if (inventoryDisplay == null)
         {
-            inventoryDisplay = FindFirstObjectByType<InventoryDisplay>();
-            if (inventoryDisplay == null)
-            {
-                Debug.LogWarning("InventoryDisplay not found in Awake, will try again later");
-            }
+            Debug.LogWarning("InventoryDisplay not found in Awake, will try again later");
         }
     }
+    
+    Debug.Log($"After Awake - GearCard: {(gearCard != null ? gearCard.gearName : "NULL")}");
+}
     
     public void OnBeginDrag(PointerEventData eventData)
     {
@@ -87,6 +106,10 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     
     public void OnEndDrag(PointerEventData eventData)
     {
+         Debug.Log("=== OnEndDrag called ===");
+    Debug.Log($"GearCard: {(gearCard != null ? gearCard.gearName : "NULL")}");
+    Debug.Log($"ActionCard: {(actionCard != null ? actionCard.actionName : "NULL")}");
+    
         if (gearCard == null && actionCard == null) return;
         
         // Restore appearance
@@ -162,23 +185,28 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         inventoryDisplay.RefreshDisplay();
     }
     
-    DropZone GetDropZone(PointerEventData eventData)
+DropZone GetDropZone(PointerEventData eventData)
+{
+    // Raycast to find what we're over (for gear cards)
+    var raycastResults = new System.Collections.Generic.List<RaycastResult>();
+    raycaster.Raycast(eventData, raycastResults);
+    
+    Debug.Log($"Raycast found {raycastResults.Count} objects");
+    
+    foreach (var result in raycastResults)
     {
-        // Raycast to find what we're over (for gear cards)
-        var raycastResults = new System.Collections.Generic.List<RaycastResult>();
-        raycaster.Raycast(eventData, raycastResults);
-        
-        foreach (var result in raycastResults)
+        Debug.Log($"Raycast hit: {result.gameObject.name}");
+        DropZone dropZone = result.gameObject.GetComponent<DropZone>();
+        if (dropZone != null)
         {
-            DropZone dropZone = result.gameObject.GetComponent<DropZone>();
-            if (dropZone != null)
-            {
-                return dropZone;
-            }
+            Debug.Log($"Found DropZone: {dropZone.zoneName}");
+            return dropZone;
         }
-        
-        return null;
     }
+    
+    Debug.Log("No DropZone found in raycast results");
+    return null;
+}
     
     ActionCardDropZone GetActionDropZone(PointerEventData eventData)
     {
@@ -204,18 +232,27 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     }
     
     void HandleGearMove(DropZone dropZone)
-    {
-        PlayerInventory inventory = inventoryDisplay.playerInventory;
-        
-        // Remove from current location
-        RemoveFromCurrentLocation();
-        
-        // Add to new location
-        dropZone.AcceptCard(gearCard);
-        
-        // Return to original parent temporarily to fix positioning
-        transform.SetParent(originalParent, true);
-    }
+{
+     Debug.Log("=== HandleGearMove called ===");
+    Debug.Log($"PlayerInventory is: {(playerInventory != null ? "FOUND" : "NULL")}");
+    Debug.Log($"GearCard is: {(gearCard != null ? gearCard.gearName : "NULL")}");
+    Debug.Log($"DropZone is: {(dropZone != null ? dropZone.zoneName : "NULL")}");
+    if (playerInventory == null)
+        {
+            Debug.LogError("PlayerInventory not assigned to CardDragDrop!");
+            ReturnToOriginalPosition();
+            return;
+        }
+    
+    // Remove from current location
+    RemoveFromCurrentLocation();
+    
+    // Add to new location
+    dropZone.AcceptCard(gearCard);
+    
+    // Return to original parent temporarily to fix positioning
+    transform.SetParent(originalParent, true);
+}
     
     void RemoveFromCurrentLocation()
     {
