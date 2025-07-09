@@ -8856,7 +8856,7 @@ MonoBehaviour:
   equippedGearType: {fileID: 280008568}
   equippedPower: {fileID: 33477214}
   equippedDurability: {fileID: 2123510707}
-  equippedGearImage: {fileID: 0}
+  equippedGearImage: {fileID: 1366176189}
   equippedDepthDisplay: {fileID: 1231484637}
   comparedGearName: {fileID: 1943545544}
   comparedGearType: {fileID: 2065096040}

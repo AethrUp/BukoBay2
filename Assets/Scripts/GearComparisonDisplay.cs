@@ -101,8 +101,8 @@ public class GearComparisonDisplay : MonoBehaviour
     {
         if (equippedGearName != null) equippedGearName.text = gear.gearName;
         if (equippedGearType != null) equippedGearType.text = gear.gearType;
-        if (equippedPower != null) equippedPower.text = "Power: " + gear.power;
-        if (equippedDurability != null) equippedDurability.text = "Durability: " + gear.durability;
+        if (equippedPower != null) equippedPower.text = gear.power.ToString();
+if (equippedDurability != null) equippedDurability.text = gear.durability.ToString();
         if (equippedGearImage != null) equippedGearImage.sprite = gear.gearImage;
         if (equippedDepthDisplay != null) equippedDepthDisplay.DisplayGearDepthEffects(gear);
     }
@@ -111,8 +111,8 @@ public class GearComparisonDisplay : MonoBehaviour
     {
         if (comparedGearName != null) comparedGearName.text = gear.gearName;
         if (comparedGearType != null) comparedGearType.text = gear.gearType;
-        if (comparedPower != null) comparedPower.text = "Power: " + gear.power;
-        if (comparedDurability != null) comparedDurability.text = "Durability: " + gear.durability;
+       if (comparedPower != null) comparedPower.text = gear.power.ToString();
+if (comparedDurability != null) comparedDurability.text = gear.durability.ToString();
         if (comparedGearImage != null) comparedGearImage.sprite = gear.gearImage;
         if (comparedDepthDisplay != null) comparedDepthDisplay.DisplayGearDepthEffects(gear);
     }

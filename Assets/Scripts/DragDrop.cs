@@ -2,8 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
-{
+public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler{
     [Header("Card References")]
     public GearCard gearCard;
     public ActionCard actionCard;
@@ -20,54 +19,74 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     private Vector2 originalPosition;
     private Transform originalParent;
     private InventoryDisplay inventoryDisplay;
-    
+
     void Awake()
+    {
+        Debug.Log($"CardDragDrop Awake called on {gameObject.name}");
+
+        rectTransform = GetComponent<RectTransform>();
+        canvasGroup = GetComponent<CanvasGroup>();
+
+        // Add CanvasGroup if it doesn't exist
+        if (canvasGroup == null)
+        {
+            canvasGroup = gameObject.AddComponent<CanvasGroup>();
+        }
+
+        // Find the canvas and raycaster automatically
+        if (canvas == null)
+        {
+            canvas = GetComponentInParent<Canvas>();
+        }
+
+        if (raycaster == null && canvas != null)
+        {
+            raycaster = canvas.GetComponent<GraphicRaycaster>();
+        }
+
+        // Find the PlayerInventory component in the scene
+        playerInventory = FindFirstObjectByType<PlayerInventory>();
+
+        if (playerInventory == null)
+        {
+            Debug.LogError("Could not find PlayerInventory in scene!");
+        }
+        else
+        {
+            Debug.Log("Found PlayerInventory successfully!");
+        }
+
+        // Find the inventory display - but don't fail if it's not found yet
+        if (inventoryDisplay == null)
+        {
+            inventoryDisplay = FindFirstObjectByType<InventoryDisplay>();
+            if (inventoryDisplay == null)
+            {
+                Debug.LogWarning("InventoryDisplay not found in Awake, will try again later");
+            }
+        }
+
+        Debug.Log($"After Awake - GearCard: {(gearCard != null ? gearCard.gearName : "NULL")}");
+    }
+public void OnPointerClick(PointerEventData eventData)
 {
-    Debug.Log($"CardDragDrop Awake called on {gameObject.name}");
+    // Only handle clicks on gear cards (not action cards)
+    if (gearCard == null) return;
     
-    rectTransform = GetComponent<RectTransform>();
-    canvasGroup = GetComponent<CanvasGroup>();
+    Debug.Log($"Clicked on gear: {gearCard.gearName}");
     
-    // Add CanvasGroup if it doesn't exist
-    if (canvasGroup == null)
+    // Find the gear comparison display
+    GearComparisonDisplay comparisonDisplay = FindFirstObjectByType<GearComparisonDisplay>();
+    
+    if (comparisonDisplay != null)
     {
-        canvasGroup = gameObject.AddComponent<CanvasGroup>();
-    }
-    
-    // Find the canvas and raycaster automatically
-    if (canvas == null)
-    {
-        canvas = GetComponentInParent<Canvas>();
-    }
-    
-    if (raycaster == null && canvas != null)
-    {
-        raycaster = canvas.GetComponent<GraphicRaycaster>();
-    }
-    
-    // Find the PlayerInventory component in the scene
-    playerInventory = FindFirstObjectByType<PlayerInventory>();
-    
-    if (playerInventory == null)
-    {
-        Debug.LogError("Could not find PlayerInventory in scene!");
+        comparisonDisplay.ShowGearComparison(gearCard);
+        Debug.Log($"Sent {gearCard.gearName} to comparison display");
     }
     else
     {
-        Debug.Log("Found PlayerInventory successfully!");
+        Debug.LogError("Could not find GearComparisonDisplay component!");
     }
-    
-    // Find the inventory display - but don't fail if it's not found yet
-    if (inventoryDisplay == null)
-    {
-        inventoryDisplay = FindFirstObjectByType<InventoryDisplay>();
-        if (inventoryDisplay == null)
-        {
-            Debug.LogWarning("InventoryDisplay not found in Awake, will try again later");
-        }
-    }
-    
-    Debug.Log($"After Awake - GearCard: {(gearCard != null ? gearCard.gearName : "NULL")}");
 }
     
     public void OnBeginDrag(PointerEventData eventData)
