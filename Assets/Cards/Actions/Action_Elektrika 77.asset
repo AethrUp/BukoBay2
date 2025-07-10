@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Elektrika 77
   m_EditorClassIdentifier: 
   actionName: Elektrika 77
+  actionImage: {fileID: 7242435891314246233, guid: 8dee42c1d0fd77d4aa1a1dcd554c01e4, type: 3}
   playerEffect: 0
   fishEffect: 0
   canTargetPlayer: 0

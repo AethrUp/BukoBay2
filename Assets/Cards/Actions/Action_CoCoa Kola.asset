@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_CoCoa Kola
   m_EditorClassIdentifier: 
   actionName: CoCoa Kola
+  actionImage: {fileID: -5919519060136365977, guid: c34339f6a9dc9584b99b06af0ff82f1b, type: 3}
   playerEffect: 3
   fishEffect: 2
   canTargetPlayer: 1

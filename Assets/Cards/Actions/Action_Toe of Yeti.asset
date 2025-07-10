@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Toe of Yeti
   m_EditorClassIdentifier: 
   actionName: Toe of Yeti
+  actionImage: {fileID: 7869965628052655866, guid: bdf5b5a1bdabd09428586bc442732de8, type: 3}
   playerEffect: 0
   fishEffect: -4
   canTargetPlayer: 0

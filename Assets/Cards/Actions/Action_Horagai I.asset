@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Horagai I
   m_EditorClassIdentifier: 
   actionName: Horagai I
+  actionImage: {fileID: 0}
   playerEffect: -2
   fishEffect: -2
   canTargetPlayer: 1

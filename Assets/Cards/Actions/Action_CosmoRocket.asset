@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_CosmoRocket
   m_EditorClassIdentifier: 
   actionName: CosmoRocket
+  actionImage: {fileID: -239539480661732411, guid: fb6f91bf7d85b0244be2180f8af9913c, type: 3}
   playerEffect: -4
   fishEffect: -2
   canTargetPlayer: 1

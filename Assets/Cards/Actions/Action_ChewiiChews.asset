@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_ChewiiChews
   m_EditorClassIdentifier: 
   actionName: ChewiiChews
+  actionImage: {fileID: 320489850156337595, guid: da4fbb19ac9f409469239be89bd87e68, type: 3}
   playerEffect: 0
   fishEffect: 0
   canTargetPlayer: 0

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_ReelTime
   m_EditorClassIdentifier: 
   actionName: ReelTime
+  actionImage: {fileID: 3829229590337173602, guid: c81cda1b9050ac942bfb220dd519f59b, type: 3}
   playerEffect: 4
   fishEffect: 0
   canTargetPlayer: 1

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Quirley
   m_EditorClassIdentifier: 
   actionName: Quirley
+  actionImage: {fileID: -6979209422281950508, guid: 79de1392f8267504e9cd3ab9d15f3ff4, type: 3}
   playerEffect: -3
   fishEffect: -5
   canTargetPlayer: 1

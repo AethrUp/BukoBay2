@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Can of Beans
   m_EditorClassIdentifier: 
   actionName: Can of Beans
+  actionImage: {fileID: -3899705851122770371, guid: 50153c5f1beac1a40815dae1adedcf8e, type: 3}
   playerEffect: 4
   fishEffect: 0
   canTargetPlayer: 1

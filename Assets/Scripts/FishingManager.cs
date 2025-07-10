@@ -38,6 +38,8 @@ public class FishingManager : MonoBehaviour
     
     [Header("UI References")]
     public InteractivePhaseUI interactiveUI;
+    public FishingResultsManager resultsManager;
+
 
     void Start()
     {
@@ -538,20 +540,25 @@ Debug.Log($"PlayerInventory.Instance = {(PlayerInventory.Instance != null ? Play
         currentPlayer.AddCoins(currentFish.coins);
     }
     
-    // Hide UI
+    // Hide interactive UI
     if (interactiveUI != null)
     {
         interactiveUI.OnInteractivePhaseEnd();
     }
     
+    // Show results screen
+    if (resultsManager != null)
+    {
+        resultsManager.ShowResults(true, currentFish, currentFish.coins, "");
+    }
+    
     // Reset fishing state
     isInteractionPhase = false;
-    currentFish = null;
     
     Debug.Log("Fishing phase ended successfully!");
 }
     
-    void HandleFailure()
+void HandleFailure()
 {
     if (battleEnded) return; // Prevent multiple calls
     battleEnded = true; // Mark battle as ended
@@ -559,10 +566,12 @@ Debug.Log($"PlayerInventory.Instance = {(PlayerInventory.Instance != null ? Play
     Debug.Log($"FAILURE! Player fails to catch {currentFish.fishName}!");
     Debug.Log("Gear takes damage...");
     
+    string damageReport = "";
+    
     // Apply gear damage based on fish's damage values
     if (currentPlayer != null && currentFish != null)
     {
-        ApplyGearDamage();
+        damageReport = ApplyGearDamage();
         
         // Refresh the inventory display to show updated durability
         InventoryDisplay inventoryDisplay = FindFirstObjectByType<InventoryDisplay>();
@@ -573,61 +582,80 @@ Debug.Log($"PlayerInventory.Instance = {(PlayerInventory.Instance != null ? Play
         }
     }
     
-    // Hide UI
+    // Hide interactive UI
     if (interactiveUI != null)
     {
         interactiveUI.OnInteractivePhaseEnd();
     }
     
+    // Show results screen
+    if (resultsManager != null)
+    {
+        resultsManager.ShowResults(false, currentFish, 0, damageReport);
+    }
+    
     // Reset fishing state
     isInteractionPhase = false;
-    currentFish = null;
     
     Debug.Log("Fishing phase ended in failure!");
 }
+
+    string ApplyGearDamage()
+{
+    Debug.Log("=== APPLYING GEAR DAMAGE ===");
     
-    void ApplyGearDamage()
+    // Get all equipped gear pieces in order
+    List<GearCard> equippedGear = GetAllEquippedGear();
+    
+    if (equippedGear.Count == 0)
     {
-        Debug.Log("=== APPLYING GEAR DAMAGE ===");
-        
-        // Get all equipped gear pieces in order
-        List<GearCard> equippedGear = GetAllEquippedGear();
-        
-        if (equippedGear.Count == 0)
-        {
-            Debug.Log("No gear equipped to damage!");
-            return;
-        }
-        
-        Debug.Log($"Player has {equippedGear.Count} gear pieces equipped");
-        
-        // Apply damage based on fish's gear damage values
-        int[] fishDamageValues = {
-            currentFish.gear1Damage,
-            currentFish.gear2Damage,
-            currentFish.gear3Damage,
-            currentFish.gear4Damage,
-            currentFish.gear5Damage
-        };
-        
-        // Apply damage to each gear piece in order
-        for (int i = 0; i < equippedGear.Count && i < fishDamageValues.Length; i++)
-        {
-            int damageAmount = fishDamageValues[i];
-            
-            if (damageAmount > 0)
-            {
-                GearCard targetGear = equippedGear[i];
-                DamageGearPiece(targetGear, damageAmount);
-            }
-            else
-            {
-                Debug.Log($"Gear slot {i + 1}: No damage (0 damage)");
-            }
-        }
-        
-        Debug.Log("=== GEAR DAMAGE COMPLETE ===");
+        Debug.Log("No gear equipped to damage!");
+        return "No gear to damage";
     }
+    
+    Debug.Log($"Player has {equippedGear.Count} gear pieces equipped");
+    
+    // Track damage for the report
+    List<string> damageMessages = new List<string>();
+    
+    // Apply damage based on fish's gear damage values
+    int[] fishDamageValues = {
+        currentFish.gear1Damage,
+        currentFish.gear2Damage,
+        currentFish.gear3Damage,
+        currentFish.gear4Damage,
+        currentFish.gear5Damage
+    };
+    
+    // Apply damage to each gear piece in order
+    for (int i = 0; i < equippedGear.Count && i < fishDamageValues.Length; i++)
+    {
+        int damageAmount = fishDamageValues[i];
+        
+        if (damageAmount > 0)
+        {
+            GearCard targetGear = equippedGear[i];
+            string damageResult = DamageGearPiece(targetGear, damageAmount);
+            damageMessages.Add(damageResult);
+        }
+        else
+        {
+            Debug.Log($"Gear slot {i + 1}: No damage (0 damage)");
+        }
+    }
+    
+    Debug.Log("=== GEAR DAMAGE COMPLETE ===");
+    
+    // Create damage report
+    if (damageMessages.Count == 0)
+    {
+        return "No damage dealt";
+    }
+    else
+    {
+        return string.Join(", ", damageMessages);
+    }
+}
     
     List<GearCard> GetAllEquippedGear()
     {
@@ -644,18 +672,23 @@ Debug.Log($"PlayerInventory.Instance = {(PlayerInventory.Instance != null ? Play
         return gearList;
     }
     
-    void DamageGearPiece(GearCard gear, int damageAmount)
+    string DamageGearPiece(GearCard gear, int damageAmount)
+{
+    int originalDurability = gear.durability;
+    gear.durability = Mathf.Max(0, gear.durability - damageAmount);
+    
+    Debug.Log($"Damaged {gear.gearName}: {originalDurability} → {gear.durability} durability (-{damageAmount})");
+    
+    if (gear.durability <= 0)
     {
-        int originalDurability = gear.durability;
-        gear.durability = Mathf.Max(0, gear.durability - damageAmount);
-        
-        Debug.Log($"Damaged {gear.gearName}: {originalDurability} → {gear.durability} durability (-{damageAmount})");
-        
-        if (gear.durability <= 0)
-        {
-            Debug.Log($"⚠️ {gear.gearName} is BROKEN! (0 durability)");
-        }
+        Debug.Log($"⚠️ {gear.gearName} is BROKEN! (0 durability)");
+        return $"{gear.gearName} BROKEN";
     }
+    else
+    {
+        return $"{gear.gearName} -{damageAmount}";
+    }
+}
     
     // Public function to play action cards during interactive phase
     public bool PlayActionCard(ActionCard actionCard, bool targetingPlayer)

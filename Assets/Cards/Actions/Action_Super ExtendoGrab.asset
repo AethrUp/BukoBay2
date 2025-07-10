@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Super ExtendoGrab
   m_EditorClassIdentifier: 
   actionName: Super ExtendoGrab
+  actionImage: {fileID: -1161310744003572522, guid: 26aee916ec889c04eba05c48551f6c26, type: 3}
   playerEffect: 5
   fishEffect: 0
   canTargetPlayer: 1

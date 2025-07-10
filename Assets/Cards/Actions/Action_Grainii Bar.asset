@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Grainii Bar
   m_EditorClassIdentifier: 
   actionName: Grainii Bar
+  actionImage: {fileID: 2402941338579649082, guid: a57d8cc5f6a9df74e9ffbbc44bb88889, type: 3}
   playerEffect: 3
   fishEffect: 0
   canTargetPlayer: 1

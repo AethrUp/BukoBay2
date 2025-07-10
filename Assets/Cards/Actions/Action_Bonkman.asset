@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Bonkman
   m_EditorClassIdentifier: 
   actionName: Bonkman
+  actionImage: {fileID: 7145194546425201680, guid: 535739372314f544381e1970fcceb447, type: 3}
   playerEffect: 0
   fishEffect: -3
   canTargetPlayer: 0

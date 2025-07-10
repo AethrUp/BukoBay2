@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Gipnotizi Ochkii
   m_EditorClassIdentifier: 
   actionName: Gipnotizi Ochkii
+  actionImage: {fileID: 3128106323068843688, guid: b5e8fd3408edf5f4d9781d5dacc29da2, type: 3}
   playerEffect: 0
   fishEffect: 0
   canTargetPlayer: 0

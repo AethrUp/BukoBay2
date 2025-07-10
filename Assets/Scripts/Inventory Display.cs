@@ -19,6 +19,7 @@ public class InventoryDisplay : MonoBehaviour
     [Header("Card Display Prefabs")]
     public GameObject cardDisplayPrefab;  // For gear cards
     public GameObject actionCardDisplayPrefab;  // For action cards
+    public GameObject effectCardDisplayPrefab;  // For effect cards
     
     [Header("Player Reference")]
     public PlayerInventory playerInventory;
@@ -41,6 +42,11 @@ public class InventoryDisplay : MonoBehaviour
         if (actionCardDisplayPrefab == null)
         {
             CreateActionCardDisplayPrefab();
+        }
+        
+        if (effectCardDisplayPrefab == null)
+        {
+            CreateEffectCardDisplayPrefab();
         }
         
         // Don't call UpdateDisplay() here - wait for PlayerInventory to exist
@@ -174,6 +180,54 @@ public class InventoryDisplay : MonoBehaviour
         prefab.SetActive(false);
     }
     
+    void CreateEffectCardDisplayPrefab()
+    {
+        // Create an effect card display prefab programmatically
+        GameObject prefab = new GameObject("EffectCardDisplayPrefab");
+        
+        // Add RectTransform and set it up properly
+        RectTransform rect = prefab.AddComponent<RectTransform>();
+        rect.sizeDelta = new Vector2(cardWidth, cardHeight);
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.zero;
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        
+        // Add CardDisplay component
+        CardDisplay cardDisplay = prefab.AddComponent<CardDisplay>();
+        
+        // Add background image with different color for effect cards
+        UnityEngine.UI.Image bgImage = prefab.AddComponent<UnityEngine.UI.Image>();
+        bgImage.color = new Color(0.6f, 1f, 0.6f, 0.9f); // Light green background for effect cards
+        
+        // Create text elements for effect cards (similar layout to action cards)
+        GameObject nameText = CreateTextElement(prefab, "CardName", new Vector2(0, 70), "Effect Name");
+        GameObject typeText = CreateTextElement(prefab, "CardType", new Vector2(0, 45), "Effect");
+        GameObject effectInfoText = CreateTextElement(prefab, "EffectInfo", new Vector2(0, 15), "Effect Info");
+        GameObject usageText = CreateTextElement(prefab, "Usage", new Vector2(0, -10), "Single Use");
+        GameObject descriptionText = CreateTextElement(prefab, "Description", new Vector2(0, -40), "Description");
+        
+        // Make description text smaller and multi-line
+        TMPro.TextMeshProUGUI descComponent = descriptionText.GetComponent<TMPro.TextMeshProUGUI>();
+        descComponent.fontSize = 8;
+        descComponent.textWrappingMode = TMPro.TextWrappingModes.Normal;
+        RectTransform descRect = descriptionText.GetComponent<RectTransform>();
+        descRect.sizeDelta = new Vector2(cardWidth - 20, 40);
+        
+        // Connect to CardDisplay component
+        cardDisplay.cardNameText = nameText.GetComponent<TMPro.TextMeshProUGUI>();
+        cardDisplay.cardTypeText = typeText.GetComponent<TMPro.TextMeshProUGUI>();
+        cardDisplay.powerText = effectInfoText.GetComponent<TMPro.TextMeshProUGUI>(); // Use powerText for effect info
+        cardDisplay.durabilityText = usageText.GetComponent<TMPro.TextMeshProUGUI>(); // Use durabilityText for usage info
+        cardDisplay.statsText = descriptionText.GetComponent<TMPro.TextMeshProUGUI>(); // Use statsText for description
+        cardDisplay.cardBackground = bgImage;
+        
+        // Store as prefab reference
+        effectCardDisplayPrefab = prefab;
+        
+        // Deactivate the original
+        prefab.SetActive(false);
+    }
+    
     GameObject CreateTextElement(GameObject parent, string name, Vector2 position, string text)
     {
         GameObject textObj = new GameObject(name);
@@ -213,6 +267,7 @@ public class InventoryDisplay : MonoBehaviour
         Debug.Log($"Equipped Line: {(playerInventory.equippedLine != null ? playerInventory.equippedLine.gearName : "NULL")}");
         Debug.Log($"Extra Gear Count: {playerInventory.extraGear.Count}");
         Debug.Log($"Action Cards Count: {playerInventory.actionCards.Count}");
+        Debug.Log($"Effect Cards Count: {playerInventory.effectCards.Count}");
         
         // Display equipped gear
         Debug.Log("About to display equipped gear...");
@@ -238,16 +293,16 @@ public class InventoryDisplay : MonoBehaviour
             Debug.LogError($"Error displaying tackle box gear: {e.Message}");
         }
         
-        // Display action cards
-        Debug.Log("About to display action cards...");
+        // Display action cards and effect cards
+        Debug.Log("About to display action and effect cards...");
         try
         {
-            DisplayActionCards();
-            Debug.Log("Action cards display completed");
+            DisplayActionAndEffectCards();
+            Debug.Log("Action and effect cards display completed");
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Error displaying action cards: {e.Message}");
+            Debug.LogError($"Error displaying action and effect cards: {e.Message}");
         }
         
         Debug.Log($"=== UpdateDisplay complete. Total cards displayed: {displayedCards.Count} ===");
@@ -269,25 +324,25 @@ public class InventoryDisplay : MonoBehaviour
         
         // Display each equipped gear in its specific panel (centered)
         if (rodPanel != null)
-            CreateCardDisplay(playerInventory.equippedRod, null, null, rodPanel, centerPosition, false);
+            CreateCardDisplay(playerInventory.equippedRod, null, null, null, rodPanel, centerPosition, false);
             
         if (reelPanel != null)
-            CreateCardDisplay(playerInventory.equippedReel, null, null, reelPanel, centerPosition, false);
+            CreateCardDisplay(playerInventory.equippedReel, null, null, null, reelPanel, centerPosition, false);
             
         if (linePanel != null)
-            CreateCardDisplay(playerInventory.equippedLine, null, null, linePanel, centerPosition, false);
+            CreateCardDisplay(playerInventory.equippedLine, null, null, null, linePanel, centerPosition, false);
             
         if (lurePanel != null)
-            CreateCardDisplay(playerInventory.equippedLure, null, null, lurePanel, centerPosition, false);
+            CreateCardDisplay(playerInventory.equippedLure, null, null, null, lurePanel, centerPosition, false);
             
         if (baitPanel != null)
-            CreateCardDisplay(playerInventory.equippedBait, null, null, baitPanel, centerPosition, false);
+            CreateCardDisplay(playerInventory.equippedBait, null, null, null, baitPanel, centerPosition, false);
         
         // Handle extra slots (these might still go in the main equipped panel or separate panels)
         Vector2 extraPosition = new Vector2(10, -10);
-        CreateCardDisplay(playerInventory.equippedExtra1, null, null, equippedGearPanel, extraPosition, true);
+        CreateCardDisplay(playerInventory.equippedExtra1, null, null, null, equippedGearPanel, extraPosition, true);
         extraPosition.x += cardWidth + cardSpacing;
-        CreateCardDisplay(playerInventory.equippedExtra2, null, null, equippedGearPanel, extraPosition, true);
+        CreateCardDisplay(playerInventory.equippedExtra2, null, null, null, equippedGearPanel, extraPosition, true);
     }
     
     void DisplayTackleBoxGear()
@@ -296,7 +351,7 @@ public class InventoryDisplay : MonoBehaviour
         
         foreach (GearCard gear in playerInventory.extraGear)
         {
-            CreateCardDisplay(gear, null, null, tackleBoxPanel, position, true); // Use grid positioning
+            CreateCardDisplay(gear, null, null, null, tackleBoxPanel, position, true); // Use grid positioning
             position.x += cardWidth + cardSpacing;
             
             // Wrap to next row if needed
@@ -308,9 +363,9 @@ public class InventoryDisplay : MonoBehaviour
         }
     }
     
-    void DisplayActionCards()
+    void DisplayActionAndEffectCards()
     {
-        Debug.Log($"DisplayActionCards called - actionCardsPanel is {(actionCardsPanel != null ? "ASSIGNED" : "NULL")}");
+        Debug.Log($"DisplayActionAndEffectCards called - actionCardsPanel is {(actionCardsPanel != null ? "ASSIGNED" : "NULL")}");
         
         if (actionCardsPanel == null)
         {
@@ -320,10 +375,26 @@ public class InventoryDisplay : MonoBehaviour
         
         Vector2 position = new Vector2(10, -10); // Start from top-left
         
+        // Display action cards
         foreach (ActionCard action in playerInventory.actionCards)
         {
             Debug.Log($"Found action card: {action.actionName}");
-            CreateCardDisplay(null, null, action, actionCardsPanel, position, true); // Use grid positioning
+            CreateCardDisplay(null, null, action, null, actionCardsPanel, position, true);
+            position.x += cardWidth + cardSpacing;
+            
+            // Wrap to next row if needed
+            if (position.x > 400)
+            {
+                position.x = 10;
+                position.y -= cardHeight + cardSpacing;
+            }
+        }
+        
+        // Display effect cards in the same panel
+        foreach (EffectCard effect in playerInventory.effectCards)
+        {
+            Debug.Log($"Found effect card: {effect.effectName}");
+            CreateCardDisplay(null, null, null, effect, actionCardsPanel, position, true);
             position.x += cardWidth + cardSpacing;
             
             // Wrap to next row if needed
@@ -335,82 +406,100 @@ public class InventoryDisplay : MonoBehaviour
         }
     }
     
-    void CreateCardDisplay(GearCard gearCard, FishCard fishCard, ActionCard actionCard, Transform parent, Vector2 position, bool useGridPositioning = false)
-{
-    Debug.Log($"CreateCardDisplay called - Gear: {(gearCard?.gearName ?? "NULL")}, Fish: {(fishCard?.fishName ?? "NULL")}, Action: {(actionCard?.actionName ?? "NULL")}, Parent: {(parent?.name ?? "NULL")}");
-    
-    // Skip if no card to display
-    if (gearCard == null && fishCard == null && actionCard == null) 
+    void CreateCardDisplay(GearCard gearCard, FishCard fishCard, ActionCard actionCard, EffectCard effectCard, Transform parent, Vector2 position, bool useGridPositioning = false)
     {
-        Debug.Log("Skipping - no card to display");
-        return;
-    }
-    
-    // Choose the right prefab based on card type
-    GameObject prefabToUse;
-    if (actionCard != null)
-    {
-        prefabToUse = actionCardDisplayPrefab;
-    }
-    else
-    {
-        prefabToUse = cardDisplayPrefab;  // Use for gear cards
-    }
-    
-    // Create card display instance
-    GameObject cardObj = Instantiate(prefabToUse, parent);
-    cardObj.SetActive(true);
-    
-    // Ensure proper RectTransform setup for UI parenting
-    RectTransform cardRect = cardObj.GetComponent<RectTransform>();
-    cardRect.sizeDelta = new Vector2(cardWidth, cardHeight);
-    
-    if (useGridPositioning)
-    {
-        // Grid positioning for tackle box (top-left anchoring)
-        cardRect.anchorMin = new Vector2(0, 1);
-        cardRect.anchorMax = new Vector2(0, 1);
-        cardRect.pivot = new Vector2(0, 1);
-    }
-    else
-    {
-        // Center positioning for individual slots
-        cardRect.anchorMin = new Vector2(0.5f, 0.5f);
-        cardRect.anchorMax = new Vector2(0.5f, 0.5f);
-        cardRect.pivot = new Vector2(0.5f, 0.5f);
-    }
-    
-    // Position relative to parent
-    cardRect.anchoredPosition = position;
-    
-    // Set up the card display
-    CardDisplay cardDisplay = cardObj.GetComponent<CardDisplay>();
-    cardDisplay.gearCard = gearCard;
-    cardDisplay.fishCard = fishCard;
-    cardDisplay.actionCard = actionCard;
-    
-    // Add drag and drop functionality for both gear cards and action cards
-    if (gearCard != null || actionCard != null)
-    {
-        CardDragDrop dragDrop = cardObj.GetComponent<CardDragDrop>();
-        if (dragDrop == null)
+        Debug.Log($"CreateCardDisplay called - Gear: {(gearCard?.gearName ?? "NULL")}, Fish: {(fishCard?.fishName ?? "NULL")}, Action: {(actionCard?.actionName ?? "NULL")}, Effect: {(effectCard?.effectName ?? "NULL")}, Parent: {(parent?.name ?? "NULL")}");
+        
+        // Skip if no card to display
+        if (gearCard == null && fishCard == null && actionCard == null && effectCard == null) 
         {
-            dragDrop = cardObj.AddComponent<CardDragDrop>();
+            Debug.Log("Skipping - no card to display");
+            return;
         }
         
-        // Assign cards immediately
-        dragDrop.gearCard = gearCard;
-        dragDrop.actionCard = actionCard;
-        dragDrop.canvas = GetComponentInParent<Canvas>();
-        dragDrop.raycaster = dragDrop.canvas.GetComponent<GraphicRaycaster>();
+        // Choose the right prefab based on card type
+        GameObject prefabToUse;
+        if (actionCard != null)
+        {
+            prefabToUse = actionCardDisplayPrefab;
+        }
+        else if (effectCard != null)
+        {
+            prefabToUse = effectCardDisplayPrefab;
+        }
+        else
+        {
+            prefabToUse = cardDisplayPrefab;  // Use for gear and fish cards
+        }
+        
+        // Create card display instance
+        GameObject cardObj = Instantiate(prefabToUse, parent);
+        cardObj.SetActive(true);
+        
+        // Ensure proper RectTransform setup for UI parenting
+        RectTransform cardRect = cardObj.GetComponent<RectTransform>();
+        cardRect.sizeDelta = new Vector2(cardWidth, cardHeight);
+        
+        if (useGridPositioning)
+        {
+            // Grid positioning for tackle box (top-left anchoring)
+            cardRect.anchorMin = new Vector2(0, 1);
+            cardRect.anchorMax = new Vector2(0, 1);
+            cardRect.pivot = new Vector2(0, 1);
+        }
+        else
+        {
+            // Center positioning for individual slots
+            cardRect.anchorMin = new Vector2(0.5f, 0.5f);
+            cardRect.anchorMax = new Vector2(0.5f, 0.5f);
+            cardRect.pivot = new Vector2(0.5f, 0.5f);
+        }
+        
+        // Position relative to parent
+        cardRect.anchoredPosition = position;
+        
+        // Set up the card display
+        CardDisplay cardDisplay = cardObj.GetComponent<CardDisplay>();
+        cardDisplay.gearCard = gearCard;
+        cardDisplay.fishCard = fishCard;
+        cardDisplay.actionCard = actionCard;
+        cardDisplay.effectCard = effectCard;
+        
+        // Add drag and drop functionality
+        if (gearCard != null || actionCard != null)
+        {
+            CardDragDrop dragDrop = cardObj.GetComponent<CardDragDrop>();
+            if (dragDrop == null)
+            {
+                dragDrop = cardObj.AddComponent<CardDragDrop>();
+            }
+            
+            // Assign cards immediately
+            dragDrop.gearCard = gearCard;
+            dragDrop.actionCard = actionCard;
+            dragDrop.canvas = GetComponentInParent<Canvas>();
+            dragDrop.raycaster = dragDrop.canvas.GetComponent<GraphicRaycaster>();
+        }
+        else if (effectCard != null)
+        {
+            EffectCardDragDrop effectDragDrop = cardObj.GetComponent<EffectCardDragDrop>();
+            if (effectDragDrop == null)
+            {
+                effectDragDrop = cardObj.AddComponent<EffectCardDragDrop>();
+            }
+            
+            // Assign effect card
+            effectDragDrop.effectCard = effectCard;
+            effectDragDrop.canvas = GetComponentInParent<Canvas>();
+            effectDragDrop.raycaster = effectDragDrop.canvas.GetComponent<GraphicRaycaster>();
+        }
+        
+        // Force update the display
+        cardDisplay.SendMessage("DisplayCard", SendMessageOptions.DontRequireReceiver);
+        
+        // Track for cleanup
+        displayedCards.Add(cardObj);
     }
-    
-    // Force update the display
-    cardDisplay.SendMessage("DisplayCard", SendMessageOptions.DontRequireReceiver);
-    
-    // Track for cleanup
-    displayedCards.Add(cardObj);
-}
     
     // Function to refresh display when inventory changes
     [ContextMenu("Refresh Display")]

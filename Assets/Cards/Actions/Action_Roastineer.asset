@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Roastineer
   m_EditorClassIdentifier: 
   actionName: Roastineer
+  actionImage: {fileID: 8062866356714303254, guid: e4158f172236966418769179aa18cd4c, type: 3}
   playerEffect: 2
   fishEffect: 0
   canTargetPlayer: 1

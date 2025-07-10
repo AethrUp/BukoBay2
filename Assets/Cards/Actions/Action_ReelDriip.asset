@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_ReelDriip
   m_EditorClassIdentifier: 
   actionName: ReelDriip
+  actionImage: {fileID: -4117460079339479223, guid: 037779963670f6544a3ffeda07c27aa2, type: 3}
   playerEffect: 3
   fishEffect: 0
   canTargetPlayer: 1

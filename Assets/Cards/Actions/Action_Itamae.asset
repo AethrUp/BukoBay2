@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Itamae
   m_EditorClassIdentifier: 
   actionName: Itamae
+  actionImage: {fileID: 8724034902407333338, guid: ffe4bf3f3279b654481987410efbb152, type: 3}
   playerEffect: 0
   fishEffect: 0
   canTargetPlayer: 0

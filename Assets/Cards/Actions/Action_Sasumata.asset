@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Sasumata
   m_EditorClassIdentifier: 
   actionName: Sasumata
+  actionImage: {fileID: -2846381900449457035, guid: a09d33128f72327478706994145568fa, type: 3}
   playerEffect: 0
   fishEffect: -3
   canTargetPlayer: 0

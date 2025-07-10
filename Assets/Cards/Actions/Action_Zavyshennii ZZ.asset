@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Zavyshennii ZZ
   m_EditorClassIdentifier: 
   actionName: Zavyshennii ZZ
+  actionImage: {fileID: 1645245731500794117, guid: 9d7a0b6108c247b479504540f4ab524a, type: 3}
   playerEffect: 0
   fishEffect: 0
   canTargetPlayer: 0

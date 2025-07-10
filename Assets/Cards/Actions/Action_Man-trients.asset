@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Man-trients
   m_EditorClassIdentifier: 
   actionName: Man-trients
+  actionImage: {fileID: -5528555819052140105, guid: 0707bacda84aa9f4b93653ddd3251407, type: 3}
   playerEffect: 4
   fishEffect: 0
   canTargetPlayer: 1

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Zashchit Rubash
   m_EditorClassIdentifier: 
   actionName: Zashchit Rubash
+  actionImage: {fileID: 0}
   playerEffect: 0
   fishEffect: 0
   canTargetPlayer: 0

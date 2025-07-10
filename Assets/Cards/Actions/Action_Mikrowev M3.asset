@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Mikrowev M3
   m_EditorClassIdentifier: 
   actionName: Mikrowev M3
+  actionImage: {fileID: 4653075363701351593, guid: cd5a63fc9e266fa4d9095979ca3ee183, type: 3}
   playerEffect: -4
   fishEffect: 0
   canTargetPlayer: 1

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Tykat Y
   m_EditorClassIdentifier: 
   actionName: Tykat Y
+  actionImage: {fileID: -82638674220892560, guid: 297dbc381d1aae041a6547f80480c7be, type: 3}
   playerEffect: -1
   fishEffect: 0
   canTargetPlayer: 1

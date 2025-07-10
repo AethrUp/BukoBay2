@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Red Eye
   m_EditorClassIdentifier: 
   actionName: Red Eye
+  actionImage: {fileID: 1714207452591874078, guid: 66f92cdcdb017c04cb9ca6e8c59d436f, type: 3}
   playerEffect: -3
   fishEffect: 0
   canTargetPlayer: 1

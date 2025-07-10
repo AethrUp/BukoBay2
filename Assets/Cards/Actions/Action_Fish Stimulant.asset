@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Fish Stimulant
   m_EditorClassIdentifier: 
   actionName: Fish Stimulant
+  actionImage: {fileID: -5934255026176001199, guid: 62691459663a38547bd59e11d49c7bb5, type: 3}
   playerEffect: -5
   fishEffect: 3
   canTargetPlayer: 1

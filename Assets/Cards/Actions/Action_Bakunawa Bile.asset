@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Bakunawa Bile
   m_EditorClassIdentifier: 
   actionName: Bakunawa Bile
+  actionImage: {fileID: 4282155862148187541, guid: 09ae4bf72ae13be4689c1d8d8b4d5b67, type: 3}
   playerEffect: -7
   fishEffect: -7
   canTargetPlayer: 1

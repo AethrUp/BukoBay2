@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Jinro's Whisker
   m_EditorClassIdentifier: 
   actionName: Jinro's Whisker
+  actionImage: {fileID: 9094033391551345387, guid: fe7c93194175eba4fb1e5b666b56c544, type: 3}
   playerEffect: 5
   fishEffect: 0
   canTargetPlayer: 1

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Elixir of Strength
   m_EditorClassIdentifier: 
   actionName: Elixir of Strength
+  actionImage: {fileID: -3742286816190420980, guid: b04277db2ddcd49499e723e7054eff10, type: 3}
   playerEffect: 4
   fishEffect: 0
   canTargetPlayer: 1

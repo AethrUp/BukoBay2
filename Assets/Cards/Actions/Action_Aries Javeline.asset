@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Aries Javeline
   m_EditorClassIdentifier: 
   actionName: Aries Javeline
+  actionImage: {fileID: -3903620147345040434, guid: a148381d3b09bc74ca7f74af70efc025, type: 3}
   playerEffect: 3
   fishEffect: 0
   canTargetPlayer: 1

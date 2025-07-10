@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Monarch
   m_EditorClassIdentifier: 
   actionName: Monarch
+  actionImage: {fileID: 0}
   playerEffect: -3
   fishEffect: 0
   canTargetPlayer: 1

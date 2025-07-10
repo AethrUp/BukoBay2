@@ -18,6 +18,7 @@ MonoBehaviour:
   gearType: Rod
   power: 2
   durability: 5
+  maxDurability: 0
   material: Metal
   depth1Effect: 0
   depth2Effect: 0

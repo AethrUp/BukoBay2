@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Otsuchii SS
   m_EditorClassIdentifier: 
   actionName: Otsuchii SS
+  actionImage: {fileID: -8081843859472088550, guid: cb34683628b5f4045b9f9c514d6b9670, type: 3}
   playerEffect: -5
   fishEffect: -5
   canTargetPlayer: 1

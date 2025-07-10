@@ -109,7 +109,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 46.9, y: -55.95}
+  m_AnchoredPosition: {x: -51.197, y: -55.95}
   m_SizeDelta: {x: 47.6066, y: 33.468}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7368202820137563366
@@ -245,7 +245,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -48.9, y: -55.071}
+  m_AnchoredPosition: {x: 48.6, y: -55.071}
   m_SizeDelta: {x: 43.5886, y: 35.226}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1033004083613339999
@@ -520,11 +520,17 @@ MonoBehaviour:
   statsText: {fileID: 0}
   powerText: {fileID: 4078504395425917700}
   durabilityText: {fileID: 6589267359291059424}
+  priceText: {fileID: 0}
+  quantityText: {fileID: 0}
   cardBackground: {fileID: 0}
   cardArtwork: {fileID: 7306387628852571867}
   gearCard: {fileID: 0}
   fishCard: {fileID: 0}
   actionCard: {fileID: 0}
+  effectCard: {fileID: 0}
+  itemPrice: 0
+  itemQuantity: 0
+  isShopItem: 0
 --- !u!114 &4947934085398688057
 MonoBehaviour:
   m_ObjectHideFlags: 0

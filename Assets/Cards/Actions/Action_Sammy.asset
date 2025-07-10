@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Sammy
   m_EditorClassIdentifier: 
   actionName: Sammy
+  actionImage: {fileID: 0}
   playerEffect: 2
   fishEffect: 0
   canTargetPlayer: 1

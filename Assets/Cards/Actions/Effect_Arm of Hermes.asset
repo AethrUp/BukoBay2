@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Effect_Arm of Hermes
   m_EditorClassIdentifier: 
   actionName: Arm of Hermes
+  actionImage: {fileID: 5788763991305837951, guid: dd1badf50a57ba142a7fa1d758e08b33, type: 3}
   playerEffect: 0
   fishEffect: 0
   canTargetPlayer: 0

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Elixir of Weakness
   m_EditorClassIdentifier: 
   actionName: Elixir of Weakness
+  actionImage: {fileID: 0}
   playerEffect: -4
   fishEffect: 0
   canTargetPlayer: 1

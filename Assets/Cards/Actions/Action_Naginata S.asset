@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Naginata S
   m_EditorClassIdentifier: 
   actionName: Naginata S
+  actionImage: {fileID: 3313751890631471141, guid: 63d19dcd6e0dae64697d55e3a6119313, type: 3}
   playerEffect: 3
   fishEffect: 3
   canTargetPlayer: 1

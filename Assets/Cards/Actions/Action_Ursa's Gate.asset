@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Ursa's Gate
   m_EditorClassIdentifier: 
   actionName: Ursa's Gate
+  actionImage: {fileID: 5803570818678787474, guid: 7bd89f5c4b2701b41a3de9a0485753d4, type: 3}
   playerEffect: 0
   fishEffect: -5
   canTargetPlayer: 0

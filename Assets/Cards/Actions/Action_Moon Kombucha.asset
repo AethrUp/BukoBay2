@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Moon Kombucha
   m_EditorClassIdentifier: 
   actionName: Moon Kombucha
+  actionImage: {fileID: 3361234801189053755, guid: b74f081db9afb7d48b857e0661798540, type: 3}
   playerEffect: 4
   fishEffect: 2
   canTargetPlayer: 1

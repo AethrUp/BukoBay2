@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Rybak Vodka
   m_EditorClassIdentifier: 
   actionName: Rybak Vodka
+  actionImage: {fileID: -3491228972430459340, guid: 69b7959a5c7e7aa4985f7c3efb80dccf, type: 3}
   playerEffect: 3
   fishEffect: 0
   canTargetPlayer: 1

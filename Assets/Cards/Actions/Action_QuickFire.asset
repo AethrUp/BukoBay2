@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_QuickFire
   m_EditorClassIdentifier: 
   actionName: QuickFire
+  actionImage: {fileID: 0}
   playerEffect: 0
   fishEffect: 0
   canTargetPlayer: 0

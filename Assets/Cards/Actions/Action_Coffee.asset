@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Coffee
   m_EditorClassIdentifier: 
   actionName: Coffee
+  actionImage: {fileID: -391648047407094207, guid: 13be176844bc4ec409d54beff4ada26a, type: 3}
   playerEffect: 2
   fishEffect: 0
   canTargetPlayer: 1

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Lil Sluggie Boy
   m_EditorClassIdentifier: 
   actionName: Lil Sluggie Boy
+  actionImage: {fileID: -534764548932072664, guid: ff61bdd28da4b3049a809ce1f10ab7ae, type: 3}
   playerEffect: -2
   fishEffect: -2
   canTargetPlayer: 1

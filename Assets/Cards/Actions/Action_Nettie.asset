@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Nettie
   m_EditorClassIdentifier: 
   actionName: Nettie
+  actionImage: {fileID: -884364148173995931, guid: f92abbb40a79cb447ba47f657c7100dd, type: 3}
   playerEffect: 3
   fishEffect: 0
   canTargetPlayer: 1

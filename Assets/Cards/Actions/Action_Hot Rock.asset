@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Hot Rock
   m_EditorClassIdentifier: 
   actionName: Hot Rock
+  actionImage: {fileID: 2572728349081190088, guid: fb6e7dfc99e312349a1d67cf688f640d, type: 3}
   playerEffect: 2
   fishEffect: 0
   canTargetPlayer: 1

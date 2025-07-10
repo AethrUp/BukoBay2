@@ -8,8 +8,8 @@ public class CardDisplay : MonoBehaviour
     public TextMeshProUGUI cardNameText;
     public TextMeshProUGUI cardTypeText;
     public TextMeshProUGUI statsText;
-    public TextMeshProUGUI powerText;      // For gear: power, For actions: player effect
-    public TextMeshProUGUI durabilityText; // For gear: durability, For actions: fish effect
+    public TextMeshProUGUI powerText;      // For gear: power, For actions: player effect, For effects: effect info
+    public TextMeshProUGUI durabilityText; // For gear: durability, For actions: fish effect, For effects: usage info
     public TextMeshProUGUI priceText;      // For shop items: price
     public TextMeshProUGUI quantityText;   // For shop items: quantity
     public Image cardBackground;
@@ -19,6 +19,7 @@ public class CardDisplay : MonoBehaviour
     public GearCard gearCard;
     public FishCard fishCard;
     public ActionCard actionCard;
+    public EffectCard effectCard;
     
     [Header("Shop Data")]
     public int itemPrice = 0;
@@ -56,6 +57,11 @@ public class CardDisplay : MonoBehaviour
         {
             Debug.Log("Displaying action card: " + actionCard.actionName);
             DisplayActionCard();
+        }
+        else if (effectCard != null)
+        {
+            Debug.Log("Displaying effect card: " + effectCard.effectName);
+            DisplayEffectCard();
         }
         else
         {
@@ -154,5 +160,41 @@ public class CardDisplay : MonoBehaviour
         }
         
         if (cardArtwork != null) cardArtwork.sprite = actionCard.actionImage;
+    }
+    
+    void DisplayEffectCard()
+    {
+        if (cardNameText != null) cardNameText.text = effectCard.effectName;
+        if (cardTypeText != null) cardTypeText.text = "Effect";
+        
+        // Show effect-specific info
+        string effectInfo = "";
+        switch (effectCard.effectType)
+        {
+            case EffectType.Repair:
+                if (effectCard.repairHalfDamage)
+                    effectInfo = "Repairs 50% damage";
+                else
+                    effectInfo = $"Repairs {effectCard.repairAmount} durability";
+                break;
+            case EffectType.Protection:
+                effectInfo = "Protection Effect";
+                break;
+            case EffectType.Utility:
+                effectInfo = "Utility Effect";
+                break;
+            case EffectType.Persistent:
+                effectInfo = "Persistent Effect";
+                break;
+        }
+        
+        // Use powerText and durabilityText for effect info
+        if (powerText != null) powerText.text = effectInfo;
+        if (durabilityText != null) durabilityText.text = effectCard.singleUse ? "Single Use" : "Reusable";
+        
+        // Use statsText for description
+        if (statsText != null) statsText.text = effectCard.description;
+        
+        if (cardArtwork != null) cardArtwork.sprite = effectCard.effectImage;
     }
 }

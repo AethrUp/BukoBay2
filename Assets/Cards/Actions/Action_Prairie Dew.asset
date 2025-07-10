@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Prairie Dew
   m_EditorClassIdentifier: 
   actionName: Prairie Dew
+  actionImage: {fileID: -7501689874842860893, guid: 6ccfd37e4311d4c4b8da7cf1a0ed0d09, type: 3}
   playerEffect: -5
   fishEffect: 0
   canTargetPlayer: 1

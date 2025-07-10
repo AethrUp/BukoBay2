@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Sarsasparilla
   m_EditorClassIdentifier: 
   actionName: Sarsasparilla
+  actionImage: {fileID: -4878107556439225359, guid: 663bb47602e63044ebf967eae08cd843, type: 3}
   playerEffect: 2
   fishEffect: 0
   canTargetPlayer: 1

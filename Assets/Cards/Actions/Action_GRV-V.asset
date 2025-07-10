@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_GRV-V
   m_EditorClassIdentifier: 
   actionName: GRV-V
+  actionImage: {fileID: 3769969742485170016, guid: de842c7d6d0f80d42b09b12b290c0205, type: 3}
   playerEffect: -3
   fishEffect: 0
   canTargetPlayer: 1

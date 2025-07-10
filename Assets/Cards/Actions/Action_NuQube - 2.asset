@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_NuQube - 2
   m_EditorClassIdentifier: 
   actionName: NuQube - 2
+  actionImage: {fileID: 146753665152074173, guid: 899481dd8e2d3f848aca6b8196e58ba6, type: 3}
   playerEffect: 2
   fishEffect: 0
   canTargetPlayer: 1

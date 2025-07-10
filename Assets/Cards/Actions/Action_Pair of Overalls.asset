@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Pair of Overalls
   m_EditorClassIdentifier: 
   actionName: Pair of Overalls
+  actionImage: {fileID: -8438148074888251229, guid: 52e4121904062a24394c44bd38c6e9e0, type: 3}
   playerEffect: -3
   fishEffect: 0
   canTargetPlayer: 1

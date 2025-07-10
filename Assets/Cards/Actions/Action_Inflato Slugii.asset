@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Inflato Slugii
   m_EditorClassIdentifier: 
   actionName: Inflato Slugii
+  actionImage: {fileID: -423295541030511052, guid: f103846049c77fc4492fa2ccd4bf0a63, type: 3}
   playerEffect: -2
   fishEffect: 0
   canTargetPlayer: 1

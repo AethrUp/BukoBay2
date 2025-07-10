@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_XO-A
   m_EditorClassIdentifier: 
   actionName: XO-A
+  actionImage: {fileID: 8239133706922841566, guid: 6c5612a2e8239434dafd577bd9782584, type: 3}
   playerEffect: 3
   fishEffect: 0
   canTargetPlayer: 1

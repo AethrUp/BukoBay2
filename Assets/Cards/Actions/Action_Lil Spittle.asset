@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Lil Spittle
   m_EditorClassIdentifier: 
   actionName: Lil Spittle
+  actionImage: {fileID: -4270416320128350393, guid: 2d1043a50779c1d4187811f05608c4c1, type: 3}
   playerEffect: -2
   fishEffect: 0
   canTargetPlayer: 1

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Udar 98
   m_EditorClassIdentifier: 
   actionName: Udar 98
+  actionImage: {fileID: 2014704668561566793, guid: 1173868d1106da74487bcad1eb4f66ba, type: 3}
   playerEffect: -3
   fishEffect: 0
   canTargetPlayer: 1

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Radioactive Waste
   m_EditorClassIdentifier: 
   actionName: Radioactive Waste
+  actionImage: {fileID: -2971911038878210443, guid: e547c7e56f017964ab5e8d2ba72887db, type: 3}
   playerEffect: 2
   fishEffect: 0
   canTargetPlayer: 1

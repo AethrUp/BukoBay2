@@ -9,10 +9,11 @@ public class GearCard : ScriptableObject
     public Sprite gearImage;
     
     [Header("Stats")]
-    public string gearType;
-    public int power;
-    public int durability;
-    public string material;
+public string gearType;
+public int power;
+public int durability;
+public int maxDurability;  // ADD THIS LINE
+public string material;
     
     [Header("Depth Effects (1-9)")]
     public int depth1Effect;

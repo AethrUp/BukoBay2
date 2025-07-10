@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Banjo
   m_EditorClassIdentifier: 
   actionName: Banjo
+  actionImage: {fileID: -2614432340280155419, guid: d663399be613a6b44bcadeb7a49c0aba, type: 3}
   playerEffect: -4
   fishEffect: -4
   canTargetPlayer: 1

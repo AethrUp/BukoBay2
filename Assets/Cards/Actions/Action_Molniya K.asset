@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Molniya K
   m_EditorClassIdentifier: 
   actionName: Molniya K
+  actionImage: {fileID: -3613426741978182866, guid: eaa4d7fd591988b459ef3276d6ffde8d, type: 3}
   playerEffect: 0
   fishEffect: -10
   canTargetPlayer: 0

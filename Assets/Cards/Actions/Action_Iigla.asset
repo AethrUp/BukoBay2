@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Iigla
   m_EditorClassIdentifier: 
   actionName: Iigla
+  actionImage: {fileID: 2229841913960457230, guid: 8344a424ec3d6c9448b944fb7d735593, type: 3}
   playerEffect: 0
   fishEffect: -2
   canTargetPlayer: 0

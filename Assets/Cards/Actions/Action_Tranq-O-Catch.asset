@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Tranq-O-Catch
   m_EditorClassIdentifier: 
   actionName: Tranq-O-Catch
+  actionImage: {fileID: 0}
   playerEffect: 0
   fishEffect: -5
   canTargetPlayer: 0

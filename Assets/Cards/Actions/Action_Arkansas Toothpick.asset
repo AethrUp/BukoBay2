@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Arkansas Toothpick
   m_EditorClassIdentifier: 
   actionName: Arkansas Toothpick
+  actionImage: {fileID: 749443412400371893, guid: 416bcf9b3848de249b6461cb355d5491, type: 3}
   playerEffect: -5
   fishEffect: -5
   canTargetPlayer: 1

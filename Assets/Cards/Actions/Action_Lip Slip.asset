@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Lip Slip
   m_EditorClassIdentifier: 
   actionName: Lip Slip
+  actionImage: {fileID: 0}
   playerEffect: 0
   fishEffect: 0
   canTargetPlayer: 0

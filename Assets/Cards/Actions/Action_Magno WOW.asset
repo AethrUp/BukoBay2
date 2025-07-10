@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Action_Magno WOW
   m_EditorClassIdentifier: 
   actionName: Magno WOW
+  actionImage: {fileID: 0}
   playerEffect: 0
   fishEffect: 0
   canTargetPlayer: 0
