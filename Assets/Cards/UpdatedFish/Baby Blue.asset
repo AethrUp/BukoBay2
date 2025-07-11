@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Baby Blue
   m_EditorClassIdentifier: 
   fishName: Baby Blue
-  fishImage: {fileID: 0}
+  fishImage: {fileID: -5511300794793373410, guid: 311a1a0366702f444a2f91c7491d97a1, type: 3}
   mainDepth: 3
   subDepth: 7
   power: 16

@@ -118,12 +118,16 @@ public class InventoryDisplay : MonoBehaviour
         GameObject powerText = CreateTextElement(prefab, "Power", new Vector2(-50, 10), "0");
         GameObject durabilityText = CreateTextElement(prefab, "Durability", new Vector2(50, 10), "0");
         
+        // Create protection icon (top-right corner)
+        GameObject protectionIcon = CreateProtectionIcon(prefab, "ProtectionIcon", new Vector2(80, 80));
+        
         // Connect to CardDisplay component
         cardDisplay.cardNameText = nameText.GetComponent<TMPro.TextMeshProUGUI>();
         cardDisplay.cardTypeText = typeText.GetComponent<TMPro.TextMeshProUGUI>();
         cardDisplay.powerText = powerText.GetComponent<TMPro.TextMeshProUGUI>();
         cardDisplay.durabilityText = durabilityText.GetComponent<TMPro.TextMeshProUGUI>();
         cardDisplay.cardBackground = bgImage;
+        cardDisplay.protectionIcon = protectionIcon.GetComponent<UnityEngine.UI.Image>();
         
         // Store as prefab reference
         cardDisplayPrefab = prefab;
@@ -244,6 +248,52 @@ public class InventoryDisplay : MonoBehaviour
         textRect.sizeDelta = new Vector2(cardWidth - 20, 20);
         
         return textObj;
+    }
+    
+    GameObject CreateProtectionIcon(GameObject parent, string name, Vector2 position)
+    {
+        GameObject iconObj = new GameObject(name);
+        iconObj.transform.SetParent(parent.transform, false);
+        
+        // Add Image component for the shield sprite
+        UnityEngine.UI.Image iconImage = iconObj.AddComponent<UnityEngine.UI.Image>();
+        
+        // Load the shield icon from your project
+        Sprite shieldSprite = LoadShieldIcon();
+        if (shieldSprite != null)
+        {
+            iconImage.sprite = shieldSprite;
+        }
+        else
+        {
+            Debug.LogWarning("Could not find shield icon at Assets/Cards/sheildIcon.png");
+        }
+        
+        // Position and size the icon
+        RectTransform iconRect = iconObj.GetComponent<RectTransform>();
+        iconRect.anchoredPosition = position;
+        iconRect.sizeDelta = new Vector2(20, 20); // Small 20x20 icon
+        iconRect.anchorMin = new Vector2(0.5f, 0.5f);
+        iconRect.anchorMax = new Vector2(0.5f, 0.5f);
+        iconRect.pivot = new Vector2(0.5f, 0.5f);
+        
+        // Hide by default
+        iconObj.SetActive(false);
+        
+        return iconObj;
+    }
+    
+    Sprite LoadShieldIcon()
+    {
+        #if UNITY_EDITOR
+        // Load the shield icon using AssetDatabase
+        string assetPath = "Assets/Cards/sheildIcon.png";
+        return UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(assetPath);
+        #else
+        // For builds, you'd need to put the icon in a Resources folder
+        // return Resources.Load<Sprite>("sheildIcon");
+        return null;
+        #endif
     }
     
     public void UpdateDisplay()

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Lightning Whale
   m_EditorClassIdentifier: 
   fishName: Lightning Whale
-  fishImage: {fileID: -8469208604200557945, guid: 43586f4e04f0ce84f910e4673d39d49a, type: 3}
+  fishImage: {fileID: -3176626657072989744, guid: 493f047fc8b0de44ba4fd85c1c50e295, type: 3}
   mainDepth: 3
   subDepth: 9
   power: 18

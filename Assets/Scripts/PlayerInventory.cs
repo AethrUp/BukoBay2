@@ -24,89 +24,98 @@ public class PlayerInventory : MonoBehaviour
     public static PlayerInventory Instance;
     
     void Awake()
-    {
-        // If there's already an instance, destroy this one
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        
-        // Make this the persistent instance
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-        
-        // Create copies of all gear cards to avoid modifying the original assets
-        CreateGearCopies();
-    }
+{
+    Debug.Log("PlayerInventory Awake() called!");
+    
+    // No more persistence logic - just create gear copies
+    CreateGearCopies();
+    
+    Debug.Log("CreateGearCopies() completed");
+}
     
     void CreateGearCopies()
+{
+    Debug.Log("Creating gear copies to avoid modifying original assets...");
+    
+    // Copy equipped gear and store original durability
+    if (equippedRod != null) 
     {
-        Debug.Log("Creating gear copies to avoid modifying original assets...");
-        
-        // Copy equipped gear and store original durability
-        if (equippedRod != null) 
-        {
-            equippedRod = Instantiate(equippedRod);
-            equippedRod.maxDurability = equippedRod.durability; // Store original as max
-        }
-        if (equippedReel != null) 
-        {
-            equippedReel = Instantiate(equippedReel);
-            equippedReel.maxDurability = equippedReel.durability;
-        }
-        if (equippedLine != null) 
-        {
-            equippedLine = Instantiate(equippedLine);
-            equippedLine.maxDurability = equippedLine.durability;
-        }
-        if (equippedLure != null) 
-        {
-            equippedLure = Instantiate(equippedLure);
-            equippedLure.maxDurability = equippedLure.durability;
-        }
-        if (equippedBait != null) 
-        {
-            equippedBait = Instantiate(equippedBait);
-            equippedBait.maxDurability = equippedBait.durability;
-        }
-        if (equippedExtra1 != null) 
-        {
-            equippedExtra1 = Instantiate(equippedExtra1);
-            equippedExtra1.maxDurability = equippedExtra1.durability;
-        }
-        if (equippedExtra2 != null) 
-        {
-            equippedExtra2 = Instantiate(equippedExtra2);
-            equippedExtra2.maxDurability = equippedExtra2.durability;
-        }
-        
-        // Copy tackle box gear and store original durability
-        for (int i = 0; i < extraGear.Count; i++)
-        {
-            if (extraGear[i] != null)
-            {
-                extraGear[i] = Instantiate(extraGear[i]);
-                extraGear[i].maxDurability = extraGear[i].durability;
-            }
-        }
-        
-        // Copy effect cards
-        for (int i = 0; i < effectCards.Count; i++)
-        {
-            if (effectCards[i] != null)
-                effectCards[i] = Instantiate(effectCards[i]);
-        }
-        
-        // Copy action cards  
-        for (int i = 0; i < actionCards.Count; i++)
-        {
-            if (actionCards[i] != null)
-                actionCards[i] = Instantiate(actionCards[i]);
-        }
-        
-        Debug.Log("Gear copies created successfully with max durability stored");
+        Debug.Log($"Before copy - Rod: {equippedRod.gearName}, Durability: {equippedRod.durability}");
+        equippedRod = Instantiate(equippedRod);
+        equippedRod.maxDurability = equippedRod.durability; // Store original as max
+        Debug.Log($"After copy - Rod: {equippedRod.gearName}, Durability: {equippedRod.durability}, Max: {equippedRod.maxDurability}");
     }
+    if (equippedReel != null) 
+    {
+        Debug.Log($"Before copy - Reel: {equippedReel.gearName}, Durability: {equippedReel.durability}");
+        equippedReel = Instantiate(equippedReel);
+        equippedReel.maxDurability = equippedReel.durability;
+        Debug.Log($"After copy - Reel: {equippedReel.gearName}, Durability: {equippedReel.durability}, Max: {equippedReel.maxDurability}");
+    }
+    if (equippedLine != null) 
+    {
+        Debug.Log($"Before copy - Line: {equippedLine.gearName}, Durability: {equippedLine.durability}");
+        equippedLine = Instantiate(equippedLine);
+        equippedLine.maxDurability = equippedLine.durability;
+        Debug.Log($"After copy - Line: {equippedLine.gearName}, Durability: {equippedLine.durability}, Max: {equippedLine.maxDurability}");
+    }
+    if (equippedLure != null) 
+    {
+        Debug.Log($"Before copy - Lure: {equippedLure.gearName}, Durability: {equippedLure.durability}");
+        equippedLure = Instantiate(equippedLure);
+        equippedLure.maxDurability = equippedLure.durability;
+        Debug.Log($"After copy - Lure: {equippedLure.gearName}, Durability: {equippedLure.durability}, Max: {equippedLure.maxDurability}");
+    }
+    if (equippedBait != null) 
+    {
+        Debug.Log($"Before copy - Bait: {equippedBait.gearName}, Durability: {equippedBait.durability}");
+        equippedBait = Instantiate(equippedBait);
+        equippedBait.maxDurability = equippedBait.durability;
+        Debug.Log($"After copy - Bait: {equippedBait.gearName}, Durability: {equippedBait.durability}, Max: {equippedBait.maxDurability}");
+    }
+    if (equippedExtra1 != null) 
+    {
+        Debug.Log($"Before copy - Extra1: {equippedExtra1.gearName}, Durability: {equippedExtra1.durability}");
+        equippedExtra1 = Instantiate(equippedExtra1);
+        equippedExtra1.maxDurability = equippedExtra1.durability;
+        Debug.Log($"After copy - Extra1: {equippedExtra1.gearName}, Durability: {equippedExtra1.durability}, Max: {equippedExtra1.maxDurability}");
+    }
+    if (equippedExtra2 != null) 
+    {
+        Debug.Log($"Before copy - Extra2: {equippedExtra2.gearName}, Durability: {equippedExtra2.durability}");
+        equippedExtra2 = Instantiate(equippedExtra2);
+        equippedExtra2.maxDurability = equippedExtra2.durability;
+        Debug.Log($"After copy - Extra2: {equippedExtra2.gearName}, Durability: {equippedExtra2.durability}, Max: {equippedExtra2.maxDurability}");
+    }
+    
+    // Copy tackle box gear and store original durability
+    for (int i = 0; i < extraGear.Count; i++)
+    {
+        if (extraGear[i] != null)
+        {
+            Debug.Log($"Before copy - TackleBox[{i}]: {extraGear[i].gearName}, Durability: {extraGear[i].durability}");
+            extraGear[i] = Instantiate(extraGear[i]);
+            extraGear[i].maxDurability = extraGear[i].durability;
+            Debug.Log($"After copy - TackleBox[{i}]: {extraGear[i].gearName}, Durability: {extraGear[i].durability}, Max: {extraGear[i].maxDurability}");
+        }
+    }
+    
+    // Copy effect cards
+    for (int i = 0; i < effectCards.Count; i++)
+    {
+        if (effectCards[i] != null)
+            effectCards[i] = Instantiate(effectCards[i]);
+    }
+    
+    // Copy action cards  
+    for (int i = 0; i < actionCards.Count; i++)
+    {
+        if (actionCards[i] != null)
+            actionCards[i] = Instantiate(actionCards[i]);
+    }
+    
+    Debug.Log("Gear copies created successfully with max durability stored");
+}
     
     // Function to check if a specific gear type is equipped
     public bool HasGearType(string gearType)

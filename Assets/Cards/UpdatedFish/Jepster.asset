@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Jepster
   m_EditorClassIdentifier: 
   fishName: Jepster
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 6934233696673383967, guid: ff81ad1969887c4458f7f8df27a1c2a4, type: 3}
   mainDepth: 1
   subDepth: 3
   power: 6

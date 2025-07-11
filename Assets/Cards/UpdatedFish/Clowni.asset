@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Clowni
   m_EditorClassIdentifier: 
   fishName: Clowni
-  fishImage: {fileID: -153674154848582116, guid: 13c0cc0008500f14ba0d87c1f0b4470e, type: 3}
+  fishImage: {fileID: 2444109019265409417, guid: 732c360bea41e644b8f9aa8a9993508e, type: 3}
   mainDepth: 1
   subDepth: 1
   power: 4

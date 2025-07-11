@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Anemoni
   m_EditorClassIdentifier: 
   fishName: Anemoni
-  fishImage: {fileID: -5617088606016511087, guid: 1f6cab4e4d1ccf344a32c453707627f1, type: 3}
+  fishImage: {fileID: -2090466682480542818, guid: 9744682115b79d94993c3030b1ca6614, type: 3}
   mainDepth: 1
   subDepth: 1
   power: 5

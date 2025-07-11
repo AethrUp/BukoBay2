@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Mosasaurus
   m_EditorClassIdentifier: 
   fishName: Mosasaurus
-  fishImage: {fileID: -7981283485955961280, guid: 46b3e031602ad9746ad63b12a162208a, type: 3}
+  fishImage: {fileID: -4287298253074239855, guid: b843dfe0aaf35ca45af4993661aac26b, type: 3}
   mainDepth: 2
   subDepth: 6
   power: 10

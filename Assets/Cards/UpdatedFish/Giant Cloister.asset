@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Giant Cloister
   m_EditorClassIdentifier: 
   fishName: Giant Cloister
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 4204284292704615366, guid: f86d8d9e0a4679048bbc7d72bbfc3841, type: 3}
   mainDepth: 1
   subDepth: 3
   power: 4

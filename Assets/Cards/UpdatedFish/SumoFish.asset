@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SumoFish
   m_EditorClassIdentifier: 
   fishName: SumoFish
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 97543812910872187, guid: 3b19e08b9af51b94fa87f86f707b0bdd, type: 3}
   mainDepth: 3
   subDepth: 7
   power: 19

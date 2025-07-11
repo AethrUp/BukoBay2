@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Bumblefish
   m_EditorClassIdentifier: 
   fishName: Bumblefish
-  fishImage: {fileID: 0}
+  fishImage: {fileID: -1984848372742794459, guid: a8383ffe8a5f2c949a6ad5907a97ab14, type: 3}
   mainDepth: 2
   subDepth: 4
   power: 9

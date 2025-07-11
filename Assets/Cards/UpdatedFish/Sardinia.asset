@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Sardinia
   m_EditorClassIdentifier: 
   fishName: Sardinia
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 6124211432338382266, guid: ce2c78d27cca9284484261651e674f06, type: 3}
   mainDepth: 1
   subDepth: 2
   power: 4

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Barracuda
   m_EditorClassIdentifier: 
   fishName: Barracuda
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 1237399038030768594, guid: 4127c09d1a6b51d40ab06ab739929162, type: 3}
   mainDepth: 1
   subDepth: 3
   power: 4

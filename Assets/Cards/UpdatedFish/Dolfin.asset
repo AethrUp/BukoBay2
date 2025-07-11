@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Dolfin
   m_EditorClassIdentifier: 
   fishName: Dolfin
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 1314093801908058236, guid: 077dd2b780cd22e42931bdf554ab6e47, type: 3}
   mainDepth: 2
   subDepth: 6
   power: 10

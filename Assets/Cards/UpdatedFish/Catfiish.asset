@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Catfiish
   m_EditorClassIdentifier: 
   fishName: Catfiish
-  fishImage: {fileID: 1945116215516448502, guid: c5bd0aae2420e7f4597a33fa32944d32, type: 3}
+  fishImage: {fileID: -8180718427656014925, guid: 587100667ab069243ac82bbc86e4c4a3, type: 3}
   mainDepth: 1
   subDepth: 2
   power: 6

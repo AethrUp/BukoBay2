@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Megalodon
   m_EditorClassIdentifier: 
   fishName: Megalodon
-  fishImage: {fileID: 4442152751571375674, guid: e70b94fa956df8943ae48e777861e1e2, type: 3}
+  fishImage: {fileID: -6767746648349558382, guid: 4322c3326f52308468fa297790943ab2, type: 3}
   mainDepth: 3
   subDepth: 8
   power: 19

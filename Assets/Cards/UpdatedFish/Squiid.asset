@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Squiid
   m_EditorClassIdentifier: 
   fishName: Squiid
-  fishImage: {fileID: 4000339528197924451, guid: 948f3feec819472478e06609b865ee56, type: 3}
+  fishImage: {fileID: 3593927745962067084, guid: 542e3aab14ee0a949bb9973f5c5b8a56, type: 3}
   mainDepth: 1
   subDepth: 2
   power: 6

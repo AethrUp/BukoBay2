@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Sailfish
   m_EditorClassIdentifier: 
   fishName: Sailfish
-  fishImage: {fileID: 0}
+  fishImage: {fileID: -8324521803228630263, guid: cefab6b1c4aa4e9459f79771d7bb6dd5, type: 3}
   mainDepth: 2
   subDepth: 5
   power: 10

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Torpedo
   m_EditorClassIdentifier: 
   fishName: Torpedo
-  fishImage: {fileID: -8861749890075921956, guid: 24180f679dd9459459b4fd00e6a201a3, type: 3}
+  fishImage: {fileID: -920614895858135285, guid: 711171927b3df534ab886c0eceb90e63, type: 3}
   mainDepth: 3
   subDepth: 9
   power: 17

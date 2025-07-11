@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Narwhal
   m_EditorClassIdentifier: 
   fishName: Narwhal
-  fishImage: {fileID: -8244672491526393290, guid: b1fe71f4014887a41ac784a2d67a9b0a, type: 3}
+  fishImage: {fileID: 5672379060190474854, guid: ca276471b96dcf541b32b829218d5672, type: 3}
   mainDepth: 3
   subDepth: 8
   power: 17

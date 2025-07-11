@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Mermaid
   m_EditorClassIdentifier: 
   fishName: Mermaid
-  fishImage: {fileID: -2303816385482242304, guid: 9e589e31f6d998d4595b0414ac3833aa, type: 3}
+  fishImage: {fileID: -8527838128565893672, guid: d9da49e18e489eb4c85e99187a2632bc, type: 3}
   mainDepth: 3
   subDepth: 7
   power: 16

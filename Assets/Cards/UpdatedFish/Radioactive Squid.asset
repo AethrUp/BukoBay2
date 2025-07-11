@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Radioactive Squid
   m_EditorClassIdentifier: 
   fishName: Radioactive Squid
-  fishImage: {fileID: 0}
+  fishImage: {fileID: -5525261534717206873, guid: 8c6390e36046e89419e09a9ac2b09e9d, type: 3}
   mainDepth: 3
   subDepth: 8
   power: 17

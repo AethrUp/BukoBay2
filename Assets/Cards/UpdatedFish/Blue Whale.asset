@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Blue Whale
   m_EditorClassIdentifier: 
   fishName: Blue Whale
-  fishImage: {fileID: -849550901580451509, guid: 7a574fead0f80b74d809b4900bb216ec, type: 3}
+  fishImage: {fileID: -5993704250113287724, guid: 5b4ffe611714d3b40b56d7624111b617, type: 3}
   mainDepth: 3
   subDepth: 7
   power: 19

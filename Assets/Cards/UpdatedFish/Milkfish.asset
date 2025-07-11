@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Milkfish
   m_EditorClassIdentifier: 
   fishName: Milkfish
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 8217271962119270399, guid: c76a004e0ba38ab438dab47c0149555f, type: 3}
   mainDepth: 1
   subDepth: 2
   power: 6

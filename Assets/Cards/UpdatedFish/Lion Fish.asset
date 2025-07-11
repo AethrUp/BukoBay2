@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Lion Fish
   m_EditorClassIdentifier: 
   fishName: Lion Fish
-  fishImage: {fileID: 0}
+  fishImage: {fileID: -2645050474553366069, guid: 41e8f3135468e674fbeb37bdf4a132f0, type: 3}
   mainDepth: 2
   subDepth: 4
   power: 9

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Stari
   m_EditorClassIdentifier: 
   fishName: Stari
-  fishImage: {fileID: -975534714167364469, guid: 2f0a3ea2334a68444bb2964022b3b6e9, type: 3}
+  fishImage: {fileID: 8096561928904252955, guid: 832afb27c081f9e409f0d834d5b47b41, type: 3}
   mainDepth: 1
   subDepth: 1
   power: 4

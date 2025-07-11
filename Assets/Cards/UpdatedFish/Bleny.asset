@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Bleny
   m_EditorClassIdentifier: 
   fishName: Bleny
-  fishImage: {fileID: 0}
+  fishImage: {fileID: -3568461051725686113, guid: f7e56cf01a8073a4688e13e5c35f45ab, type: 3}
   mainDepth: 1
   subDepth: 1
   power: 5

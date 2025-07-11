@@ -692,10 +692,14 @@ public class ShopManager : MonoBehaviour
             item.quantity--;
             
             if (item.itemType == ShopItem.ItemType.Gear && item.gearCard != null)
-            {
-                playerInventory.extraGear.Add(item.gearCard);
-                Debug.Log($"Added {item.gearCard.gearName} to player's gear");
-            }
+{
+    // Create a copy of the gear to avoid modifying the original asset
+    GearCard gearCopy = Instantiate(item.gearCard);
+    gearCopy.maxDurability = gearCopy.durability; // Store original durability as max
+    
+    playerInventory.extraGear.Add(gearCopy);
+    Debug.Log($"Added {gearCopy.gearName} copy to player's gear (Durability: {gearCopy.durability}/{gearCopy.maxDurability})");
+}
             else if (item.itemType == ShopItem.ItemType.Action && item.actionCard != null)
             {
                 playerInventory.actionCards.Add(item.actionCard);

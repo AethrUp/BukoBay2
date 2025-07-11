@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Urchin
   m_EditorClassIdentifier: 
   fishName: Urchin
-  fishImage: {fileID: 0}
+  fishImage: {fileID: -491630882708088005, guid: 2c4dc912874bd894fb1d07c1b3586dfa, type: 3}
   mainDepth: 1
   subDepth: 1
   power: 5

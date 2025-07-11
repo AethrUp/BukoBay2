@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Cosmic Jelli
   m_EditorClassIdentifier: 
   fishName: Cosmic Jelli
-  fishImage: {fileID: 7222305767932119169, guid: c07fcc913e6d70f43b6474249600cfa3, type: 3}
+  fishImage: {fileID: 7510265864467188058, guid: aa24f738d71016b44adbfb0fdbae7ad0, type: 3}
   mainDepth: 3
   subDepth: 8
   power: 16

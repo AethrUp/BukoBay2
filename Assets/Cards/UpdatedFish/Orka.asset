@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Orka
   m_EditorClassIdentifier: 
   fishName: Orka
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 2800141207643744815, guid: bbf7fa5eff26bbb42ab592d5cdce2ec9, type: 3}
   mainDepth: 3
   subDepth: 9
   power: 18

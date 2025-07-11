@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Junk
   m_EditorClassIdentifier: 
   fishName: Junk
-  fishImage: {fileID: -4810626303189975412, guid: 3cb7807e280cbaf449487166b5ae4f99, type: 3}
+  fishImage: {fileID: 3698234313127134493, guid: 25ff9d393d8aed74489682dbca568ec7, type: 3}
   mainDepth: 2
   subDepth: 5
   power: 10

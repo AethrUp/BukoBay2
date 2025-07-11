@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Maki
   m_EditorClassIdentifier: 
   fishName: Maki
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 2962707830961095814, guid: 7d34104025e332f4fa616b0c0d6d3e80, type: 3}
   mainDepth: 1
   subDepth: 3
   power: 5

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Seaturtil
   m_EditorClassIdentifier: 
   fishName: Seaturtil
-  fishImage: {fileID: 0}
+  fishImage: {fileID: -1407612038554653827, guid: 7ef643e9fe9db314d88396d4116efb05, type: 3}
   mainDepth: 2
   subDepth: 4
   power: 11

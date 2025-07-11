@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Sealeafs
   m_EditorClassIdentifier: 
   fishName: Sealeafs
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 437354644676344944, guid: f24f202eba21c654c8a81c36b74ca9be, type: 3}
   mainDepth: 1
   subDepth: 1
   power: 6

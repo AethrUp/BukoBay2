@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Kronosaurus
   m_EditorClassIdentifier: 
   fishName: Kronosaurus
-  fishImage: {fileID: -2854344548141901958, guid: dc1e633d4ac404e4a9a48b165287da76, type: 3}
+  fishImage: {fileID: -4287298253074239855, guid: b843dfe0aaf35ca45af4993661aac26b, type: 3}
   mainDepth: 3
   subDepth: 9
   power: 17

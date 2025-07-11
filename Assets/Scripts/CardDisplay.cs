@@ -14,6 +14,7 @@ public class CardDisplay : MonoBehaviour
     public TextMeshProUGUI quantityText;   // For shop items: quantity
     public Image cardBackground;
     public Image cardArtwork;
+    public Image protectionIcon;           // Shield sprite for protection
     
     [Header("Card Data")]
     public GearCard gearCard;
@@ -113,6 +114,9 @@ public class CardDisplay : MonoBehaviour
         if (statsText != null) statsText.text = "";
         
         if (cardArtwork != null) cardArtwork.sprite = gearCard.gearImage;
+        
+        // Handle protection icon
+        UpdateProtectionIcon();
     }
     
     void DisplayFishCard()
@@ -196,5 +200,21 @@ public class CardDisplay : MonoBehaviour
         if (statsText != null) statsText.text = effectCard.description;
         
         if (cardArtwork != null) cardArtwork.sprite = effectCard.effectImage;
+    }
+    
+    void UpdateProtectionIcon()
+    {
+        if (protectionIcon == null) return;
+        
+        // Show/hide protection icon based on gear protection status
+        if (gearCard != null && gearCard.hasProtection)
+        {
+            protectionIcon.gameObject.SetActive(true);
+            Debug.Log($"Showing protection icon for {gearCard.gearName}");
+        }
+        else
+        {
+            protectionIcon.gameObject.SetActive(false);
+        }
     }
 }

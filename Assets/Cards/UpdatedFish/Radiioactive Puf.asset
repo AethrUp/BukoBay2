@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Radiioactive Puf
   m_EditorClassIdentifier: 
   fishName: Radiioactive Puf
-  fishImage: {fileID: 2470235055787202272, guid: d20980f8a830a0a4a863ef7741f8330f, type: 3}
+  fishImage: {fileID: -6535061216159887078, guid: a594a99158c2aeb4e827ea9dd703807b, type: 3}
   mainDepth: 3
   subDepth: 8
   power: 16

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Pufling
   m_EditorClassIdentifier: 
   fishName: Pufling
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 5963504069866374622, guid: 2d53c7233462f814990b9c4a4e70bdac, type: 3}
   mainDepth: 1
   subDepth: 2
   power: 6

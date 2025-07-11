@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Jelli
   m_EditorClassIdentifier: 
   fishName: Jelli
-  fishImage: {fileID: 3964790451504784274, guid: fd5fba9d8de7b1548b8c036aa36f53f0, type: 3}
+  fishImage: {fileID: 7184469537686222111, guid: 284f9f988e3c3b743b0a1e5158bb68fe, type: 3}
   mainDepth: 1
   subDepth: 3
   power: 5

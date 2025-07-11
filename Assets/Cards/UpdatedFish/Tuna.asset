@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tuna
   m_EditorClassIdentifier: 
   fishName: Tuna
-  fishImage: {fileID: 8975063482949865834, guid: 114cf5c6f104ff1489cdbb5f731143ff, type: 3}
+  fishImage: {fileID: 6691283147511552051, guid: 19890c2498320104a882baf2cb87527b, type: 3}
   mainDepth: 1
   subDepth: 3
   power: 5

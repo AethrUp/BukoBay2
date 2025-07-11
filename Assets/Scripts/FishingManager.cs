@@ -671,23 +671,109 @@ void HandleFailure()
         
         return gearList;
     }
-    
+
     string DamageGearPiece(GearCard gear, int damageAmount)
+    {
+        // Check for protection first
+        if (gear.hasProtection)
+        {
+            Debug.Log($"🛡️ {gear.gearName} protection activated! Blocking {damageAmount} damage from {gear.protectionType}");
+
+            // Remove the protection (it's been used)
+            gear.hasProtection = false;
+            string protectionUsed = gear.protectionType;
+            gear.protectionType = "";
+
+            // Update the display to remove the shield icon
+            UpdateGearDisplay(gear);
+
+            Debug.Log($"Protection from {protectionUsed} consumed. {gear.gearName} takes no damage.");
+            return $"{gear.gearName} PROTECTED";
+        }
+
+        // No protection - apply damage normally
+        int originalDurability = gear.durability;
+        gear.durability = Mathf.Max(0, gear.durability - damageAmount);
+
+        Debug.Log($"Damaged {gear.gearName}: {originalDurability} → {gear.durability} durability (-{damageAmount})");
+
+        // Update the display to show new durability
+        UpdateGearDisplay(gear);
+
+        if (gear.durability <= 0)
+        {
+            Debug.Log($"⚠️ {gear.gearName} is BROKEN! (0 durability)");
+            return $"{gear.gearName} BROKEN";
+        }
+        else
+        {
+            return $"{gear.gearName} -{damageAmount}";
+        }
+    }
+void UpdateGearDisplay(GearCard gear)
 {
-    int originalDurability = gear.durability;
-    gear.durability = Mathf.Max(0, gear.durability - damageAmount);
+    // Find and update all displays showing this gear
+    CardDisplay[] allCardDisplays = FindObjectsByType<CardDisplay>(FindObjectsSortMode.None);
     
-    Debug.Log($"Damaged {gear.gearName}: {originalDurability} → {gear.durability} durability (-{damageAmount})");
+    foreach (CardDisplay cardDisplay in allCardDisplays)
+    {
+        if (cardDisplay.gearCard == gear)
+        {
+            cardDisplay.SendMessage("DisplayCard", SendMessageOptions.DontRequireReceiver);
+        }
+    }
+}
+void DestroyBrokenGear(GearCard brokenGear)
+{
+    if (currentPlayer == null || brokenGear == null) return;
     
-    if (gear.durability <= 0)
+    Debug.Log($"Destroying broken gear: {brokenGear.gearName}");
+    
+    // Remove from equipped slots
+    if (currentPlayer.equippedRod == brokenGear)
     {
-        Debug.Log($"⚠️ {gear.gearName} is BROKEN! (0 durability)");
-        return $"{gear.gearName} BROKEN";
+        currentPlayer.equippedRod = null;
+        Debug.Log("Removed broken rod from equipped slot");
     }
-    else
+    else if (currentPlayer.equippedReel == brokenGear)
     {
-        return $"{gear.gearName} -{damageAmount}";
+        currentPlayer.equippedReel = null;
+        Debug.Log("Removed broken reel from equipped slot");
     }
+    else if (currentPlayer.equippedLine == brokenGear)
+    {
+        currentPlayer.equippedLine = null;
+        Debug.Log("Removed broken line from equipped slot");
+    }
+    else if (currentPlayer.equippedLure == brokenGear)
+    {
+        currentPlayer.equippedLure = null;
+        Debug.Log("Removed broken lure from equipped slot");
+    }
+    else if (currentPlayer.equippedBait == brokenGear)
+    {
+        currentPlayer.equippedBait = null;
+        Debug.Log("Removed broken bait from equipped slot");
+    }
+    else if (currentPlayer.equippedExtra1 == brokenGear)
+    {
+        currentPlayer.equippedExtra1 = null;
+        Debug.Log("Removed broken gear from extra slot 1");
+    }
+    else if (currentPlayer.equippedExtra2 == brokenGear)
+    {
+        currentPlayer.equippedExtra2 = null;
+        Debug.Log("Removed broken gear from extra slot 2");
+    }
+    
+    // Also remove from tackle box if it's there
+    if (currentPlayer.extraGear.Contains(brokenGear))
+    {
+        currentPlayer.extraGear.Remove(brokenGear);
+        Debug.Log("Removed broken gear from tackle box");
+    }
+    
+    Debug.Log($"Successfully destroyed {brokenGear.gearName}");
 }
     
     // Public function to play action cards during interactive phase

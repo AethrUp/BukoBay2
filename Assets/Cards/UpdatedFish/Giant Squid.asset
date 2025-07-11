@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Giant Squid
   m_EditorClassIdentifier: 
   fishName: Giant Squid
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 4160543359277355609, guid: dd018ccf18007cd4c952c338db332917, type: 3}
   mainDepth: 2
   subDepth: 6
   power: 10

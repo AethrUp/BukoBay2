@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Stoneman
   m_EditorClassIdentifier: 
   fishName: Stoneman
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 1790191627928547123, guid: 05b4e32bf0d55114abfcbf39bd41da05, type: 3}
   mainDepth: 1
   subDepth: 3
   power: 5

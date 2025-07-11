@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Radioactive Waste
   m_EditorClassIdentifier: 
   fishName: Radioactive Waste
-  fishImage: {fileID: -2971911038878210443, guid: e547c7e56f017964ab5e8d2ba72887db, type: 3}
+  fishImage: {fileID: -6435352045391557987, guid: d79bc2cd0ed17d44e983e1d49ab0390c, type: 3}
   mainDepth: 2
   subDepth: 6
   power: 11

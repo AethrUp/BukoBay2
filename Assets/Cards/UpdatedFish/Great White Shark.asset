@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Great White Shark
   m_EditorClassIdentifier: 
   fishName: Great White Shark
-  fishImage: {fileID: 8828350603037861220, guid: 4be5c91aaae166a468137b1265989fec, type: 3}
+  fishImage: {fileID: 30125050734819266, guid: 7598af4f7e97c6a4093fbfcab46dc0f6, type: 3}
   mainDepth: 2
   subDepth: 6
   power: 11

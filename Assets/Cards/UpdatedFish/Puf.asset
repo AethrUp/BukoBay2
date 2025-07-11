@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Puf
   m_EditorClassIdentifier: 
   fishName: Puf
-  fishImage: {fileID: 1239664075574931003, guid: e3d34539f08e95840ab54b40f4c4f20c, type: 3}
+  fishImage: {fileID: -621359431677433727, guid: 7e9d0108225fe8943b2594b4c9275bcd, type: 3}
   mainDepth: 1
   subDepth: 3
   power: 5

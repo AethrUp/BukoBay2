@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Lobstir Prime
   m_EditorClassIdentifier: 
   fishName: Lobstir Prime
-  fishImage: {fileID: 0}
+  fishImage: {fileID: -3281923487956167314, guid: e2a99bdc3689cfa47a395bead3dd40f3, type: 3}
   mainDepth: 2
   subDepth: 6
   power: 10

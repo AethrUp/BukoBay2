@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Dunkleosteus
   m_EditorClassIdentifier: 
   fishName: Dunkleosteus
-  fishImage: {fileID: -4728880930791903265, guid: b94932c01aa373440923a61af2965cde, type: 3}
+  fishImage: {fileID: -4287298253074239855, guid: b843dfe0aaf35ca45af4993661aac26b, type: 3}
   mainDepth: 2
   subDepth: 6
   power: 11

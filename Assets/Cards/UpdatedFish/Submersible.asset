@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Submersible
   m_EditorClassIdentifier: 
   fishName: Submersible
-  fishImage: {fileID: -6484031451369407589, guid: 363750ab11e81944096a61327747eafb, type: 3}
+  fishImage: {fileID: 4443438409744034673, guid: 52f972b369ae4cb42a7865d4a151e452, type: 3}
   mainDepth: 3
   subDepth: 7
   power: 18

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Seakle
   m_EditorClassIdentifier: 
   fishName: Seakle
-  fishImage: {fileID: 0}
+  fishImage: {fileID: -5695994057939535623, guid: e111ffcbefa64ac4fb6ed38ccb836373, type: 3}
   mainDepth: 1
   subDepth: 1
   power: 5

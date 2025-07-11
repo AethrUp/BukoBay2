@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Marlin
   m_EditorClassIdentifier: 
   fishName: Marlin
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 3041689018094131812, guid: 0daafd343d59ff941ba066e1cba72f35, type: 3}
   mainDepth: 2
   subDepth: 5
   power: 11

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Big Raii
   m_EditorClassIdentifier: 
   fishName: Big Raii
-  fishImage: {fileID: 5740772242786742105, guid: f5c34d32bce9b9a4e81c41b98f094941, type: 3}
+  fishImage: {fileID: 3891147549589300480, guid: d7b6306cc7d8a584ea3286f53166038f, type: 3}
   mainDepth: 3
   subDepth: 7
   power: 18

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Oister
   m_EditorClassIdentifier: 
   fishName: Oister
-  fishImage: {fileID: -2686942278002404481, guid: 239c3666f639706498e6691ad4024f53, type: 3}
+  fishImage: {fileID: 1957650772432202415, guid: 443bff80c3635ff47a3b0e2c027acf3b, type: 3}
   mainDepth: 1
   subDepth: 1
   power: 4

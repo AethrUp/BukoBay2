@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RecyclerFiish
   m_EditorClassIdentifier: 
   fishName: RecyclerFiish
-  fishImage: {fileID: -6728906826671165104, guid: b13a082c987791342b57b875472539b5, type: 3}
+  fishImage: {fileID: 8777089743358242592, guid: 629ebe23b57134641aa95eb65a55d097, type: 3}
   mainDepth: 2
   subDepth: 5
   power: 9

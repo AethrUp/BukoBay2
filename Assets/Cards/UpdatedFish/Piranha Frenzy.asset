@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Piranha Frenzy
   m_EditorClassIdentifier: 
   fishName: Piranha Frenzy
-  fishImage: {fileID: 0}
+  fishImage: {fileID: -613354267193400126, guid: 9c90631e12b20084f97705f1748a1e49, type: 3}
   mainDepth: 2
   subDepth: 5
   power: 10

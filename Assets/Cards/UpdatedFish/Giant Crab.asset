@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Giant Crab
   m_EditorClassIdentifier: 
   fishName: Giant Crab
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 7096949139270178854, guid: 6858e513fd4ed7949adcccb173e3e26c, type: 3}
   mainDepth: 2
   subDepth: 6
   power: 9

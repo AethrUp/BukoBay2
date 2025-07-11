@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Equinine
   m_EditorClassIdentifier: 
   fishName: Equinine
-  fishImage: {fileID: 0}
+  fishImage: {fileID: -5816936244321713545, guid: 6af84391f69d8cf4da86279242df2d28, type: 3}
   mainDepth: 1
   subDepth: 1
   power: 5

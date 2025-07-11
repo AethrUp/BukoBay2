@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Koi
   m_EditorClassIdentifier: 
   fishName: Koi
-  fishImage: {fileID: -6005529356224218831, guid: 5c32b2ce6e5f1994c9479b16622dc3ea, type: 3}
+  fishImage: {fileID: -4615616152862767646, guid: 3344e1664c9403046a6a75235a8cbc3e, type: 3}
   mainDepth: 1
   subDepth: 2
   power: 5

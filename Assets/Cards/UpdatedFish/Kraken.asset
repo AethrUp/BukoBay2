@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Kraken
   m_EditorClassIdentifier: 
   fishName: Kraken
-  fishImage: {fileID: 5237017023272633388, guid: 75cecccfb21dd714e92eded513f4561a, type: 3}
+  fishImage: {fileID: -3858968278623798919, guid: b27ebd74604f1cd4991384ace45db89c, type: 3}
   mainDepth: 3
   subDepth: 9
   power: 16

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectName: BiteOff!
   effectImage: {fileID: 0}
-  effectType: 2
+  effectType: 1
   repairAmount: 0
   repairHalfDamage: 0
   description: Works every time! *not guaranteed to work on all sharks.*

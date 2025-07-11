@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Bakunawa
   m_EditorClassIdentifier: 
   fishName: Bakunawa
-  fishImage: {fileID: -5213167203053670461, guid: d3748e2ebc7cc8f47a4d4e42c1e27580, type: 3}
+  fishImage: {fileID: -5013161027770849957, guid: ef48dcf671a1bce47bcb8d16edfe0298, type: 3}
   mainDepth: 3
   subDepth: 9
   power: 17

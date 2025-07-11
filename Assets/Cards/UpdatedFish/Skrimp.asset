@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Skrimp
   m_EditorClassIdentifier: 
   fishName: Skrimp
-  fishImage: {fileID: 0}
+  fishImage: {fileID: 199451247498165582, guid: b0118896ec16af7488e15accaf4ff600, type: 3}
   mainDepth: 1
   subDepth: 1
   power: 5

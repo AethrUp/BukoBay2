@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Whale Shark
   m_EditorClassIdentifier: 
   fishName: Whale Shark
-  fishImage: {fileID: 3742706704262112072, guid: e0e83b32fe1a8c2419bdeb11c69acaf8, type: 3}
+  fishImage: {fileID: 5752301820189305588, guid: 8442744121aca124e97f82d59e690139, type: 3}
   mainDepth: 2
   subDepth: 4
   power: 10

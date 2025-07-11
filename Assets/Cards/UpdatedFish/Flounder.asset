@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Flounder
   m_EditorClassIdentifier: 
   fishName: Flounder
-  fishImage: {fileID: 0}
+  fishImage: {fileID: -2165508549920955440, guid: 5c67cb71eefeaca48b623a32068661d8, type: 3}
   mainDepth: 1
   subDepth: 2
   power: 6

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Angler
   m_EditorClassIdentifier: 
   fishName: Angler
-  fishImage: {fileID: 8294111392996102216, guid: 64f6b79d88cb6fe48afea8ff24fed5b5, type: 3}
+  fishImage: {fileID: -2160787434512505075, guid: d02dbce21eba2124b8370966688fc282, type: 3}
   mainDepth: 2
   subDepth: 6
   power: 10

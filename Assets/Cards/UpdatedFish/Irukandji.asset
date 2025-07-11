@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Irukandji
   m_EditorClassIdentifier: 
   fishName: Irukandji
-  fishImage: {fileID: 2697546306607356735, guid: 8bc4cf3175c32b444803583bfc341271, type: 3}
+  fishImage: {fileID: -4845771408389314410, guid: 01882302ecb510845ae3adee12b9ae71, type: 3}
   mainDepth: 3
   subDepth: 8
   power: 19

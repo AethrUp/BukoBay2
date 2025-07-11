@@ -171,8 +171,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
             case EffectType.Repair:
                 return CanRepairGear(effect, gear);
             case EffectType.Protection:
-                // Add other effect types later
-                return false;
+                return CanProtectGear(effect, gear);
             case EffectType.Utility:
                 return false;
             case EffectType.Persistent:
@@ -241,6 +240,9 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
             case EffectType.Repair:
                 ApplyRepairEffect(effect, targetGear);
                 break;
+            case EffectType.Protection:
+                ApplyProtectionEffect(effect, targetGear);
+                break;
             // Add other effect types later
         }
         
@@ -289,7 +291,97 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         }
     }
     
-    void UpdateSpecificGearDisplay(GearCard repairedGear)
+    void ApplyProtectionEffect(EffectCard protectionCard, GearCard gear)
+    {
+        // Apply protection to the gear
+        gear.hasProtection = true;
+        gear.protectionType = protectionCard.effectName;
+        
+        Debug.Log($"Applied {protectionCard.effectName} protection to {gear.gearName}");
+        
+        // For HandsOff, we need to protect ALL equipped gear
+        if (protectionCard.effectName.Contains("HandsOff"))
+        {
+            ApplyProtectionToAllGear(protectionCard);
+        }
+        
+        // Show protection feedback and update the display
+        ShowProtectionFeedback(gear, protectionCard.effectName);
+        UpdateSpecificGearDisplay(gear);
+    }
+    
+    void ApplyProtectionToAllGear(EffectCard protectionCard)
+    {
+        if (playerInventory == null) return;
+        
+        Debug.Log("Applying HandsOff protection to all equipped gear");
+        
+        // Apply protection to all equipped gear
+        if (playerInventory.equippedRod != null && !playerInventory.equippedRod.hasProtection)
+        {
+            playerInventory.equippedRod.hasProtection = true;
+            playerInventory.equippedRod.protectionType = protectionCard.effectName;
+            UpdateSpecificGearDisplay(playerInventory.equippedRod);
+        }
+        
+        if (playerInventory.equippedReel != null && !playerInventory.equippedReel.hasProtection)
+        {
+            playerInventory.equippedReel.hasProtection = true;
+            playerInventory.equippedReel.protectionType = protectionCard.effectName;
+            UpdateSpecificGearDisplay(playerInventory.equippedReel);
+        }
+        
+        if (playerInventory.equippedLine != null && !playerInventory.equippedLine.hasProtection)
+        {
+            playerInventory.equippedLine.hasProtection = true;
+            playerInventory.equippedLine.protectionType = protectionCard.effectName;
+            UpdateSpecificGearDisplay(playerInventory.equippedLine);
+        }
+        
+        if (playerInventory.equippedLure != null && !playerInventory.equippedLure.hasProtection)
+        {
+            playerInventory.equippedLure.hasProtection = true;
+            playerInventory.equippedLure.protectionType = protectionCard.effectName;
+            UpdateSpecificGearDisplay(playerInventory.equippedLure);
+        }
+        
+        if (playerInventory.equippedBait != null && !playerInventory.equippedBait.hasProtection)
+        {
+            playerInventory.equippedBait.hasProtection = true;
+            playerInventory.equippedBait.protectionType = protectionCard.effectName;
+            UpdateSpecificGearDisplay(playerInventory.equippedBait);
+        }
+        
+        if (playerInventory.equippedExtra1 != null && !playerInventory.equippedExtra1.hasProtection)
+        {
+            playerInventory.equippedExtra1.hasProtection = true;
+            playerInventory.equippedExtra1.protectionType = protectionCard.effectName;
+            UpdateSpecificGearDisplay(playerInventory.equippedExtra1);
+        }
+        
+        if (playerInventory.equippedExtra2 != null && !playerInventory.equippedExtra2.hasProtection)
+        {
+            playerInventory.equippedExtra2.hasProtection = true;
+            playerInventory.equippedExtra2.protectionType = protectionCard.effectName;
+            UpdateSpecificGearDisplay(playerInventory.equippedExtra2);
+        }
+        
+        Debug.Log("HandsOff protection applied to all equipped gear");
+    }
+    
+    void ShowProtectionFeedback(GearCard gear, string protectionType)
+    {
+        Debug.Log($"🛡️ {gear.gearName} protected with {protectionType}!");
+    }
+    
+    void ShowRepairFeedback(GearCard gear, int repairAmount)
+    {
+        // Simple console feedback for now
+        // You could add floating text or other visual effects later
+        Debug.Log($"✓ {gear.gearName} repaired for +{repairAmount} durability!");
+    }
+    
+    void UpdateSpecificGearDisplay(GearCard updatedGear)
     {
         // Find all CardDisplay components in the scene
         CardDisplay[] allCardDisplays = FindObjectsByType<CardDisplay>(FindObjectsSortMode.None);
@@ -298,24 +390,39 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         
         foreach (CardDisplay cardDisplay in allCardDisplays)
         {
-            // Check if this card display is showing the repaired gear
-            if (cardDisplay.gearCard == repairedGear)
+            // Check if this card display is showing the updated gear
+            if (cardDisplay.gearCard == updatedGear)
             {
-                Debug.Log($"Found CardDisplay showing {repairedGear.gearName}, forcing update");
+                Debug.Log($"Found CardDisplay showing {updatedGear.gearName}, forcing update");
                 
                 // Force the card display to update by calling DisplayCard
                 cardDisplay.SendMessage("DisplayCard", SendMessageOptions.DontRequireReceiver);
                 
-                Debug.Log($"Updated CardDisplay for {repairedGear.gearName}");
+                Debug.Log($"Updated CardDisplay for {updatedGear.gearName}");
             }
         }
     }
     
-    void ShowRepairFeedback(GearCard gear, int repairAmount)
+    bool CanProtectGear(EffectCard protectionCard, GearCard gear)
     {
-        // Simple console feedback for now
-        // You could add floating text or other visual effects later
-        Debug.Log($"✓ {gear.gearName} repaired for +{repairAmount} durability!");
+        // Check if gear already has protection
+        if (gear.hasProtection)
+        {
+            Debug.Log($"{gear.gearName} already has protection ({gear.protectionType})");
+            return false;
+        }
+        
+        // Check if gear belongs to the player
+        bool isPlayerGear = IsPlayerGear(gear);
+        
+        if (!isPlayerGear)
+        {
+            Debug.Log($"{gear.gearName} does not belong to the player");
+            return false;
+        }
+        
+        Debug.Log($"{gear.gearName} can be protected with {protectionCard.effectName}");
+        return true;
     }
     
     void ReturnToOriginalPosition()

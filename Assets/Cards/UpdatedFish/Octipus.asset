@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Octipus
   m_EditorClassIdentifier: 
   fishName: Octipus
-  fishImage: {fileID: -4491912474826804159, guid: 56c6e38e26b59c643947fa6ccd1e584d, type: 3}
+  fishImage: {fileID: -393720414041235215, guid: 5c019334c3509f14e90645b608d8374e, type: 3}
   mainDepth: 2
   subDepth: 4
   power: 11

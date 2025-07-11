@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Monk Crab
   m_EditorClassIdentifier: 
   fishName: Monk Crab
-  fishImage: {fileID: 0}
+  fishImage: {fileID: -3027699971090960523, guid: 6874c152978f27f44b335cf7baef8ff9, type: 3}
   mainDepth: 2
   subDepth: 4
   power: 9

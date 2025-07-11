@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Pyropuf
   m_EditorClassIdentifier: 
   fishName: Pyropuf
-  fishImage: {fileID: 0}
+  fishImage: {fileID: -7085686141974560534, guid: fe9fdca7122b7694e91984feabf586f9, type: 3}
   mainDepth: 3
   subDepth: 7
   power: 19

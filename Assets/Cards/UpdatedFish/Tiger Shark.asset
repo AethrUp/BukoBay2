@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tiger Shark
   m_EditorClassIdentifier: 
   fishName: Tiger Shark
-  fishImage: {fileID: 708152266570792783, guid: 2cdd884f0d6cf134ba2d4ed374627137, type: 3}
+  fishImage: {fileID: 6631254521187239247, guid: 8a28996b0148b234eaa1d37680254029, type: 3}
   mainDepth: 2
   subDepth: 5
   power: 11
