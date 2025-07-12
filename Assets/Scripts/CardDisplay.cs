@@ -171,6 +171,18 @@ public class CardDisplay : MonoBehaviour
         if (cardNameText != null) cardNameText.text = effectCard.effectName;
         if (cardTypeText != null) cardTypeText.text = "Effect";
         
+        // Check if this is an equipped shield (has strength value)
+        bool isEquippedShield = false;
+        int shieldStrength = 0;
+        
+        // Find the player inventory to check if this is the equipped shield
+        PlayerInventory playerInv = FindFirstObjectByType<PlayerInventory>();
+        if (playerInv != null && playerInv.equippedShield == effectCard)
+        {
+            isEquippedShield = true;
+            shieldStrength = playerInv.shieldStrength;
+        }
+        
         // Show effect-specific info
         string effectInfo = "";
         switch (effectCard.effectType)
@@ -182,7 +194,10 @@ public class CardDisplay : MonoBehaviour
                     effectInfo = $"Repairs {effectCard.repairAmount} durability";
                 break;
             case EffectType.Protection:
-                effectInfo = "Protection Effect";
+                if (isEquippedShield)
+                    effectInfo = $"Shield: {shieldStrength}"; // Show current shield strength
+                else
+                    effectInfo = GetProtectionEffectInfo(effectCard.effectName); // Show max protection
                 break;
             case EffectType.Utility:
                 effectInfo = "Utility Effect";
@@ -200,6 +215,15 @@ public class CardDisplay : MonoBehaviour
         if (statsText != null) statsText.text = effectCard.description;
         
         if (cardArtwork != null) cardArtwork.sprite = effectCard.effectImage;
+    }
+    
+    string GetProtectionEffectInfo(string effectName)
+    {
+        // Return the protection amount based on the effect name
+        if (effectName.Contains("bT Helmet")) return "Blocks: 5";
+        if (effectName.Contains("Kasa")) return "Blocks: 3";
+        if (effectName.Contains("Tessen Ichi")) return "Blocks: 4";
+        return "Protection Effect";
     }
     
     void UpdateProtectionIcon()

@@ -105,11 +105,17 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         
         // Check what we dropped on
         GearCard targetGear = GetTargetGear(eventData);
+        bool isShieldDrop = IsPlayerShieldDropZone(eventData);
         
         if (targetGear != null && CanUseEffectOnGear(effectCard, targetGear))
         {
-            // Valid drop - use the effect
+            // Valid drop - use the effect on gear
             UseEffectOnGear(effectCard, targetGear);
+        }
+        else if (isShieldDrop && CanUseAsShield(effectCard))
+        {
+            // Valid drop - equip as player shield
+            UseEffectAsShield(effectCard);
         }
         else
         {
@@ -118,6 +124,10 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
             if (targetGear != null)
             {
                 Debug.Log($"Cannot use {effectCard.effectName} on {targetGear.gearName}");
+            }
+            else if (isShieldDrop)
+            {
+                Debug.Log($"Cannot use {effectCard.effectName} as shield");
             }
             else
             {
@@ -164,6 +174,41 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         return null;
     }
     
+    bool IsPlayerShieldDropZone(PointerEventData eventData)
+    {
+        // Check if we're dropping on the shield panel or player area
+        var raycastResults = new System.Collections.Generic.List<RaycastResult>();
+        raycaster.Raycast(eventData, raycastResults);
+        
+        foreach (var raycastResult in raycastResults)
+        {
+            string objectName = raycastResult.gameObject.name.ToLower();
+            Debug.Log($"Checking drop zone: {objectName}");
+            
+            // Check if this is a shield panel or player area
+            if (objectName.Contains("shield") || objectName.Contains("player"))
+            {
+                Debug.Log("Found shield drop zone");
+                return true;
+            }
+            
+            // Also check parent objects
+            Transform current = raycastResult.gameObject.transform;
+            while (current != null)
+            {
+                string parentName = current.name.ToLower();
+                if (parentName.Contains("shield") || parentName.Contains("player"))
+                {
+                    Debug.Log($"Found shield drop zone on parent: {current.name}");
+                    return true;
+                }
+                current = current.parent;
+            }
+        }
+        
+        return false;
+    }
+    
     bool CanUseEffectOnGear(EffectCard effect, GearCard gear)
     {
         switch (effect.effectType)
@@ -203,6 +248,28 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         }
         
         Debug.Log($"{gear.gearName} can be repaired (durability: {gear.durability}/{maxDurability})");
+        return true;
+    }
+    
+    bool CanProtectGear(EffectCard protectionCard, GearCard gear)
+    {
+        // Check if gear already has protection
+        if (gear.hasProtection)
+        {
+            Debug.Log($"{gear.gearName} already has protection ({gear.protectionType})");
+            return false;
+        }
+        
+        // Check if gear belongs to the player
+        bool isPlayerGear = IsPlayerGear(gear);
+        
+        if (!isPlayerGear)
+        {
+            Debug.Log($"{gear.gearName} does not belong to the player");
+            return false;
+        }
+        
+        Debug.Log($"{gear.gearName} can be protected with {protectionCard.effectName}");
         return true;
     }
     
@@ -273,22 +340,6 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         // Show repair feedback and update the specific card display
         ShowRepairFeedback(gear, actualRepair);
         UpdateSpecificGearDisplay(gear);
-    }
-    
-    int CalculateRepairAmount(EffectCard effectCard, GearCard gear)
-    {
-        if (effectCard.repairHalfDamage)
-        {
-            // For cards like Sumūzu - repair half of missing durability
-            int maxDurability = GetMaxDurability(gear);
-            int missingDurability = maxDurability - gear.durability;
-            return Mathf.CeilToInt(missingDurability / 2f);
-        }
-        else
-        {
-            // For cards like protivoyadiye - repair fixed amount
-            return effectCard.repairAmount;
-        }
     }
     
     void ApplyProtectionEffect(EffectCard protectionCard, GearCard gear)
@@ -369,6 +420,22 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         Debug.Log("HandsOff protection applied to all equipped gear");
     }
     
+    int CalculateRepairAmount(EffectCard effectCard, GearCard gear)
+    {
+        if (effectCard.repairHalfDamage)
+        {
+            // For cards like Sumūzu - repair half of missing durability
+            int maxDurability = GetMaxDurability(gear);
+            int missingDurability = maxDurability - gear.durability;
+            return Mathf.CeilToInt(missingDurability / 2f);
+        }
+        else
+        {
+            // For cards like protivoyadiye - repair fixed amount
+            return effectCard.repairAmount;
+        }
+    }
+    
     void ShowProtectionFeedback(GearCard gear, string protectionType)
     {
         Debug.Log($"🛡️ {gear.gearName} protected with {protectionType}!");
@@ -403,26 +470,73 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         }
     }
     
-    bool CanProtectGear(EffectCard protectionCard, GearCard gear)
+    bool CanUseAsShield(EffectCard effect)
     {
-        // Check if gear already has protection
-        if (gear.hasProtection)
+        // Check if this is a player protection effect
+        if (effect.effectType != EffectType.Protection) return false;
+        
+        // Check if it's one of the player shield cards
+        string effectName = effect.effectName.ToLower();
+        if (effectName.Contains("bt helmet") || effectName.Contains("kasa") || effectName.Contains("tessen"))
         {
-            Debug.Log($"{gear.gearName} already has protection ({gear.protectionType})");
-            return false;
+            // Check if player already has a shield
+            if (playerInventory.equippedShield != null)
+            {
+                Debug.Log($"Player already has shield: {playerInventory.equippedShield.effectName}");
+                return false;
+            }
+            
+            Debug.Log($"{effect.effectName} can be used as player shield");
+            return true;
         }
         
-        // Check if gear belongs to the player
-        bool isPlayerGear = IsPlayerGear(gear);
+        return false;
+    }
+    
+    void UseEffectAsShield(EffectCard effect)
+    {
+        Debug.Log($"Equipping {effect.effectName} as player shield");
         
-        if (!isPlayerGear)
+        // Equip the shield
+        playerInventory.equippedShield = effect;
+        
+        // Set shield strength based on the effect
+        playerInventory.shieldStrength = GetShieldStrength(effect.effectName);
+        
+        Debug.Log($"Player shield equipped: {effect.effectName} with {playerInventory.shieldStrength} absorption");
+        
+        // Remove effect card from inventory if single use
+        if (effect.singleUse && playerInventory.effectCards.Contains(effect))
         {
-            Debug.Log($"{gear.gearName} does not belong to the player");
-            return false;
+            playerInventory.effectCards.Remove(effect);
+            Debug.Log($"Consumed {effect.effectName} from inventory");
+            
+            // Destroy this card display
+            Destroy(gameObject);
         }
         
-        Debug.Log($"{gear.gearName} can be protected with {protectionCard.effectName}");
-        return true;
+        // Update the shield display
+        UpdateShieldDisplay();
+    }
+    
+    int GetShieldStrength(string effectName)
+    {
+        string name = effectName.ToLower();
+        if (name.Contains("bt helmet")) return 5;
+        if (name.Contains("kasa")) return 3;
+        if (name.Contains("tessen")) return 4;
+        return 1; // Default
+    }
+    
+    void UpdateShieldDisplay()
+    {
+        // Find and update the shield display
+        InventoryDisplay inventoryDisplay = FindFirstObjectByType<InventoryDisplay>();
+        if (inventoryDisplay != null)
+        {
+            inventoryDisplay.UpdateDisplay();
+            Debug.Log("Updated shield display");
+        }
     }
     
     void ReturnToOriginalPosition()
