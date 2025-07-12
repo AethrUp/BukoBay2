@@ -520,7 +520,7 @@ public class InventoryDisplay : MonoBehaviour
         cardDisplay.effectCard = effectCard;
         
         // Add drag and drop functionality
-        if (gearCard != null || actionCard != null)
+        if (gearCard != null)
         {
             CardDragDrop dragDrop = cardObj.GetComponent<CardDragDrop>();
             if (dragDrop == null)
@@ -530,40 +530,34 @@ public class InventoryDisplay : MonoBehaviour
             
             // Assign cards immediately
             dragDrop.gearCard = gearCard;
+            dragDrop.canvas = GetComponentInParent<Canvas>();
+            dragDrop.raycaster = dragDrop.canvas.GetComponent<GraphicRaycaster>();
+        }
+        else if (actionCard != null)
+        {
+            CardDragDrop dragDrop = cardObj.GetComponent<CardDragDrop>();
+            if (dragDrop == null)
+            {
+                dragDrop = cardObj.AddComponent<CardDragDrop>();
+            }
+            
             dragDrop.actionCard = actionCard;
             dragDrop.canvas = GetComponentInParent<Canvas>();
             dragDrop.raycaster = dragDrop.canvas.GetComponent<GraphicRaycaster>();
         }
         else if (effectCard != null)
         {
-            // Check if this is an equipped shield (use regular CardDragDrop for unequipping)
-            PlayerInventory playerInv = FindFirstObjectByType<PlayerInventory>();
-            if (playerInv != null && playerInv.equippedShield == effectCard)
+            // Always use EffectCardDragDrop for all effect cards (equipped shields and tackle box effects)
+            EffectCardDragDrop effectDragDrop = cardObj.GetComponent<EffectCardDragDrop>();
+            if (effectDragDrop == null)
             {
-                // This is an equipped shield - use CardDragDrop for unequipping
-                CardDragDrop dragDrop = cardObj.GetComponent<CardDragDrop>();
-                if (dragDrop == null)
-                {
-                    dragDrop = cardObj.AddComponent<CardDragDrop>();
-                }
-                dragDrop.effectCard = effectCard; // Add this to CardDragDrop
-                dragDrop.canvas = GetComponentInParent<Canvas>();
-                dragDrop.raycaster = dragDrop.canvas.GetComponent<GraphicRaycaster>();
+                effectDragDrop = cardObj.AddComponent<EffectCardDragDrop>();
             }
-            else
-            {
-                // Regular effect card in tackle box - use EffectCardDragDrop
-                EffectCardDragDrop effectDragDrop = cardObj.GetComponent<EffectCardDragDrop>();
-                if (effectDragDrop == null)
-                {
-                    effectDragDrop = cardObj.AddComponent<EffectCardDragDrop>();
-                }
-                
-                // Assign effect card
-                effectDragDrop.effectCard = effectCard;
-                effectDragDrop.canvas = GetComponentInParent<Canvas>();
-                effectDragDrop.raycaster = effectDragDrop.canvas.GetComponent<GraphicRaycaster>();
-            }
+            
+            // Assign effect card
+            effectDragDrop.effectCard = effectCard;
+            effectDragDrop.canvas = GetComponentInParent<Canvas>();
+            effectDragDrop.raycaster = effectDragDrop.canvas.GetComponent<GraphicRaycaster>();
         }
         
         // Force update the display

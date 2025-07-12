@@ -2,14 +2,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
-{
+public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler{
     [Header("Card References")]
     public GearCard gearCard;
     public ActionCard actionCard;
-    public EffectCard effectCard;
 
-    [Header("Game References")]  
+    [Header("Game References")]  // Add this new section
     private PlayerInventory playerInventory;   
 
     [Header("Drag Settings")]
@@ -68,34 +66,33 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
             }
         }
 
-        Debug.Log($"After Awake - GearCard: {(gearCard != null ? gearCard.gearName : "NULL")}, ActionCard: {(actionCard != null ? actionCard.actionName : "NULL")}, EffectCard: {(effectCard != null ? effectCard.effectName : "NULL")}");
+        Debug.Log($"After Awake - GearCard: {(gearCard != null ? gearCard.gearName : "NULL")}");
     }
-
-    public void OnPointerClick(PointerEventData eventData)
+public void OnPointerClick(PointerEventData eventData)
+{
+    // Only handle clicks on gear cards (not action cards)
+    if (gearCard == null) return;
+    
+    Debug.Log($"Clicked on gear: {gearCard.gearName}");
+    
+    // Find the gear comparison display
+    GearComparisonDisplay comparisonDisplay = FindFirstObjectByType<GearComparisonDisplay>();
+    
+    if (comparisonDisplay != null)
     {
-        // Only handle clicks on gear cards (not action cards)
-        if (gearCard == null) return;
-        
-        Debug.Log($"Clicked on gear: {gearCard.gearName}");
-        
-        // Find the gear comparison display
-        GearComparisonDisplay comparisonDisplay = FindFirstObjectByType<GearComparisonDisplay>();
-        
-        if (comparisonDisplay != null)
-        {
-            comparisonDisplay.ShowGearComparison(gearCard);
-            Debug.Log($"Sent {gearCard.gearName} to comparison display");
-        }
-        else
-        {
-            Debug.LogError("Could not find GearComparisonDisplay component!");
-        }
+        comparisonDisplay.ShowGearComparison(gearCard);
+        Debug.Log($"Sent {gearCard.gearName} to comparison display");
     }
+    else
+    {
+        Debug.LogError("Could not find GearComparisonDisplay component!");
+    }
+}
     
     public void OnBeginDrag(PointerEventData eventData)
     {
-        // Allow dragging gear cards, action cards, and effect cards
-        if (gearCard == null && actionCard == null && effectCard == null) return;
+        // Allow dragging both gear cards and action cards
+        if (gearCard == null && actionCard == null) return;
         
         // Store original position and parent
         originalPosition = rectTransform.anchoredPosition;
@@ -116,15 +113,11 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         {
             Debug.Log($"Started dragging action: {actionCard.actionName}");
         }
-        else if (effectCard != null)
-        {
-            Debug.Log($"Started dragging effect: {effectCard.effectName}");
-        }
     }
     
     public void OnDrag(PointerEventData eventData)
     {
-        if (gearCard == null && actionCard == null && effectCard == null) return;
+        if (gearCard == null && actionCard == null) return;
         
         // Move the card with the mouse/touch
         rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
@@ -132,12 +125,11 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     
     public void OnEndDrag(PointerEventData eventData)
     {
-        Debug.Log("=== OnEndDrag called ===");
-        Debug.Log($"GearCard: {(gearCard != null ? gearCard.gearName : "NULL")}");
-        Debug.Log($"ActionCard: {(actionCard != null ? actionCard.actionName : "NULL")}");
-        Debug.Log($"EffectCard: {(effectCard != null ? effectCard.effectName : "NULL")}");
-        
-        if (gearCard == null && actionCard == null && effectCard == null) return;
+         Debug.Log("=== OnEndDrag called ===");
+    Debug.Log($"GearCard: {(gearCard != null ? gearCard.gearName : "NULL")}");
+    Debug.Log($"ActionCard: {(actionCard != null ? actionCard.actionName : "NULL")}");
+    
+        if (gearCard == null && actionCard == null) return;
         
         // Restore appearance
         canvasGroup.alpha = 1f;
@@ -167,11 +159,6 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
                 ReturnToOriginalPosition();
                 Debug.Log($"Invalid drop for {actionCard.actionName}, returning to original position");
             }
-        }
-        else if (effectCard != null)
-        {
-            // Handle equipped shield being dragged back to tackle box
-            HandleEquippedShieldDrop(eventData);
         }
         
         // Only refresh the inventory display if needed
@@ -209,72 +196,36 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         }
     }
     
-    void HandleEquippedShieldDrop(PointerEventData eventData)
-    {
-        // Check if dropped on tackle box
-        DropZone dropZone = GetDropZone(eventData);
-        
-        if (dropZone != null && dropZone.zoneType == DropZone.DropZoneType.TackleBox)
-        {
-            Debug.Log($"Unequipping shield: {effectCard.effectName}");
-            
-            // Unequip the shield
-            PlayerInventory playerInv = FindFirstObjectByType<PlayerInventory>();
-            if (playerInv != null)
-            {
-                playerInv.equippedShield = null;
-                playerInv.shieldStrength = 0;
-                
-                // Add back to effect cards inventory
-                if (!playerInv.effectCards.Contains(effectCard))
-                {
-                    playerInv.effectCards.Add(effectCard);
-                    Debug.Log($"Added {effectCard.effectName} back to effect cards inventory");
-                }
-            }
-            
-            // Refresh inventory display
-            if (inventoryDisplay != null)
-            {
-                StartCoroutine(RefreshAfterDrop());
-            }
-        }
-        else
-        {
-            // Invalid drop - return to original position
-            ReturnToOriginalPosition();
-            Debug.Log($"Cannot move {effectCard.effectName} there");
-        }
-    }
 
+    
     System.Collections.IEnumerator RefreshAfterDrop()
     {
         yield return new WaitForEndOfFrame();
         inventoryDisplay.RefreshDisplay();
     }
     
-    DropZone GetDropZone(PointerEventData eventData)
+DropZone GetDropZone(PointerEventData eventData)
+{
+    // Raycast to find what we're over (for gear cards)
+    var raycastResults = new System.Collections.Generic.List<RaycastResult>();
+    raycaster.Raycast(eventData, raycastResults);
+    
+    Debug.Log($"Raycast found {raycastResults.Count} objects");
+    
+    foreach (var result in raycastResults)
     {
-        // Raycast to find what we're over (for gear cards)
-        var raycastResults = new System.Collections.Generic.List<RaycastResult>();
-        raycaster.Raycast(eventData, raycastResults);
-        
-        Debug.Log($"Raycast found {raycastResults.Count} objects");
-        
-        foreach (var result in raycastResults)
+        Debug.Log($"Raycast hit: {result.gameObject.name}");
+        DropZone dropZone = result.gameObject.GetComponent<DropZone>();
+        if (dropZone != null)
         {
-            Debug.Log($"Raycast hit: {result.gameObject.name}");
-            DropZone dropZone = result.gameObject.GetComponent<DropZone>();
-            if (dropZone != null)
-            {
-                Debug.Log($"Found DropZone: {dropZone.zoneName}");
-                return dropZone;
-            }
+            Debug.Log($"Found DropZone: {dropZone.zoneName}");
+            return dropZone;
         }
-        
-        Debug.Log("No DropZone found in raycast results");
-        return null;
     }
+    
+    Debug.Log("No DropZone found in raycast results");
+    return null;
+}
     
     ActionCardDropZone GetActionDropZone(PointerEventData eventData)
     {
@@ -300,28 +251,27 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     }
     
     void HandleGearMove(DropZone dropZone)
-    {
-        Debug.Log("=== HandleGearMove called ===");
-        Debug.Log($"PlayerInventory is: {(playerInventory != null ? "FOUND" : "NULL")}");
-        Debug.Log($"GearCard is: {(gearCard != null ? gearCard.gearName : "NULL")}");
-        Debug.Log($"DropZone is: {(dropZone != null ? dropZone.zoneName : "NULL")}");
-        
-        if (playerInventory == null)
+{
+     Debug.Log("=== HandleGearMove called ===");
+    Debug.Log($"PlayerInventory is: {(playerInventory != null ? "FOUND" : "NULL")}");
+    Debug.Log($"GearCard is: {(gearCard != null ? gearCard.gearName : "NULL")}");
+    Debug.Log($"DropZone is: {(dropZone != null ? dropZone.zoneName : "NULL")}");
+    if (playerInventory == null)
         {
             Debug.LogError("PlayerInventory not assigned to CardDragDrop!");
             ReturnToOriginalPosition();
             return;
         }
     
-        // Remove from current location
-        RemoveFromCurrentLocation();
-        
-        // Add to new location
-        dropZone.AcceptCard(gearCard);
-        
-        // Return to original parent temporarily to fix positioning
-        transform.SetParent(originalParent, true);
-    }
+    // Remove from current location
+    RemoveFromCurrentLocation();
+    
+    // Add to new location
+    dropZone.AcceptCard(gearCard);
+    
+    // Return to original parent temporarily to fix positioning
+    transform.SetParent(originalParent, true);
+}
     
     void RemoveFromCurrentLocation()
     {

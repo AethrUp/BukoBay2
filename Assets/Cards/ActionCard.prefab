@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2268878864856767274}
   - component: {fileID: 1002030777152335461}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Frame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35,7 +35,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -0.098323, y: 0.2308}
-  m_SizeDelta: {x: 148.75, y: 148.7462}
+  m_SizeDelta: {x: 150, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2268878864856767274
 CanvasRenderer:
@@ -65,7 +65,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1242653882072526734, guid: 0549953e42a08fa4fb6b2771e5419a06, type: 3}
+  m_Sprite: {fileID: 2978038132780791657, guid: 75ac05a7533ccac45b50f06ce24b2d4b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -109,7 +109,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -51.197, y: -55.95}
+  m_AnchoredPosition: {x: 54.3, y: 32}
   m_SizeDelta: {x: 47.6066, y: 33.468}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7368202820137563366
@@ -245,7 +245,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 48.6, y: -55.071}
+  m_AnchoredPosition: {x: 54.3, y: -39.6}
   m_SizeDelta: {x: 43.5886, y: 35.226}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1033004083613339999
@@ -381,8 +381,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.098316, y: 5.3}
-  m_SizeDelta: {x: 133.18, y: 133.1761}
+  m_AnchoredPosition: {x: -15.6878, y: 0.5874}
+  m_SizeDelta: {x: 104.2043, y: 104.2013}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1159797423580229639
 CanvasRenderer:
@@ -463,7 +463,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -609.5, y: -564.2}
-  m_SizeDelta: {x: 150, y: 150}
+  m_SizeDelta: {x: 150, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4281547148874259445
 CanvasRenderer:
@@ -524,6 +524,7 @@ MonoBehaviour:
   quantityText: {fileID: 0}
   cardBackground: {fileID: 0}
   cardArtwork: {fileID: 7306387628852571867}
+  protectionIcon: {fileID: 0}
   gearCard: {fileID: 0}
   fishCard: {fileID: 0}
   actionCard: {fileID: 0}

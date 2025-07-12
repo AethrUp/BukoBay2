@@ -776,52 +776,125 @@ void DestroyBrokenGear(GearCard brokenGear)
     Debug.Log($"Successfully destroyed {brokenGear.gearName}");
 }
     
-    // Public function to play action cards during interactive phase
-    public bool PlayActionCard(ActionCard actionCard, bool targetingPlayer)
+// Public function to play action cards during interactive phase
+public bool PlayActionCard(ActionCard actionCard, bool targetingPlayer)
+{
+    if (!isInteractionPhase)
     {
-        if (!isInteractionPhase)
-        {
-            Debug.LogWarning("Cannot play action cards - not in interactive phase!");
-            return false;
-        }
-        
-        if (actionCard == null)
-        {
-            Debug.LogWarning("Invalid action card!");
-            return false;
-        }
-        
-        // Check if card can target the chosen target
-        if (targetingPlayer && !actionCard.canTargetPlayer)
-        {
-            Debug.LogWarning($"{actionCard.actionName} cannot target players!");
-            return false;
-        }
-        
-        if (!targetingPlayer && !actionCard.canTargetFish)
-        {
-            Debug.LogWarning($"{actionCard.actionName} cannot target fish!");
-            return false;
-        }
-        
-        // Apply the effect
-        if (targetingPlayer)
-        {
-            totalPlayerBuffs += actionCard.playerEffect;
-            Debug.Log($"Played {actionCard.actionName} on player: {actionCard.playerEffect:+0;-#} effect");
-        }
-        else
-        {
-            totalFishBuffs += actionCard.fishEffect;
-            Debug.Log($"Played {actionCard.actionName} on fish: {actionCard.fishEffect:+0;-#} effect");
-        }
-        
-        appliedEffects.Add($"{actionCard.actionName}: {(targetingPlayer ? actionCard.playerEffect : actionCard.fishEffect):+0;-#} to {(targetingPlayer ? "player" : "fish")}");
-        
-        Debug.Log($"Current totals - Player buffs: {totalPlayerBuffs:+0;-#}, Fish buffs: {totalFishBuffs:+0;-#}");
-        
-        return true;
+        Debug.LogWarning("Cannot play action cards - not in interactive phase!");
+        return false;
     }
+    
+    if (actionCard == null)
+    {
+        Debug.LogWarning("Invalid action card!");
+        return false;
+    }
+    
+    // Check if card can target the chosen target
+    if (targetingPlayer && !actionCard.canTargetPlayer)
+    {
+        Debug.LogWarning($"{actionCard.actionName} cannot target players!");
+        return false;
+    }
+    
+    if (!targetingPlayer && !actionCard.canTargetFish)
+    {
+        Debug.LogWarning($"{actionCard.actionName} cannot target fish!");
+        return false;
+    }
+    
+    // Apply the effect
+    if (targetingPlayer)
+    {
+        int effectToApply = actionCard.playerEffect;
+        
+        // Check for shield absorption if this is a negative effect
+        if (effectToApply < 0 && currentPlayer != null && currentPlayer.equippedShield != null)
+        {
+            int originalEffect = effectToApply;
+            effectToApply = ApplyShieldAbsorption(effectToApply);
+            
+            if (effectToApply != originalEffect)
+            {
+                Debug.Log($"Shield absorbed {originalEffect - effectToApply} damage! Reduced from {originalEffect} to {effectToApply}");
+            }
+        }
+        
+        totalPlayerBuffs += effectToApply;
+        Debug.Log($"Played {actionCard.actionName} on player: {effectToApply:+0;-#} effect (original: {actionCard.playerEffect:+0;-#})");
+    }
+    else
+    {
+        totalFishBuffs += actionCard.fishEffect;
+        Debug.Log($"Played {actionCard.actionName} on fish: {actionCard.fishEffect:+0;-#} effect");
+    }
+    
+    appliedEffects.Add($"{actionCard.actionName}: {(targetingPlayer ? actionCard.playerEffect : actionCard.fishEffect):+0;-#} to {(targetingPlayer ? "player" : "fish")}");
+    
+    Debug.Log($"Current totals - Player buffs: {totalPlayerBuffs:+0;-#}, Fish buffs: {totalFishBuffs:+0;-#}");
+    
+    return true;
+}
+
+    int ApplyShieldAbsorption(int negativeEffect)
+    {
+        if (currentPlayer == null || currentPlayer.equippedShield == null || currentPlayer.shieldStrength <= 0)
+        {
+            return negativeEffect; // No shield or shield is broken
+        }
+
+        // negativeEffect is negative (like -3), so we need to work with absolute values
+        int damageAmount = Mathf.Abs(negativeEffect);
+        int shieldCanAbsorb = Mathf.Min(damageAmount, currentPlayer.shieldStrength);
+        int remainingDamage = damageAmount - shieldCanAbsorb;
+
+        // Reduce shield strength
+        currentPlayer.shieldStrength -= shieldCanAbsorb;
+
+        Debug.Log($"🛡️ Shield absorbed {shieldCanAbsorb} damage! Shield strength: {currentPlayer.shieldStrength}");
+// Update the shield display to show new strength
+UpdateShieldDisplay();
+        // If shield is depleted, unequip it
+    // If shield is depleted, destroy it completely
+if (currentPlayer.shieldStrength <= 0)
+{
+    Debug.Log($"💥 Shield {currentPlayer.equippedShield.effectName} is completely destroyed!");
+    
+    // DON'T add it back to inventory - just destroy it
+    currentPlayer.equippedShield = null;
+    currentPlayer.shieldStrength = 0;
+    
+    // Update the inventory display
+    InventoryDisplay inventoryDisplay = FindFirstObjectByType<InventoryDisplay>();
+    if (inventoryDisplay != null)
+    {
+        inventoryDisplay.RefreshDisplay();
+    }
+}
+
+        // Return the remaining damage as a negative number
+        return remainingDamage > 0 ? -remainingDamage : 0;
+    }    
+void UpdateShieldDisplay()
+{
+    // Find all CardDisplay components in the scene
+    CardDisplay[] allCardDisplays = FindObjectsByType<CardDisplay>(FindObjectsSortMode.None);
+    
+    foreach (CardDisplay cardDisplay in allCardDisplays)
+    {
+        // Check if this card display is showing the equipped shield
+        if (cardDisplay.effectCard != null && currentPlayer != null && 
+            cardDisplay.effectCard == currentPlayer.equippedShield)
+        {
+            Debug.Log($"Updating shield display for {cardDisplay.effectCard.effectName}");
+            
+            // Force the card display to update
+            cardDisplay.SendMessage("DisplayCard", SendMessageOptions.DontRequireReceiver);
+        }
+    }
+}
+
     
     // Public function to manually end round (for UI button)
     [ContextMenu("Next Round")]

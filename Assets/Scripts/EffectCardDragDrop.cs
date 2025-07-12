@@ -117,6 +117,11 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
             // Valid drop - equip as player shield
             UseEffectAsShield(effectCard);
         }
+        else if (IsEquippedShield(effectCard) && IsDroppedOnActionPanel(eventData))
+        {
+            // Valid drop - unequip shield back to action panel
+            UnequipShield(effectCard);
+        }
         else
         {
             // Invalid drop - return to original position
@@ -128,6 +133,10 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
             else if (isShieldDrop)
             {
                 Debug.Log($"Cannot use {effectCard.effectName} as shield");
+            }
+            else if (IsEquippedShield(effectCard))
+            {
+                Debug.Log($"Must drop {effectCard.effectName} on action card panel to unequip");
             }
             else
             {
@@ -536,6 +545,78 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         {
             inventoryDisplay.UpdateDisplay();
             Debug.Log("Updated shield display");
+        }
+    }
+    
+    // NEW METHODS FOR SHIELD UNEQUIPPING
+    bool IsEquippedShield(EffectCard effect)
+    {
+        PlayerInventory playerInv = FindFirstObjectByType<PlayerInventory>();
+        return playerInv != null && playerInv.equippedShield == effect;
+    }
+
+    bool IsDroppedOnActionPanel(PointerEventData eventData)
+    {
+        // Raycast to find what we're over
+        var raycastResults = new System.Collections.Generic.List<RaycastResult>();
+        raycaster.Raycast(eventData, raycastResults);
+        
+        foreach (var raycastResult in raycastResults)
+        {
+            string objectName = raycastResult.gameObject.name.ToLower();
+            Debug.Log($"Checking drop target: {objectName}");
+            
+            // Check if this is the action card panel or any child of it
+            if (objectName.Contains("action") || objectName.Contains("effect"))
+            {
+                Debug.Log("Found action/effect card panel");
+                return true;
+            }
+            
+            // Also check parent objects
+            Transform current = raycastResult.gameObject.transform;
+            while (current != null)
+            {
+                string parentName = current.name.ToLower();
+                if (parentName.Contains("action") || parentName.Contains("effect"))
+                {
+                    Debug.Log($"Found action/effect panel on parent: {current.name}");
+                    return true;
+                }
+                current = current.parent;
+            }
+        }
+        
+        return false;
+    }
+
+    void UnequipShield(EffectCard shieldCard)
+    {
+        Debug.Log($"Unequipping shield: {shieldCard.effectName}");
+        
+        PlayerInventory playerInv = FindFirstObjectByType<PlayerInventory>();
+        if (playerInv != null)
+        {
+            // Unequip the shield
+            playerInv.equippedShield = null;
+            playerInv.shieldStrength = 0;
+            
+            // Add back to effect cards inventory
+            if (!playerInv.effectCards.Contains(shieldCard))
+            {
+                playerInv.effectCards.Add(shieldCard);
+                Debug.Log($"Added {shieldCard.effectName} back to effect cards inventory");
+            }
+            
+            // Destroy this card display (it will be recreated in the action panel)
+            Destroy(gameObject);
+            
+            // Update the inventory display
+            InventoryDisplay inventoryDisplay = FindFirstObjectByType<InventoryDisplay>();
+            if (inventoryDisplay != null)
+            {
+                inventoryDisplay.RefreshDisplay();
+            }
         }
     }
     

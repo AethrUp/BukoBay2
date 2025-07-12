@@ -195,7 +195,7 @@ public class CardDisplay : MonoBehaviour
                 break;
             case EffectType.Protection:
                 if (isEquippedShield)
-                    effectInfo = $"Shield: {shieldStrength}"; // Show current shield strength
+                    effectInfo = $"{shieldStrength}"; // Show current shield strength
                 else
                     effectInfo = GetProtectionEffectInfo(effectCard.effectName); // Show max protection
                 break;
