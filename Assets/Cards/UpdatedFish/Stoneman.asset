@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Stoneman
   m_EditorClassIdentifier: 
   fishName: Stoneman
-  fishImage: {fileID: 1790191627928547123, guid: 05b4e32bf0d55114abfcbf39bd41da05, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 1
   subDepth: 3
   power: 5
-  coins: 5
-  material1: Wood
-  materialDiff1: 2
+  coins: 12
+  treasures: 5
+  material1: 2
+  materialDiff1: 0
   material2: 
   materialDiff2: 0
   material3: 
-  materialDiff3: 0
-  gear1Damage: 1
+  materialDiff3: 1
+  gear1Damage: 0
   gear2Damage: 0
   gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: Evolved to look just like a rock. Clever.
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Stoneman.jpg

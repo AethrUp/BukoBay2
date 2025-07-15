@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Equinine
   m_EditorClassIdentifier: 
   fishName: Equinine
-  fishImage: {fileID: -5816936244321713545, guid: 6af84391f69d8cf4da86279242df2d28, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 1
   subDepth: 1
   power: 5
-  coins: 4
-  material1: Bio
-  materialDiff1: 1
+  coins: 9
+  treasures: 4
+  material1: 1
+  materialDiff1: 0
   material2: 
   materialDiff2: 0
   material3: 
-  materialDiff3: 0
-  gear1Damage: 1
+  materialDiff3: 1
+  gear1Damage: 0
   gear2Damage: 0
   gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: If only it wasn't so small we could go for a ride.
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Equinine.jpg

@@ -13,20 +13,22 @@ MonoBehaviour:
   m_Name: Piranha Frenzy
   m_EditorClassIdentifier: 
   fishName: Piranha Frenzy
-  fishImage: {fileID: -613354267193400126, guid: 9c90631e12b20084f97705f1748a1e49, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 2
   subDepth: 5
   power: 10
-  coins: 6
-  material1: Bio
-  materialDiff1: 2
+  coins: 14
+  treasures: 6
+  material1: 2
+  materialDiff1: 0
   material2: 
   materialDiff2: 0
   material3: 
-  materialDiff3: 0
-  gear1Damage: 2
-  gear2Damage: 1
+  materialDiff3: 2
+  gear1Damage: 1
+  gear2Damage: 0
   gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: 
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Piranha
+    Frenzy.jpg

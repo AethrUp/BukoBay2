@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Dragon Shark
   m_EditorClassIdentifier: 
   fishName: Dragon Shark
-  fishImage: {fileID: -8569253295229620856, guid: 844d5fed706073e45ad0290cad92a68e, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 3
   subDepth: 9
   power: 17
-  coins: 8
-  material1: Bio
-  materialDiff1: 1
-  material2: Plastic
-  materialDiff2: 2
-  material3: Metal
-  materialDiff3: 2
+  coins: 18
+  treasures: 8
+  material1: 1
+  materialDiff1: 0
+  material2: 2
+  materialDiff2: 0
+  material3: 2
+  materialDiff3: 1
   gear1Damage: 1
   gear2Damage: 1
-  gear3Damage: 1
+  gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: So
+  description: it's not a mythical creature?

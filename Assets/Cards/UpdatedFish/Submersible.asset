@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Submersible
   m_EditorClassIdentifier: 
   fishName: Submersible
-  fishImage: {fileID: 4443438409744034673, guid: 52f972b369ae4cb42a7865d4a151e452, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 3
   subDepth: 7
   power: 18
-  coins: 8
-  material1: Metal
-  materialDiff1: 2
-  material2: Wood
-  materialDiff2: 3
+  coins: 18
+  treasures: 8
+  material1: 2
+  materialDiff1: 0
+  material2: 3
+  materialDiff2: 0
   material3: 
-  materialDiff3: 0
+  materialDiff3: 1
   gear1Damage: 1
-  gear2Damage: 1
-  gear3Damage: 2
+  gear2Damage: 2
+  gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: 
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Submersible.jpg

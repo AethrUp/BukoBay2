@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Mermaid
   m_EditorClassIdentifier: 
   fishName: Mermaid
-  fishImage: {fileID: -8527838128565893672, guid: d9da49e18e489eb4c85e99187a2632bc, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 3
   subDepth: 7
   power: 16
-  coins: 7
-  material1: Wood
-  materialDiff1: 2
-  material2: Plastic
-  materialDiff2: 2
+  coins: 16
+  treasures: 7
+  material1: 2
+  materialDiff1: 0
+  material2: 2
+  materialDiff2: 0
   material3: 
-  materialDiff3: 0
+  materialDiff3: 2
   gear1Damage: 2
-  gear2Damage: 2
-  gear3Damage: 1
+  gear2Damage: 1
+  gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: 
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Mermaid.jpg

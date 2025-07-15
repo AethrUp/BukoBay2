@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: RecyclerFiish
   m_EditorClassIdentifier: 
   fishName: RecyclerFiish
-  fishImage: {fileID: 8777089743358242592, guid: 629ebe23b57134641aa95eb65a55d097, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 2
   subDepth: 5
   power: 9
-  coins: 5
-  material1: Plastic
-  materialDiff1: 1
-  material2: Bio
-  materialDiff2: 1
+  coins: 12
+  treasures: 5
+  material1: 1
+  materialDiff1: 0
+  material2: 1
+  materialDiff2: 0
   material3: 
-  materialDiff3: 0
-  gear1Damage: 2
-  gear2Damage: 1
+  materialDiff3: 2
+  gear1Damage: 1
+  gear2Damage: 0
   gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: 
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\RecyclerFiish.jpg

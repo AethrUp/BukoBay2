@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Giant Crab
   m_EditorClassIdentifier: 
   fishName: Giant Crab
-  fishImage: {fileID: 7096949139270178854, guid: 6858e513fd4ed7949adcccb173e3e26c, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 2
   subDepth: 6
   power: 9
-  coins: 5
-  material1: Bio
-  materialDiff1: 1
+  coins: 12
+  treasures: 5
+  material1: 1
+  materialDiff1: 0
   material2: 
   materialDiff2: 0
   material3: 
-  materialDiff3: 0
+  materialDiff3: 1
   gear1Damage: 1
   gear2Damage: 1
-  gear3Damage: 1
+  gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: Crabs are more dangerous than you thought
+  description: huh?

@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Shelldweler
   m_EditorClassIdentifier: 
   fishName: Shelldweler
-  fishImage: {fileID: 5098412988093724724, guid: 5921d55356f44d54c929307ef9661d57, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 1
   subDepth: 1
   power: 4
-  coins: 3
+  coins: 7
+  treasures: 3
   material1: 
   materialDiff1: 0
   material2: 
   materialDiff2: 0
   material3: 
-  materialDiff3: 0
-  gear1Damage: 1
+  materialDiff3: 1
+  gear1Damage: 0
   gear2Damage: 0
   gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: Cute...I guess?
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Shelldweler.jpg

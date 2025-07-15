@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Pyropuf
   m_EditorClassIdentifier: 
   fishName: Pyropuf
-  fishImage: {fileID: -7085686141974560534, guid: fe9fdca7122b7694e91984feabf586f9, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 3
   subDepth: 7
   power: 19
-  coins: 9
-  material1: Wood
-  materialDiff1: 3
-  material2: Plastic
-  materialDiff2: 3
-  material3: Metal
-  materialDiff3: 3
+  coins: 21
+  treasures: 9
+  material1: 3
+  materialDiff1: 0
+  material2: 3
+  materialDiff2: 0
+  material3: 3
+  materialDiff3: 1
   gear1Damage: 1
   gear2Damage: 1
-  gear3Damage: 1
-  gear4Damage: 2
+  gear3Damage: 2
+  gear4Damage: 0
   gear5Damage: 0
-  description: Yep. That's real fire.
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Pyropuf.jpg

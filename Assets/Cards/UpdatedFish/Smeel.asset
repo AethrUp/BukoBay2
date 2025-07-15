@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Smeel
   m_EditorClassIdentifier: 
   fishName: Smeel
-  fishImage: {fileID: -3358203868276659191, guid: 1f8c1b4e05417f1428c430093f3a71ba, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 2
   subDepth: 4
   power: 9
-  coins: 5
-  material1: Plastic
-  materialDiff1: 2
-  material2: Wood
-  materialDiff2: 3
+  coins: 12
+  treasures: 5
+  material1: 2
+  materialDiff1: 0
+  material2: 3
+  materialDiff2: 0
   material3: 
-  materialDiff3: 0
-  gear1Damage: 1
-  gear2Damage: 2
-  gear3Damage: 1
+  materialDiff3: 1
+  gear1Damage: 2
+  gear2Damage: 1
+  gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: Electrocutes you.
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Smeel.jpg

@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Stari
   m_EditorClassIdentifier: 
   fishName: Stari
-  fishImage: {fileID: 8096561928904252955, guid: 832afb27c081f9e409f0d834d5b47b41, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 1
   subDepth: 1
   power: 4
-  coins: 3
+  coins: 7
+  treasures: 3
   material1: 
   materialDiff1: 0
   material2: 
   materialDiff2: 0
   material3: 
-  materialDiff3: 0
-  gear1Damage: 2
+  materialDiff3: 2
+  gear1Damage: 0
   gear2Damage: 0
   gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: Some say it brings luck.
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Stari.jpg

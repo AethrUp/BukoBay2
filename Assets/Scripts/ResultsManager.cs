@@ -24,7 +24,6 @@ public int coinsEarned = 0;
 public string damageReport = "";
 
 [Header("Gear Display")]
-[Header("Gear Display")]
 public Transform rodPanel;
 public Transform reelPanel;
 public Transform linePanel;
@@ -43,7 +42,22 @@ public TextMeshProUGUI playerTotalCoinsText; // Shows player's total coins
 public float coinAnimationSpeed = 50f;       // How fast coins count up
 public Button nextButton;                    // Button to proceed to next step
 
-private bool coinAnimationComplete = false;
+private bool coinAnimationComplete = false;  // Add this line here
+
+[Header("Treasure System")]
+public GameObject treasurePanel;              // Panel containing treasure UI
+public TextMeshProUGUI treasureCountText;     // Shows remaining treasures
+public Button gearChestButton;               // Left chest - gives gear
+public Button actionChestButton;             // Right chest - gives action cards
+public Transform rewardDisplayPanel;         // Panel to show the reward cards
+public Button treasureNextButton;           // Button to proceed to damage phase
+
+[Header("Treasure Data")]
+public int remainingTreasures = 0;           // How many treasures left to open
+private bool treasurePhaseComplete = false;
+private List<GameObject> rewardCards = new List<GameObject>(); // Track reward cards for cleanup
+
+
     void Start()
     {
         // Find game references if not assigned
@@ -319,19 +333,20 @@ System.Collections.IEnumerator AnimateCoinReward()
     if (continueButton != null) continueButton.gameObject.SetActive(false);
     if (coinIcon != null) coinIcon.SetActive(true);
     
-    // Show earned coins counting up
+    // Show earned coins (just the number)
     if (earnedCoinsText != null)
     {
         earnedCoinsText.gameObject.SetActive(true);
-        yield return StartCoroutine(CountUpCoins(earnedCoinsText, 0, coinsEarned));
+        earnedCoinsText.text = coinsEarned.ToString();
+        yield return new WaitForSeconds(0.5f);
     }
     
-    // Show player's current total
+    // Show player's current total (just the number)
     if (playerTotalCoinsText != null)
     {
         playerTotalCoinsText.gameObject.SetActive(true);
         int currentTotal = playerInventory != null ? playerInventory.coins : 0;
-        playerTotalCoinsText.text = $"Total: {currentTotal}";
+        playerTotalCoinsText.text = currentTotal.ToString();
         yield return new WaitForSeconds(0.5f);
     }
     
@@ -341,8 +356,8 @@ System.Collections.IEnumerator AnimateCoinReward()
         yield return StartCoroutine(TransferCoins());
     }
     
-    // Show next button
-    if (nextButton != null) nextButton.gameObject.SetActive(true);
+    // Start treasure phase instead of showing next button
+    StartTreasurePhase();
     
     coinAnimationComplete = true;
     Debug.Log("Coin animation complete");
@@ -364,35 +379,262 @@ System.Collections.IEnumerator CountUpCoins(TextMeshProUGUI textField, int start
     textField.text = $"Earned: {endValue}";
 }
 
-System.Collections.IEnumerator TransferCoins()
-{
-    // Get current values
-    int startPlayerTotal = playerInventory != null ? playerInventory.coins : 0;
-    int endPlayerTotal = startPlayerTotal + coinsEarned;
-    
-    // Animate earned coins going down to 0 and player total going up
-    float duration = 1f;
-    float elapsed = 0f;
-    
-    while (elapsed < duration)
+    System.Collections.IEnumerator TransferCoins()
     {
-        elapsed += Time.deltaTime;
-        float progress = elapsed / duration;
-        
-        // Earned coins count down
-        int currentEarned = Mathf.RoundToInt(Mathf.Lerp(coinsEarned, 0, progress));
-        if (earnedCoinsText != null) earnedCoinsText.text = $"Earned: {currentEarned}";
-        
-        // Player total counts up
-        int currentTotal = Mathf.RoundToInt(Mathf.Lerp(startPlayerTotal, endPlayerTotal, progress));
-        if (playerTotalCoinsText != null) playerTotalCoinsText.text = $"Total: {currentTotal}";
-        
-        yield return null;
+        // Get current values
+        int startPlayerTotal = playerInventory != null ? playerInventory.coins : 0;
+        int endPlayerTotal = startPlayerTotal + coinsEarned;
+
+        // Animate earned coins going down to 0 and player total going up
+        float duration = 1f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float progress = elapsed / duration;
+
+            // Earned coins count down from coinsEarned to 0 (just numbers)
+            int currentEarned = Mathf.RoundToInt(Mathf.Lerp(coinsEarned, 0, progress));
+            if (earnedCoinsText != null) earnedCoinsText.text = currentEarned.ToString();
+
+            // Player total counts up (just numbers)
+            int currentTotal = Mathf.RoundToInt(Mathf.Lerp(startPlayerTotal, endPlayerTotal, progress));
+            if (playerTotalCoinsText != null) playerTotalCoinsText.text = currentTotal.ToString();
+
+            yield return null;
+        }
+
+        // Final values (just numbers)
+        if (earnedCoinsText != null) earnedCoinsText.text = "0";
+        if (playerTotalCoinsText != null) playerTotalCoinsText.text = endPlayerTotal.ToString();
+    }
+
+    void StartTreasurePhase()
+    {
+        Debug.Log("Starting treasure phase");
+
+        // Calculate treasures based on fish
+        if (caughtFish != null)
+        {
+            remainingTreasures = Mathf.Max(1, caughtFish.coins / 10); // 1 treasure per 10 coins, minimum 1
+        }
+        else
+        {
+            remainingTreasures = 0;
+        }
+
+        if (remainingTreasures > 0)
+        {
+            // Clear any previous reward cards
+            ClearRewardCards();
+
+            // Show treasure UI
+            if (treasurePanel != null) treasurePanel.SetActive(true);
+            UpdateTreasureDisplay();
+
+            // Set up chest buttons
+            if (gearChestButton != null)
+            {
+                gearChestButton.onClick.RemoveAllListeners();
+                gearChestButton.onClick.AddListener(() => OpenChest("gear"));
+            }
+
+            if (actionChestButton != null)
+            {
+                actionChestButton.onClick.RemoveAllListeners();
+                actionChestButton.onClick.AddListener(() => OpenChest("action"));
+            }
+
+            // Hide treasure next button initially
+            if (treasureNextButton != null) treasureNextButton.gameObject.SetActive(false);
+        }
+        else
+        {
+            // No treasures, skip to damage phase
+            StartDamagePhase();
+        }
+    }
+void UpdateTreasureDisplay()
+{
+    if (treasureCountText != null)
+    {
+        treasureCountText.text = remainingTreasures.ToString();
     }
     
-    // Final values
-    if (earnedCoinsText != null) earnedCoinsText.text = "Earned: 0";
-    if (playerTotalCoinsText != null) playerTotalCoinsText.text = $"Total: {endPlayerTotal}";
+    // Enable/disable chest buttons based on remaining treasures
+    bool hasRemainingTreasures = remainingTreasures > 0;
+    if (gearChestButton != null) gearChestButton.interactable = hasRemainingTreasures;
+    if (actionChestButton != null) actionChestButton.interactable = hasRemainingTreasures;
+}
+
+void OpenChest(string chestType)
+{
+    if (remainingTreasures <= 0) return;
+    
+    Debug.Log($"Opening {chestType} chest");
+    
+    // Decrease treasure count
+    remainingTreasures--;
+    UpdateTreasureDisplay();
+    
+    // Give reward based on chest type and show the card
+    if (chestType == "gear")
+    {
+        GiveRandomGear();
+    }
+    else if (chestType == "action")
+    {
+        GiveRandomAction();
+    }
+    
+    // Check if treasures are done
+    if (remainingTreasures <= 0)
+    {
+        // Show next button to proceed to damage phase
+        if (treasureNextButton != null)
+        {
+            treasureNextButton.gameObject.SetActive(true);
+            treasureNextButton.onClick.RemoveAllListeners();
+            treasureNextButton.onClick.AddListener(StartDamagePhase);
+        }
+    }
+}
+
+void GiveRandomGear()
+{
+    if (playerInventory == null || cardDisplayPrefab == null || rewardDisplayPanel == null) return;
+    
+    // Get a random gear card from all available gear
+    GearCard randomGear = GetRandomGearCard();
+    
+    if (randomGear != null)
+    {
+        // Add gear to player's inventory
+        GearCard gearCopy = Instantiate(randomGear);
+        gearCopy.maxDurability = gearCopy.durability;
+        playerInventory.extraGear.Add(gearCopy);
+        
+        // Create and show the card display
+        ShowRewardCard(gearCopy, null, null);
+        
+        Debug.Log($"Player received: {randomGear.gearName}");
+    }
+}
+
+void GiveRandomAction()
+{
+    if (playerInventory == null || cardDisplayPrefab == null || rewardDisplayPanel == null) return;
+    
+    // Get a random action card from all available actions
+    ActionCard randomAction = GetRandomActionCard();
+    
+    if (randomAction != null)
+    {
+        // Add action to player's inventory
+        playerInventory.actionCards.Add(randomAction);
+        
+        // Create and show the card display
+        ShowRewardCard(null, randomAction, null);
+        
+        Debug.Log($"Player received: {randomAction.actionName}");
+    }
+}
+
+void ShowRewardCard(GearCard gear, ActionCard action, EffectCard effect)
+{
+    if (cardDisplayPrefab == null || rewardDisplayPanel == null) return;
+    
+    // Create the card display
+    GameObject rewardCard = Instantiate(cardDisplayPrefab, rewardDisplayPanel);
+    
+    // Set up the card display
+    CardDisplay cardDisplay = rewardCard.GetComponent<CardDisplay>();
+    if (cardDisplay != null)
+    {
+        cardDisplay.gearCard = gear;
+        cardDisplay.actionCard = action;
+        cardDisplay.effectCard = effect;
+        cardDisplay.fishCard = null;
+    }
+    
+    // Position the card (you might want to arrange multiple cards horizontally)
+    RectTransform rectTransform = rewardCard.GetComponent<RectTransform>();
+    float cardWidth = 120f;
+    float spacing = 10f;
+    Vector2 position = new Vector2((rewardCards.Count * (cardWidth + spacing)), 0);
+    rectTransform.anchoredPosition = position;
+    
+    // Add scale-up animation
+    rewardCard.transform.localScale = Vector3.zero;
+    StartCoroutine(AnimateCardAppear(rewardCard));
+    
+    // Track for cleanup
+    rewardCards.Add(rewardCard);
+}
+
+GearCard GetRandomGearCard()
+{
+    // Load all gear cards from the project
+    #if UNITY_EDITOR
+    string[] gearGuids = UnityEditor.AssetDatabase.FindAssets("t:GearCard");
+    
+    if (gearGuids.Length > 0)
+    {
+        int randomIndex = Random.Range(0, gearGuids.Length);
+        string assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(gearGuids[randomIndex]);
+        return UnityEditor.AssetDatabase.LoadAssetAtPath<GearCard>(assetPath);
+    }
+    #endif
+    
+    return null;
+}
+
+ActionCard GetRandomActionCard()
+{
+    // Load all action cards from the project
+    #if UNITY_EDITOR
+    string[] actionGuids = UnityEditor.AssetDatabase.FindAssets("t:ActionCard");
+    
+    if (actionGuids.Length > 0)
+    {
+        int randomIndex = Random.Range(0, actionGuids.Length);
+        string assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(actionGuids[randomIndex]);
+        return UnityEditor.AssetDatabase.LoadAssetAtPath<ActionCard>(assetPath);
+    }
+    #endif
+    
+    return null;
+}
+
+void ClearRewardCards()
+{
+    foreach (GameObject card in rewardCards)
+    {
+        if (card != null) Destroy(card);
+    }
+    rewardCards.Clear();
+}
+
+void StartDamagePhase()
+{
+    Debug.Log("Starting damage phase");
+    
+    // Hide treasure UI
+    if (treasurePanel != null) treasurePanel.SetActive(false);
+    
+    // Clear reward cards
+    ClearRewardCards();
+    
+    // TODO: Start gear damage animations
+    // For now, just show the finish button
+    if (continueButton != null)
+    {
+        continueButton.gameObject.SetActive(true);
+        // Reset the button to return to main camera for now
+    }
+    
+    treasurePhaseComplete = true;
 }
     void OnContinueClicked()
 {

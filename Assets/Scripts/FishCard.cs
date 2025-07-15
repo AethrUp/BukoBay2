@@ -15,8 +15,9 @@ public class FishCard : ScriptableObject
     public int power;            // Fish strength
     
     [Header("Rewards")]
-    public int coins;            // Treasure value
-    
+    public int coins;            // Coin rewards
+    public int treasures;        // Treasure rewards
+        
     [Header("Material Modifiers")]
     public string material1;     // First material type (e.g. "Plastic", "Bio")
     public int materialDiff1;    // Modifier for material1 (+/- to difficulty)

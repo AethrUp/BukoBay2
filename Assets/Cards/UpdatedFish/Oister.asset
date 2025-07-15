@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Oister
   m_EditorClassIdentifier: 
   fishName: Oister
-  fishImage: {fileID: 1957650772432202415, guid: 443bff80c3635ff47a3b0e2c027acf3b, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 1
   subDepth: 1
   power: 4
-  coins: 3
+  coins: 7
+  treasures: 3
   material1: 
   materialDiff1: 0
   material2: 
   materialDiff2: 0
   material3: 
-  materialDiff3: 0
-  gear1Damage: 2
+  materialDiff3: 2
+  gear1Damage: 0
   gear2Damage: 0
   gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: Maybe there is a pearl inside! Or is that clams?
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Oister.jpg

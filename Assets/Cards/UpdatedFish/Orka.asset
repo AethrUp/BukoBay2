@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Orka
   m_EditorClassIdentifier: 
   fishName: Orka
-  fishImage: {fileID: 2800141207643744815, guid: bbf7fa5eff26bbb42ab592d5cdce2ec9, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 3
   subDepth: 9
   power: 18
-  coins: 8
-  material1: Bio
-  materialDiff1: 2
+  coins: 18
+  treasures: 8
+  material1: 2
+  materialDiff1: 0
   material2: 
   materialDiff2: 0
   material3: 
-  materialDiff3: 0
+  materialDiff3: 2
   gear1Damage: 2
   gear2Damage: 2
-  gear3Damage: 2
+  gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: One of smartest
+  description: deadliest predators in the ocean.

@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Angler
   m_EditorClassIdentifier: 
   fishName: Angler
-  fishImage: {fileID: -2160787434512505075, guid: d02dbce21eba2124b8370966688fc282, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 2
   subDepth: 6
   power: 10
-  coins: 5
-  material1: Plastic
-  materialDiff1: 2
+  coins: 12
+  treasures: 5
+  material1: 2
+  materialDiff1: 0
   material2: 
   materialDiff2: 0
   material3: 
-  materialDiff3: 0
-  gear1Damage: 2
-  gear2Damage: 1
-  gear3Damage: 2
+  materialDiff3: 2
+  gear1Damage: 1
+  gear2Damage: 2
+  gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: 
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Angler.jpg

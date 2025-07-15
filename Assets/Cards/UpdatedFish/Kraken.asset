@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Kraken
   m_EditorClassIdentifier: 
   fishName: Kraken
-  fishImage: {fileID: -3858968278623798919, guid: b27ebd74604f1cd4991384ace45db89c, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 3
   subDepth: 9
   power: 16
-  coins: 7
-  material1: Plastic
-  materialDiff1: 2
-  material2: Bio
-  materialDiff2: 3
-  material3: Wood
+  coins: 16
+  treasures: 7
+  material1: 2
+  materialDiff1: 0
+  material2: 3
+  materialDiff2: 0
+  material3: 2
   materialDiff3: 2
   gear1Damage: 2
-  gear2Damage: 2
-  gear3Damage: 1
-  gear4Damage: 2
+  gear2Damage: 1
+  gear3Damage: 2
+  gear4Damage: 0
   gear5Damage: 0
-  description: 
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Kraken.jpg

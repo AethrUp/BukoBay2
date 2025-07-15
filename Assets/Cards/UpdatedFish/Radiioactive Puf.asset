@@ -13,20 +13,22 @@ MonoBehaviour:
   m_Name: Radiioactive Puf
   m_EditorClassIdentifier: 
   fishName: Radiioactive Puf
-  fishImage: {fileID: -6535061216159887078, guid: a594a99158c2aeb4e827ea9dd703807b, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 3
   subDepth: 8
   power: 16
-  coins: 7
-  material1: Metal
-  materialDiff1: 1
+  coins: 16
+  treasures: 7
+  material1: 1
+  materialDiff1: 0
   material2: 
   materialDiff2: 0
   material3: 
-  materialDiff3: 0
-  gear1Damage: 2
+  materialDiff3: 2
+  gear1Damage: 1
   gear2Damage: 1
-  gear3Damage: 1
-  gear4Damage: 2
+  gear3Damage: 2
+  gear4Damage: 0
   gear5Damage: 0
-  description: It's kind of your fault the Puffi is like this.
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Radiioactive
+    Puf.jpg

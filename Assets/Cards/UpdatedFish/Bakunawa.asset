@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Bakunawa
   m_EditorClassIdentifier: 
   fishName: Bakunawa
-  fishImage: {fileID: -5013161027770849957, guid: ef48dcf671a1bce47bcb8d16edfe0298, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 3
   subDepth: 9
   power: 17
-  coins: 8
-  material1: Wood
-  materialDiff1: 2
-  material2: Metal
-  materialDiff2: 1
-  material3: Plastic
-  materialDiff3: 3
+  coins: 18
+  treasures: 8
+  material1: 2
+  materialDiff1: 0
+  material2: 1
+  materialDiff2: 0
+  material3: 3
+  materialDiff3: 2
   gear1Damage: 2
-  gear2Damage: 2
+  gear2Damage: 1
   gear3Damage: 1
-  gear4Damage: 1
+  gear4Damage: 0
   gear5Damage: 0
-  description: 
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Bakunawa.jpg

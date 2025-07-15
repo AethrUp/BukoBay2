@@ -13,20 +13,22 @@ MonoBehaviour:
   m_Name: Radioactive Squid
   m_EditorClassIdentifier: 
   fishName: Radioactive Squid
-  fishImage: {fileID: -5525261534717206873, guid: 8c6390e36046e89419e09a9ac2b09e9d, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 3
   subDepth: 8
   power: 17
-  coins: 8
-  material1: Wood
-  materialDiff1: 2
-  material2: Plastic
-  materialDiff2: 1
-  material3: Metal
-  materialDiff3: 1
-  gear1Damage: 2
+  coins: 18
+  treasures: 8
+  material1: 2
+  materialDiff1: 0
+  material2: 1
+  materialDiff2: 0
+  material3: 1
+  materialDiff3: 2
+  gear1Damage: 1
   gear2Damage: 1
-  gear3Damage: 1
+  gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: A very dangerous creature.
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Radioactive
+    Squid.jpg

@@ -39,7 +39,7 @@ public class UpdatedFishCardImporter : EditorWindow
         GUILayout.Label("1. Click 'Browse for CSV File' and select your new fish CSV");
         GUILayout.Label("2. Click 'Import Updated Fish Cards' to create all assets");
         GUILayout.Label("3. Fish cards will be created in Assets/Cards/UpdatedFish/");
-        GUILayout.Label("Note: Uses new depth system (main + sub depths)");
+        GUILayout.Label("Note: Now supports both Treasures and Coins!");
     }
     
     void ImportUpdatedFishCards()
@@ -50,7 +50,7 @@ public class UpdatedFishCardImporter : EditorWindow
             return;
         }
         
-        Debug.Log("Starting updated fish card import...");
+        Debug.Log("Starting updated fish card import with treasures and coins...");
         
         // Create directories if they don't exist
         string cardsPath = "Assets/Cards";
@@ -88,6 +88,16 @@ public class UpdatedFishCardImporter : EditorWindow
         }
         
         Debug.Log($"Found {headers.Length} headers");
+        Debug.Log("Column mapping:");
+        Debug.Log("  Column 1: Fish Name");
+        Debug.Log("  Column 2: Depth Type");
+        Debug.Log("  Column 4: Sub Depth");
+        Debug.Log("  Column 5: Treasures");
+        Debug.Log("  Column 6: Coins");
+        Debug.Log("  Column 7: Strength");
+        Debug.Log("  Column 9-14: Materials");
+        Debug.Log("  Column 15-19: Gear Damage");
+        Debug.Log("  Column 20: Description");
         
         int importedCount = 0;
         int skippedCount = 0;
@@ -107,7 +117,7 @@ public class UpdatedFishCardImporter : EditorWindow
                 values[i] = values[i].Trim().Replace("\"", "");
             }
             
-            if (values.Length < 18) // Need at least through Gear 5 column
+            if (values.Length < 20) // Need at least through Description column
             {
                 Debug.LogWarning($"Line {lineIndex} has too few values ({values.Length}), skipping");
                 skippedCount++;
@@ -138,44 +148,48 @@ public class UpdatedFishCardImporter : EditorWindow
             if (int.TryParse(GetValue(values, 4), out int subDepth))
                 fishCard.subDepth = subDepth;                // Column 4 - Depth Num
             
-            // Set challenge and rewards
-            if (int.TryParse(GetValue(values, 6), out int strength))
-                fishCard.power = strength;                   // Column 6 - Strength
+            // Set rewards (NEW: Both treasures and coins!)
+            if (int.TryParse(GetValue(values, 5), out int treasures))
+                fishCard.treasures = treasures;             // Column 5 - Treasure
             
-            if (int.TryParse(GetValue(values, 5), out int coins))
-                fishCard.coins = coins;                      // Column 5 - Coins
+            if (int.TryParse(GetValue(values, 6), out int coins))
+                fishCard.coins = coins;                     // Column 6 - Coins
             
-            // Set material modifiers
-            fishCard.material1 = GetValue(values, 7);        // Column 7 - Mat 1
-            if (int.TryParse(GetValue(values, 8), out int matDiff1))
-                fishCard.materialDiff1 = matDiff1;           // Column 8 - MatDif 1
+            // Set challenge
+            if (int.TryParse(GetValue(values, 7), out int strength))
+                fishCard.power = strength;                   // Column 7 - Strength
             
-            fishCard.material2 = GetValue(values, 9);        // Column 9 - Mat 2
-            if (int.TryParse(GetValue(values, 10), out int matDiff2))
-                fishCard.materialDiff2 = matDiff2;           // Column 10 - MatDif 2
+            // Set material modifiers (ALL SHIFTED BY +1 because of new Treasure column)
+            fishCard.material1 = GetValue(values, 9);        // Column 9 - Mat 1
+            if (int.TryParse(GetValue(values, 10), out int matDiff1))
+                fishCard.materialDiff1 = matDiff1;           // Column 10 - MatDif 1
             
-            fishCard.material3 = GetValue(values, 11);       // Column 11 - Mat 3
-            if (int.TryParse(GetValue(values, 12), out int matDiff3))
-                fishCard.materialDiff3 = matDiff3;           // Column 12 - MatDif 3
+            fishCard.material2 = GetValue(values, 11);       // Column 11 - Mat 2
+            if (int.TryParse(GetValue(values, 12), out int matDiff2))
+                fishCard.materialDiff2 = matDiff2;           // Column 12 - MatDif 2
             
-            // Set gear damage values (columns 13-17: Gear 1-5)
-            if (int.TryParse(GetValue(values, 13), out int gear1))
+            fishCard.material3 = GetValue(values, 13);       // Column 13 - Mat 3
+            if (int.TryParse(GetValue(values, 14), out int matDiff3))
+                fishCard.materialDiff3 = matDiff3;           // Column 14 - MatDif 3
+            
+            // Set gear damage values (columns 15-19: Gear 1-5)
+            if (int.TryParse(GetValue(values, 15), out int gear1))
                 fishCard.gear1Damage = gear1;
             
-            if (int.TryParse(GetValue(values, 14), out int gear2))
+            if (int.TryParse(GetValue(values, 16), out int gear2))
                 fishCard.gear2Damage = gear2;
             
-            if (int.TryParse(GetValue(values, 15), out int gear3))
+            if (int.TryParse(GetValue(values, 17), out int gear3))
                 fishCard.gear3Damage = gear3;
             
-            if (int.TryParse(GetValue(values, 16), out int gear4))
+            if (int.TryParse(GetValue(values, 18), out int gear4))
                 fishCard.gear4Damage = gear4;
             
-            if (int.TryParse(GetValue(values, 17), out int gear5))
+            if (int.TryParse(GetValue(values, 19), out int gear5))
                 fishCard.gear5Damage = gear5;
             
             // Set description
-            fishCard.description = GetValue(values, 18);     // Column 18 - Description
+            fishCard.description = GetValue(values, 20);     // Column 20 - Description
             
             // Try to find and assign the fish image
             string imageName = $"fishx_{fishName}";
@@ -199,6 +213,9 @@ public class UpdatedFishCardImporter : EditorWindow
             string assetPath = $"{fishPath}/{fileName}";
             
             Debug.Log($"Creating asset at: {assetPath}");
+            Debug.Log($"  Treasures: {fishCard.treasures}");
+            Debug.Log($"  Coins: {fishCard.coins}");
+            Debug.Log($"  Power: {fishCard.power}");
             
             AssetDatabase.CreateAsset(fishCard, assetPath);
             importedCount++;
@@ -207,9 +224,9 @@ public class UpdatedFishCardImporter : EditorWindow
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         
-        Debug.Log($"Import complete! Created {importedCount} updated fish cards, skipped {skippedCount} rows");
+        Debug.Log($"Import complete! Created {importedCount} updated fish cards with treasures and coins, skipped {skippedCount} rows");
         EditorUtility.DisplayDialog("Import Complete", 
-            $"Successfully imported {importedCount} updated fish cards.\nSkipped {skippedCount} rows.\nSee console for details.", "OK");
+            $"Successfully imported {importedCount} updated fish cards with treasures and coins.\nSkipped {skippedCount} rows.\nSee console for details.", "OK");
     }
     
     string GetValue(string[] values, int index)

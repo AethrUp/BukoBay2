@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Baby Blue
   m_EditorClassIdentifier: 
   fishName: Baby Blue
-  fishImage: {fileID: -5511300794793373410, guid: 311a1a0366702f444a2f91c7491d97a1, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 3
   subDepth: 7
   power: 16
-  coins: 7
-  material1: Bio
-  materialDiff1: 2
-  material2: Plastic
-  materialDiff2: 2
+  coins: 16
+  treasures: 7
+  material1: 2
+  materialDiff1: 0
+  material2: 2
+  materialDiff2: 0
   material3: 
-  materialDiff3: 0
-  gear1Damage: 1
+  materialDiff3: 1
+  gear1Damage: 2
   gear2Damage: 2
   gear3Damage: 2
-  gear4Damage: 2
+  gear4Damage: 0
   gear5Damage: 0
-  description: 
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Baby Blue.jpg

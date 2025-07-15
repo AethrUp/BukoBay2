@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Sealeafs
   m_EditorClassIdentifier: 
   fishName: Sealeafs
-  fishImage: {fileID: 437354644676344944, guid: f24f202eba21c654c8a81c36b74ca9be, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 1
   subDepth: 1
   power: 6
-  coins: 4
+  coins: 9
+  treasures: 4
   material1: 
   materialDiff1: 0
   material2: 
   materialDiff2: 0
   material3: 
-  materialDiff3: 0
+  materialDiff3: 1
   gear1Damage: 1
-  gear2Damage: 1
+  gear2Damage: 0
   gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: Wow. Delicious.
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Sealeafs.jpg

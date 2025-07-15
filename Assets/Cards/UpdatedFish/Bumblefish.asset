@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Bumblefish
   m_EditorClassIdentifier: 
   fishName: Bumblefish
-  fishImage: {fileID: -1984848372742794459, guid: a8383ffe8a5f2c949a6ad5907a97ab14, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 2
   subDepth: 4
   power: 9
-  coins: 5
-  material1: Plastic
-  materialDiff1: 2
+  coins: 12
+  treasures: 5
+  material1: 2
+  materialDiff1: 0
   material2: 
   materialDiff2: 0
   material3: 
-  materialDiff3: 0
+  materialDiff3: 1
   gear1Damage: 1
-  gear2Damage: 1
+  gear2Damage: 0
   gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: 
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Bumblefish.jpg

@@ -13,20 +13,21 @@ MonoBehaviour:
   m_Name: Sailfish
   m_EditorClassIdentifier: 
   fishName: Sailfish
-  fishImage: {fileID: -8324521803228630263, guid: cefab6b1c4aa4e9459f79771d7bb6dd5, type: 3}
+  fishImage: {fileID: 0}
   mainDepth: 2
   subDepth: 5
   power: 10
-  coins: 6
-  material1: Wood
-  materialDiff1: 2
+  coins: 14
+  treasures: 6
+  material1: 2
+  materialDiff1: 0
   material2: 
   materialDiff2: 0
   material3: 
-  materialDiff3: 0
-  gear1Damage: 2
-  gear2Damage: 1
+  materialDiff3: 2
+  gear1Damage: 1
+  gear2Damage: 0
   gear3Damage: 0
   gear4Damage: 0
   gear5Damage: 0
-  description: That big spike ain't no joke.
+  description: C:\Users\joe\Dropbox\Design\FishFish\Tabletopia\Fish\Fish2\Sailfish.jpg
