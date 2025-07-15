@@ -546,6 +546,13 @@ Debug.Log($"PlayerInventory.Instance = {(PlayerInventory.Instance != null ? Play
         interactiveUI.OnInteractivePhaseEnd();
     }
     
+    // Hide the fish card panel
+    FishingUI fishingUI = FindFirstObjectByType<FishingUI>();
+    if (fishingUI != null)
+    {
+        fishingUI.HideFishCard();
+    }
+    
     // Show results screen
     if (resultsManager != null)
     {
@@ -554,6 +561,13 @@ Debug.Log($"PlayerInventory.Instance = {(PlayerInventory.Instance != null ? Play
     
     // Reset fishing state
     isInteractionPhase = false;
+
+    // Clear played action cards
+ActionCardDropZone[] dropZones = FindObjectsByType<ActionCardDropZone>(FindObjectsSortMode.None);
+foreach (ActionCardDropZone dropZone in dropZones)
+{
+    dropZone.ClearPlayedCards();
+}
     
     Debug.Log("Fishing phase ended successfully!");
 }
@@ -588,6 +602,13 @@ void HandleFailure()
         interactiveUI.OnInteractivePhaseEnd();
     }
     
+    // Hide the fish card panel
+    FishingUI fishingUI = FindFirstObjectByType<FishingUI>();
+    if (fishingUI != null)
+    {
+        fishingUI.HideFishCard();
+    }
+    
     // Show results screen
     if (resultsManager != null)
     {
@@ -596,6 +617,13 @@ void HandleFailure()
     
     // Reset fishing state
     isInteractionPhase = false;
+
+    // Clear played action cards
+ActionCardDropZone[] dropZones = FindObjectsByType<ActionCardDropZone>(FindObjectsSortMode.None);
+foreach (ActionCardDropZone dropZone in dropZones)
+{
+    dropZone.ClearPlayedCards();
+}
     
     Debug.Log("Fishing phase ended in failure!");
 }
@@ -673,43 +701,44 @@ void HandleFailure()
     }
 
     string DamageGearPiece(GearCard gear, int damageAmount)
+{
+    // Check for protection first
+    if (gear.hasProtection)
     {
-        // Check for protection first
-        if (gear.hasProtection)
-        {
-            Debug.Log($"🛡️ {gear.gearName} protection activated! Blocking {damageAmount} damage from {gear.protectionType}");
+        Debug.Log($"🛡️ {gear.gearName} protection activated! Blocking {damageAmount} damage from {gear.protectionType}");
 
-            // Remove the protection (it's been used)
-            gear.hasProtection = false;
-            string protectionUsed = gear.protectionType;
-            gear.protectionType = "";
+        // Remove the protection (it's been used)
+        gear.hasProtection = false;
+        string protectionUsed = gear.protectionType;
+        gear.protectionType = "";
 
-            // Update the display to remove the shield icon
-            UpdateGearDisplay(gear);
-
-            Debug.Log($"Protection from {protectionUsed} consumed. {gear.gearName} takes no damage.");
-            return $"{gear.gearName} PROTECTED";
-        }
-
-        // No protection - apply damage normally
-        int originalDurability = gear.durability;
-        gear.durability = Mathf.Max(0, gear.durability - damageAmount);
-
-        Debug.Log($"Damaged {gear.gearName}: {originalDurability} → {gear.durability} durability (-{damageAmount})");
-
-        // Update the display to show new durability
+        // Update the display to remove the shield icon
         UpdateGearDisplay(gear);
 
-        if (gear.durability <= 0)
-        {
-            Debug.Log($"⚠️ {gear.gearName} is BROKEN! (0 durability)");
-            return $"{gear.gearName} BROKEN";
-        }
-        else
-        {
-            return $"{gear.gearName} -{damageAmount}";
-        }
+        Debug.Log($"Protection from {protectionUsed} consumed. {gear.gearName} takes no damage.");
+        return $"{gear.gearName} PROTECTED";
     }
+
+    // No protection - apply damage normally
+    int originalDurability = gear.durability;
+    gear.durability = Mathf.Max(0, gear.durability - damageAmount);
+
+    Debug.Log($"Damaged {gear.gearName}: {originalDurability} → {gear.durability} durability (-{damageAmount})");
+
+    // Update the display to show new durability
+    UpdateGearDisplay(gear);
+
+    if (gear.durability <= 0)
+    {
+        Debug.Log($"⚠️ {gear.gearName} is BROKEN! (0 durability)");
+        DestroyBrokenGear(gear); // THIS IS THE FIX - ADDED THIS LINE
+        return $"{gear.gearName} BROKEN";
+    }
+    else
+    {
+        return $"{gear.gearName} -{damageAmount}";
+    }
+}
 void UpdateGearDisplay(GearCard gear)
 {
     // Find and update all displays showing this gear

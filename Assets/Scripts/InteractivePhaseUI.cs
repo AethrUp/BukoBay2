@@ -36,27 +36,34 @@ public class InteractivePhaseUI : MonoBehaviour
     [Header("Current Selection")]
     public ActionCard selectedActionCard;
     public bool targetingPlayer = true;
+
+    [Header("Action Card Drop Zones")]
+public ActionCardDropZone targetPlayerDropZone;
+public ActionCardDropZone targetFishDropZone;
     
     private System.Collections.Generic.List<GameObject> actionCardButtons = new System.Collections.Generic.List<GameObject>();
-    
+
     void Start()
     {
         // Set up buttons
         if (nextRoundButton != null)
             nextRoundButton.onClick.AddListener(NextRound);
-        
+
         if (skipActionButton != null)
             skipActionButton.onClick.AddListener(SkipAction);
-        
+
         if (targetPlayerButton != null)
             targetPlayerButton.onClick.AddListener(() => SetTarget(true));
-        
+
         if (targetFishButton != null)
             targetFishButton.onClick.AddListener(() => SetTarget(false));
-        
+
         // Hide panel initially
         if (interactivePanel != null)
             interactivePanel.SetActive(false);
+            
+            if (tugOfWarBar != null)
+        tugOfWarBar.gameObject.SetActive(false);
     }
     
     void Update()
@@ -69,25 +76,33 @@ public class InteractivePhaseUI : MonoBehaviour
     }
     
     public void ShowInteractivePhase()
-    {
-        if (interactivePanel != null)
-            interactivePanel.SetActive(true);
-        
-        SetupActionCards();
-        UpdateFishInfo();
-        UpdateTargetButtons();
-        
-        // Initialize the tug-of-war bar when fishing starts
-        InitializeTugOfWarBar();
-    }
+{
+    if (interactivePanel != null)
+        interactivePanel.SetActive(true);
+    
+    // Show the tug-of-war bar when interactive phase starts
+    if (tugOfWarBar != null)
+        tugOfWarBar.gameObject.SetActive(true);
+    
+    SetupActionCards();
+    UpdateFishInfo();
+    UpdateTargetButtons();
+    
+    // Initialize the tug-of-war bar when fishing starts
+    InitializeTugOfWarBar();
+}
     
     public void HideInteractivePhase()
-    {
-        if (interactivePanel != null)
-            interactivePanel.SetActive(false);
-        
-        ClearActionCards();
-    }
+{
+    if (interactivePanel != null)
+        interactivePanel.SetActive(false);
+    
+    // Hide the tug-of-war bar when interactive phase ends
+    if (tugOfWarBar != null)
+        tugOfWarBar.gameObject.SetActive(false);
+    
+    ClearActionCards();
+}
     
     void SetupActionCards()
     {
@@ -288,9 +303,35 @@ public class InteractivePhaseUI : MonoBehaviour
     
     // Called when interactive phase ends
     public void OnInteractivePhaseEnd()
+{
+    // Clear played action cards BEFORE hiding the phase
+    Debug.Log("Clearing played action cards from interactive phase end...");
+    
+    if (targetPlayerDropZone != null)
     {
-        HideInteractivePhase();
+        Debug.Log("Clearing cards from Target Player drop zone");
+        targetPlayerDropZone.ClearPlayedCards();
     }
+    else
+    {
+        Debug.Log("Target Player drop zone is null!");
+    }
+    
+    if (targetFishDropZone != null)
+    {
+        Debug.Log("Clearing cards from Target Fish drop zone");
+        targetFishDropZone.ClearPlayedCards();
+    }
+    else
+    {
+        Debug.Log("Target Fish drop zone is null!");
+    }
+    
+    Debug.Log("Finished clearing played action cards");
+    
+    // Now hide the phase
+    HideInteractivePhase();
+}
     
     void InitializeTugOfWarBar()
     {

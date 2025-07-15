@@ -139,33 +139,49 @@ public class FishingUI : MonoBehaviour
             startFishingButton.interactable = canFish;
         }
     }
-    
+
     public void StartFishing()
+{
+    if (fishingManager == null)
     {
-        if (fishingManager == null)
-        {
-            Debug.LogError("No FishingManager assigned!");
-            return;
-        }
-        
-        Debug.Log("=== STARTING FISHING ===");
-        
-        // Setup fishing (calculates depth based on gear count)
-        fishingManager.SetupFishing();
-        
-        // Cast at the required depth
-        if (fishingManager.requiredMinDepth > 0)
-        {
-            fishingManager.CastAtDepth(fishingManager.requiredMinDepth);
-            
-            // Show the fish that appeared
-            ShowCaughtFish();
-        }
-        else
-        {
-            Debug.LogWarning("Cannot fish - not enough gear!");
-        }
+        Debug.LogError("No FishingManager assigned!");
+        return;
     }
+
+    Debug.Log("=== STARTING FISHING COUNTDOWN ===");
+    
+    // Setup fishing (calculates depth based on gear count)
+    fishingManager.SetupFishing();
+    
+    // Start the countdown using GetComponent
+    FishingCountdownController countdown = GetComponent<FishingCountdownController>();
+    if (countdown != null)
+    {
+        countdown.StartCountdown();
+    }
+    else
+    {
+        Debug.LogWarning("No countdown controller found on this GameObject, starting fishing immediately");
+        StartFishingAfterCountdown();
+    }
+}
+public void StartFishingAfterCountdown()
+{
+    Debug.Log("=== COUNTDOWN COMPLETE - CASTING LINE ===");
+    
+    // Cast at the required depth
+    if (fishingManager.requiredMinDepth > 0)
+    {
+        fishingManager.CastAtDepth(fishingManager.requiredMinDepth);
+        
+        // Show the fish that appeared
+        ShowCaughtFish();
+    }
+    else
+    {
+        Debug.LogWarning("Cannot fish - not enough gear!");
+    }
+}
     
     void ShowCaughtFish()
     {

@@ -145,15 +145,21 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
 
     // Clear all played cards (call this when the interactive phase ends)
     public void ClearPlayedCards()
+{
+    Debug.Log($"ClearPlayedCards called on {gameObject.name} - found {playedCards.Count} cards to clear");
+    foreach (GameObject card in playedCards)
     {
-        foreach (GameObject card in playedCards)
+        if (card != null)
         {
-            if (card != null)
-            {
-                Destroy(card);
-            }
+            Debug.Log($"Destroying card: {card.name}");
+            Destroy(card);
         }
-        playedCards.Clear();
+        else
+        {
+            Debug.Log("Found null card in playedCards list");
+        }
     }
-    
+    playedCards.Clear();
+    Debug.Log($"All played cards cleared from {gameObject.name}");
+}
 }

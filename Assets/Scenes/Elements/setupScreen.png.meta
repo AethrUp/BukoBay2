@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: d8dba6ab19497244baa040ea241a204a
+guid: a9ef1866ab2e0194ab1105859db62805
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6443651658516717602
-    second: effectCard2_0
+      213: -7302773723096631944
+    second: setupScreen_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: effectCard2_0
+      name: setupScreen_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 2
-        width: 168
-        height: 134
+        x: 0
+        y: 0
+        width: 1921
+        height: 1081
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: edf11cdd4fc8396a0800000000000000
-      internalID: -6443651658516717602
+      spriteID: 875b4c79df557aa90800000000000000
+      internalID: -7302773723096631944
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      effectCard2_0: -6443651658516717602
+      setupScreen_0: -7302773723096631944
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
