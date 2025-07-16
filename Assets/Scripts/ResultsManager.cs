@@ -12,6 +12,14 @@ public TextMeshProUGUI coinsEarnedText;
 public TextMeshProUGUI gearDamageText;
 public UnityEngine.UI.Image fishImage;
 public Button continueButton;
+
+[Header("Damage Animation")]
+public float damageAnimationDelay = 0.5f;    // Time between each gear damage animation
+public GameObject damageNumberPrefab;        // Prefab for floating damage numbers
+public Color damageNumberColor = Color.red;  // Color for damage numbers
+public Color destroyedColor = Color.black;   // Color when gear is destroyed
+
+private bool damagePhaseComplete = false;
     
 [Header("Game References")]
 public CameraManager cameraManager;
@@ -30,10 +38,9 @@ public Transform linePanel;
 public Transform lurePanel;
 public Transform baitPanel;
 public Transform shieldPanel;
-public GameObject cardDisplayPrefab;
+public GameObject gearCardDisplayPrefab;    // For gear cards
+public GameObject actionCardDisplayPrefab;  // For action cards
 public float gearAnimationDelay = 0.1f;
-private List<GameObject> displayedGearCards = new List<GameObject>();
-private bool gearDisplayComplete = false;
 
 [Header("Coin Animation")]
 public GameObject coinIcon;                  // UI coin icon
@@ -55,7 +62,9 @@ public Button treasureNextButton;           // Button to proceed to damage phase
 [Header("Treasure Data")]
 public int remainingTreasures = 0;           // How many treasures left to open
 private bool treasurePhaseComplete = false;
-private List<GameObject> rewardCards = new List<GameObject>(); // Track reward cards for cleanup
+    private List<GameObject> rewardCards = new List<GameObject>(); // Track reward cards for cleanup
+private List<GameObject> displayedGearCards = new List<GameObject>();
+private bool gearDisplayComplete = false;
 
 
     void Start()
@@ -158,7 +167,7 @@ if (fishImage != null)
 
     System.Collections.IEnumerator AnimateGearDisplay()
 {
-    if (cardDisplayPrefab == null || playerInventory == null)
+    if (gearCardDisplayPrefab == null || playerInventory == null)
     {
         Debug.LogWarning("Missing components for gear display!");
         gearDisplayComplete = true;
@@ -240,7 +249,7 @@ if (fishImage != null)
 
 void CreateGearDisplay(GearCard gear, Transform parentPanel, Vector2 position)
 {
-    GameObject gearCard = Instantiate(cardDisplayPrefab, parentPanel);
+    GameObject gearCard = Instantiate(gearCardDisplayPrefab, parentPanel);
     
     // Set up the card display
     CardDisplay cardDisplay = gearCard.GetComponent<CardDisplay>();
@@ -271,7 +280,7 @@ void CreateGearDisplay(GearCard gear, Transform parentPanel, Vector2 position)
 // Add this method for shield display
 void CreateEffectDisplay(EffectCard effect, Transform parentPanel, Vector2 position)
 {
-    GameObject effectCard = Instantiate(cardDisplayPrefab, parentPanel);
+    GameObject effectCard = Instantiate(gearCardDisplayPrefab, parentPanel);
     
     // Set up the card display
     CardDisplay cardDisplay = effectCard.GetComponent<CardDisplay>();
@@ -333,7 +342,7 @@ System.Collections.IEnumerator AnimateCoinReward()
     if (continueButton != null) continueButton.gameObject.SetActive(false);
     if (coinIcon != null) coinIcon.SetActive(true);
     
-    // Show earned coins (just the number)
+    // Show earned coins (just the number) - even if 0
     if (earnedCoinsText != null)
     {
         earnedCoinsText.gameObject.SetActive(true);
@@ -350,13 +359,13 @@ System.Collections.IEnumerator AnimateCoinReward()
         yield return new WaitForSeconds(0.5f);
     }
     
-    // Transfer animation (earned coins go to total)
+    // Transfer animation only if there are coins to transfer
     if (earnedCoinsText != null && playerTotalCoinsText != null && coinsEarned > 0)
     {
         yield return StartCoroutine(TransferCoins());
     }
     
-    // Start treasure phase instead of showing next button
+    // Always start treasure phase (even if 0 treasures)
     StartTreasurePhase();
     
     coinAnimationComplete = true;
@@ -411,50 +420,50 @@ System.Collections.IEnumerator CountUpCoins(TextMeshProUGUI textField, int start
     }
 
     void StartTreasurePhase()
+{
+    Debug.Log("Starting treasure phase");
+    
+    // Use the fish's actual treasure value
+    if (caughtFish != null)
     {
-        Debug.Log("Starting treasure phase");
-
-        // Calculate treasures based on fish
-        if (caughtFish != null)
-        {
-            remainingTreasures = Mathf.Max(1, caughtFish.coins / 10); // 1 treasure per 10 coins, minimum 1
-        }
-        else
-        {
-            remainingTreasures = 0;
-        }
-
-        if (remainingTreasures > 0)
-        {
-            // Clear any previous reward cards
-            ClearRewardCards();
-
-            // Show treasure UI
-            if (treasurePanel != null) treasurePanel.SetActive(true);
-            UpdateTreasureDisplay();
-
-            // Set up chest buttons
-            if (gearChestButton != null)
-            {
-                gearChestButton.onClick.RemoveAllListeners();
-                gearChestButton.onClick.AddListener(() => OpenChest("gear"));
-            }
-
-            if (actionChestButton != null)
-            {
-                actionChestButton.onClick.RemoveAllListeners();
-                actionChestButton.onClick.AddListener(() => OpenChest("action"));
-            }
-
-            // Hide treasure next button initially
-            if (treasureNextButton != null) treasureNextButton.gameObject.SetActive(false);
-        }
-        else
-        {
-            // No treasures, skip to damage phase
-            StartDamagePhase();
-        }
+        remainingTreasures = caughtFish.treasures;
     }
+    else
+    {
+        remainingTreasures = 0;
+    }
+    
+    if (remainingTreasures > 0)
+    {
+        // Clear any previous reward cards
+        ClearRewardCards();
+        
+        // Show treasure UI
+        if (treasurePanel != null) treasurePanel.SetActive(true);
+        UpdateTreasureDisplay();
+        
+        // Set up chest buttons
+        if (gearChestButton != null)
+        {
+            gearChestButton.onClick.RemoveAllListeners();
+            gearChestButton.onClick.AddListener(() => OpenChest("gear"));
+        }
+        
+        if (actionChestButton != null)
+        {
+            actionChestButton.onClick.RemoveAllListeners();
+            actionChestButton.onClick.AddListener(() => OpenChest("action"));
+        }
+        
+        // Hide treasure next button initially
+        if (treasureNextButton != null) treasureNextButton.gameObject.SetActive(false);
+    }
+    else
+    {
+        // No treasures, go directly to damage phase
+        StartDamagePhase();
+    }
+}
 void UpdateTreasureDisplay()
 {
     if (treasureCountText != null)
@@ -503,7 +512,7 @@ void OpenChest(string chestType)
 
 void GiveRandomGear()
 {
-    if (playerInventory == null || cardDisplayPrefab == null || rewardDisplayPanel == null) return;
+    if (playerInventory == null || gearCardDisplayPrefab == null || rewardDisplayPanel == null) return;
     
     // Get a random gear card from all available gear
     GearCard randomGear = GetRandomGearCard();
@@ -524,7 +533,7 @@ void GiveRandomGear()
 
 void GiveRandomAction()
 {
-    if (playerInventory == null || cardDisplayPrefab == null || rewardDisplayPanel == null) return;
+    if (playerInventory == null || actionCardDisplayPrefab == null || rewardDisplayPanel == null) return;
     
     // Get a random action card from all available actions
     ActionCard randomAction = GetRandomActionCard();
@@ -543,10 +552,19 @@ void GiveRandomAction()
 
 void ShowRewardCard(GearCard gear, ActionCard action, EffectCard effect)
 {
-    if (cardDisplayPrefab == null || rewardDisplayPanel == null) return;
+    if (rewardDisplayPanel == null) return;
+    
+    // Choose the correct prefab based on card type
+    GameObject prefabToUse = null;
+    if (gear != null)
+        prefabToUse = gearCardDisplayPrefab;
+    else if (action != null)
+        prefabToUse = actionCardDisplayPrefab;
+    
+    if (prefabToUse == null) return;
     
     // Create the card display
-    GameObject rewardCard = Instantiate(cardDisplayPrefab, rewardDisplayPanel);
+    GameObject rewardCard = Instantiate(prefabToUse, rewardDisplayPanel);
     
     // Set up the card display
     CardDisplay cardDisplay = rewardCard.GetComponent<CardDisplay>();
@@ -616,25 +634,248 @@ void ClearRewardCards()
     rewardCards.Clear();
 }
 
-void StartDamagePhase()
+    void StartDamagePhase()
+    {
+        Debug.Log("Starting damage phase");
+
+        // Hide treasure UI
+        if (treasurePanel != null) treasurePanel.SetActive(false);
+
+        // Clear reward cards
+        ClearRewardCards();
+
+        // Start gear damage animations if there was damage
+        if (!string.IsNullOrEmpty(damageReport) && damageReport != "No damage dealt")
+        {
+            StartCoroutine(AnimateGearDamage());
+        }
+        else
+        {
+            // No damage to animate, just show finish button
+            ShowFinishButton();
+        }
+    }
+System.Collections.IEnumerator AnimateGearDamage()
 {
-    Debug.Log("Starting damage phase");
+    Debug.Log("Starting gear damage animations");
     
-    // Hide treasure UI
-    if (treasurePanel != null) treasurePanel.SetActive(false);
+    // We need to get the actual damage info from the fishing manager
+    // For now, let's parse the damage report string
+    string[] damageEntries = damageReport.Split(',');
     
-    // Clear reward cards
-    ClearRewardCards();
+    foreach (string entry in damageEntries)
+    {
+        if (string.IsNullOrEmpty(entry.Trim())) continue;
+        
+        // Parse the damage entry (e.g., "Rod -2" or "Reel BROKEN")
+        yield return StartCoroutine(AnimateGearPieceDamage(entry.Trim()));
+        
+        // Wait before next damage animation
+        yield return new WaitForSeconds(damageAnimationDelay);
+    }
     
-    // TODO: Start gear damage animations
-    // For now, just show the finish button
+    // All damage animations complete
+    ShowFinishButton();
+    damagePhaseComplete = true;
+}
+
+System.Collections.IEnumerator AnimateGearPieceDamage(string damageEntry)
+{
+    Debug.Log($"Animating damage for: {damageEntry}");
+    
+    // Parse the damage entry to get gear name and damage amount
+    string[] parts = damageEntry.Split(' ');
+    if (parts.Length < 2) yield break;
+    
+    string gearName = parts[0];
+    string damageInfo = parts[1];
+    
+    // Find the gear card that matches this damage entry
+    GameObject gearCardObj = FindGearCardByName(gearName);
+    if (gearCardObj == null) yield break;
+    
+    // Animate the gear taking damage
+    if (damageInfo == "BROKEN")
+    {
+        yield return StartCoroutine(AnimateGearDestroyed(gearCardObj));
+    }
+    else if (damageInfo == "PROTECTED")
+    {
+        yield return StartCoroutine(AnimateGearProtected(gearCardObj));
+    }
+    else
+    {
+        // Regular damage (like "-2")
+        int damageAmount = 0;
+        if (int.TryParse(damageInfo, out damageAmount))
+        {
+            yield return StartCoroutine(AnimateGearDamaged(gearCardObj, Mathf.Abs(damageAmount)));
+        }
+    }
+}
+
+GameObject FindGearCardByName(string gearName)
+{
+    // Look through all displayed gear cards to find the one with matching gear name
+    foreach (GameObject gearCard in displayedGearCards)
+    {
+        if (gearCard == null) continue;
+        
+        CardDisplay cardDisplay = gearCard.GetComponent<CardDisplay>();
+        if (cardDisplay != null && cardDisplay.gearCard != null)
+        {
+            if (cardDisplay.gearCard.gearName.Contains(gearName) || gearName.Contains(cardDisplay.gearCard.gearName))
+            {
+                return gearCard;
+            }
+        }
+    }
+    
+    return null;
+}
+
+System.Collections.IEnumerator AnimateGearDamaged(GameObject gearCard, int damageAmount)
+{
+    Debug.Log($"Animating gear damaged: {damageAmount} damage");
+    
+    // Simple hit animation - shake the card
+    Vector3 originalPosition = gearCard.transform.localPosition;
+    
+    // Shake animation
+    float shakeTime = 0.5f;
+    float shakeIntensity = 10f;
+    float elapsed = 0f;
+    
+    while (elapsed < shakeTime)
+    {
+        elapsed += Time.deltaTime;
+        Vector3 shakeOffset = Random.insideUnitCircle * shakeIntensity * (1f - elapsed / shakeTime);
+        gearCard.transform.localPosition = originalPosition + shakeOffset;
+        yield return null;
+    }
+    
+    // Return to original position
+    gearCard.transform.localPosition = originalPosition;
+    
+    // Flash red briefly
+    yield return StartCoroutine(FlashCardColor(gearCard, damageNumberColor, 0.3f));
+    
+    // Show floating damage number
+    ShowFloatingDamageNumber(gearCard, $"-{damageAmount}");
+}
+
+System.Collections.IEnumerator AnimateGearDestroyed(GameObject gearCard)
+{
+    Debug.Log("Animating gear destroyed");
+    
+    // More intense shake
+    Vector3 originalPosition = gearCard.transform.localPosition;
+    
+    float shakeTime = 0.8f;
+    float shakeIntensity = 20f;
+    float elapsed = 0f;
+    
+    while (elapsed < shakeTime)
+    {
+        elapsed += Time.deltaTime;
+        Vector3 shakeOffset = Random.insideUnitCircle * shakeIntensity;
+        gearCard.transform.localPosition = originalPosition + shakeOffset;
+        yield return null;
+    }
+    
+    // Flash black and fade out
+    yield return StartCoroutine(FlashCardColor(gearCard, destroyedColor, 0.5f));
+    
+    // Show "BROKEN" text
+    ShowFloatingDamageNumber(gearCard, "BROKEN");
+    
+    // Fade out the card
+    yield return StartCoroutine(FadeOutCard(gearCard));
+}
+
+System.Collections.IEnumerator AnimateGearProtected(GameObject gearCard)
+{
+    Debug.Log("Animating gear protected");
+    
+    // Flash green/blue to show protection
+    yield return StartCoroutine(FlashCardColor(gearCard, Color.cyan, 0.5f));
+    
+    // Show "PROTECTED" text
+    ShowFloatingDamageNumber(gearCard, "PROTECTED");
+}
+
+System.Collections.IEnumerator FlashCardColor(GameObject gearCard, Color flashColor, float duration)
+{
+    UnityEngine.UI.Image cardImage = gearCard.GetComponent<UnityEngine.UI.Image>();
+    if (cardImage == null) yield break;
+    
+    Color originalColor = cardImage.color;
+    
+    // Flash to damage color
+    float elapsed = 0f;
+    while (elapsed < duration / 2)
+    {
+        elapsed += Time.deltaTime;
+        cardImage.color = Color.Lerp(originalColor, flashColor, elapsed / (duration / 2));
+        yield return null;
+    }
+    
+    // Flash back to original
+    elapsed = 0f;
+    while (elapsed < duration / 2)
+    {
+        elapsed += Time.deltaTime;
+        cardImage.color = Color.Lerp(flashColor, originalColor, elapsed / (duration / 2));
+        yield return null;
+    }
+    
+    cardImage.color = originalColor;
+}
+
+System.Collections.IEnumerator FadeOutCard(GameObject gearCard)
+{
+    CanvasGroup canvasGroup = gearCard.GetComponent<CanvasGroup>();
+    if (canvasGroup == null)
+    {
+        canvasGroup = gearCard.AddComponent<CanvasGroup>();
+    }
+    
+    float fadeTime = 1f;
+    float elapsed = 0f;
+    
+    while (elapsed < fadeTime)
+    {
+        elapsed += Time.deltaTime;
+        canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsed / fadeTime);
+        yield return null;
+    }
+    
+    canvasGroup.alpha = 0f;
+}
+
+void ShowFloatingDamageNumber(GameObject gearCard, string damageText)
+{
+    // For now, just log the damage. We'll implement floating text in the next step if needed
+    Debug.Log($"Damage number: {damageText}");
+}
+
+void ShowFinishButton()
+{
+    Debug.Log("Showing finish button");
+    
     if (continueButton != null)
     {
         continueButton.gameObject.SetActive(true);
-        // Reset the button to return to main camera for now
+        
+        // Update button to return to main camera
+        continueButton.onClick.RemoveAllListeners();
+        continueButton.onClick.AddListener(() => {
+            if (cameraManager != null)
+            {
+                cameraManager.SwitchToMainCamera();
+            }
+        });
     }
-    
-    treasurePhaseComplete = true;
 }
     void OnContinueClicked()
 {
