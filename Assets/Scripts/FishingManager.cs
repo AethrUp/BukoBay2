@@ -527,105 +527,182 @@ Debug.Log($"PlayerInventory.Instance = {(PlayerInventory.Instance != null ? Play
     // void Update() - REMOVED
 
     void HandleSuccess()
-{
-    if (battleEnded) return; // Prevent multiple calls
+    {
+        if (battleEnded) return; // Prevent multiple calls
 
-    battleEnded = true; // Mark battle as ended
-    Debug.Log($"SUCCESS! Player catches {currentFish.fishName}!");
-    Debug.Log($"Received {currentFish.coins} coins!");
-    
-    // Add coins to player inventory
-    if (currentPlayer != null)
-    {
-        currentPlayer.AddCoins(currentFish.coins);
-    }
-    
-    // Hide interactive UI
-    if (interactiveUI != null)
-    {
-        interactiveUI.OnInteractivePhaseEnd();
-    }
-    
-    // Hide the fish card panel
-    FishingUI fishingUI = FindFirstObjectByType<FishingUI>();
-    if (fishingUI != null)
-    {
-        fishingUI.HideFishCard();
-    }
-    
-    // Show results screen
-    if (resultsManager != null)
-    {
-        resultsManager.ShowResults(true, currentFish, currentFish.coins, "");
-    }
-    
-    // Reset fishing state
-    isInteractionPhase = false;
+        battleEnded = true; // Mark battle as ended
+        Debug.Log($"SUCCESS! Player catches {currentFish.fishName}!");
+        Debug.Log($"Received {currentFish.coins} coins!");
 
-    // Clear played action cards
-ActionCardDropZone[] dropZones = FindObjectsByType<ActionCardDropZone>(FindObjectsSortMode.None);
-foreach (ActionCardDropZone dropZone in dropZones)
-{
-    dropZone.ClearPlayedCards();
-}
-    
-    Debug.Log("Fishing phase ended successfully!");
-}
-    
-void HandleFailure()
-{
-    if (battleEnded) return; // Prevent multiple calls
-    battleEnded = true; // Mark battle as ended
-    
-    Debug.Log($"FAILURE! Player fails to catch {currentFish.fishName}!");
-    Debug.Log("Gear takes damage...");
-    
-    string damageReport = "";
-    
-    // Apply gear damage based on fish's damage values
-    if (currentPlayer != null && currentFish != null)
-    {
-        damageReport = ApplyGearDamage();
-        
-        // Refresh the inventory display to show updated durability
-        InventoryDisplay inventoryDisplay = FindFirstObjectByType<InventoryDisplay>();
-        if (inventoryDisplay != null)
+        // Add coins to player inventory
+        if (currentPlayer != null)
         {
-            inventoryDisplay.RefreshDisplay();
-            Debug.Log("Refreshed inventory display to show gear damage");
+            currentPlayer.AddCoins(currentFish.coins);
         }
-    }
-    
-    // Hide interactive UI
-    if (interactiveUI != null)
-    {
-        interactiveUI.OnInteractivePhaseEnd();
-    }
-    
-    // Hide the fish card panel
-    FishingUI fishingUI = FindFirstObjectByType<FishingUI>();
-    if (fishingUI != null)
-    {
-        fishingUI.HideFishCard();
-    }
-    
-    // Show results screen
-    if (resultsManager != null)
-    {
-        resultsManager.ShowResults(false, currentFish, 0, damageReport);
-    }
-    
-    // Reset fishing state
-    isInteractionPhase = false;
 
+        // Hide interactive UI
+        if (interactiveUI != null)
+        {
+            interactiveUI.OnInteractivePhaseEnd();
+        }
+
+        // Hide the fish card panel
+        FishingUI fishingUI = FindFirstObjectByType<FishingUI>();
+        if (fishingUI != null)
+        {
+            fishingUI.HideFishCard();
+        }
+
+        // Show results screen
+        if (resultsManager != null)
+        {
+            resultsManager.ShowResults(true, currentFish, currentFish.coins, "");
+        }
+
+        // Reset fishing state
+        isInteractionPhase = false;
+
+        // Clear played action cards
+        ActionCardDropZone[] failureDropZones  = FindObjectsByType<ActionCardDropZone>(FindObjectsSortMode.None);
+        foreach (ActionCardDropZone dropZone in failureDropZones)
+        {
+            dropZone.ClearPlayedCards();
+        }
+
+        Debug.Log("Fishing phase ended successfully!");
+    
     // Clear played action cards
+Debug.Log("Attempting to clear played action cards...");
 ActionCardDropZone[] dropZones = FindObjectsByType<ActionCardDropZone>(FindObjectsSortMode.None);
+Debug.Log($"Found {dropZones.Length} ActionCardDropZone components");
+
 foreach (ActionCardDropZone dropZone in dropZones)
 {
-    dropZone.ClearPlayedCards();
+    if (dropZone != null)
+    {
+        Debug.Log($"Clearing cards from drop zone: {dropZone.name}");
+        dropZone.ClearPlayedCards();
+    }
 }
-    
-    Debug.Log("Fishing phase ended in failure!");
+        Debug.Log("Finished clearing played action cards");
+NetworkGameManager gameManager = FindFirstObjectByType<NetworkGameManager>();
+if (gameManager != null)
+{
+    gameManager.NextTurnServerRpc();
+    Debug.Log("Advanced to next player's turn after fishing success");
+}
+}
+
+    void HandleFailure()
+    {
+        Debug.Log("*** ACTUAL HANDLE FAILURE CALLED ***");
+        Debug.Log($"battleEnded at start: {battleEnded}");
+
+        if (battleEnded)
+        {
+            Debug.Log("battleEnded is true, but we still need to apply damage!");
+            // DON'T return early - we need to apply damage even if battleEnded is true
+            // This might be a second call, but we need to make sure damage happens
+        }
+
+        // Apply damage BEFORE setting battleEnded to true
+        string damageReport = "";
+
+        Debug.Log("About to call ApplyGearDamage()...");
+
+        if (currentPlayer != null && currentFish != null)
+        {
+            Debug.Log("Calling ApplyGearDamage() now...");
+            damageReport = ApplyGearDamage();
+
+            Debug.Log($"=== DAMAGE REPORT GENERATED ===");
+            Debug.Log($"Damage report: '{damageReport}'");
+            Debug.Log($"Damage report length: {damageReport.Length}");
+            Debug.Log($"=== END DAMAGE REPORT ===");
+        }
+        else
+        {
+            Debug.Log("Skipping ApplyGearDamage because currentPlayer or currentFish is null");
+        }
+
+        // NOW set battleEnded to true
+        if (!battleEnded)
+        {
+            battleEnded = true;
+            Debug.Log("Set battleEnded to true");
+
+            Debug.Log("=== HANDLE FAILURE CALLED ===");
+            Debug.Log($"CurrentPlayer: {(currentPlayer != null ? currentPlayer.name : "NULL")}");
+            Debug.Log($"CurrentFish: {(currentFish != null ? currentFish.fishName : "NULL")}");
+
+            // TEST FISH DAMAGE VALUES:
+            if (currentFish != null)
+            {
+                Debug.Log($"=== FISH DAMAGE VALUES TEST ===");
+                Debug.Log($"Fish: {currentFish.fishName}");
+                Debug.Log($"Gear 1 Damage: {currentFish.gear1Damage}");
+                Debug.Log($"Gear 2 Damage: {currentFish.gear2Damage}");
+                Debug.Log($"Gear 3 Damage: {currentFish.gear3Damage}");
+                Debug.Log($"Gear 4 Damage: {currentFish.gear4Damage}");
+                Debug.Log($"Gear 5 Damage: {currentFish.gear5Damage}");
+                Debug.Log($"Total Damage: {currentFish.GetTotalGearDamage()}");
+                Debug.Log($"=== END FISH DAMAGE TEST ===");
+            }
+
+            Debug.Log($"FAILURE! Player fails to catch {currentFish.fishName}!");
+            Debug.Log("Gear takes damage...");
+
+            // Refresh the inventory display to show updated durability
+            InventoryDisplay inventoryDisplay = FindFirstObjectByType<InventoryDisplay>();
+            if (inventoryDisplay != null)
+            {
+                inventoryDisplay.RefreshDisplay();
+                Debug.Log("Refreshed inventory display to show gear damage");
+            }
+
+            // Hide interactive UI
+            if (interactiveUI != null)
+            {
+                interactiveUI.OnInteractivePhaseEnd();
+            }
+
+            // Hide the fish card panel
+            FishingUI fishingUI = FindFirstObjectByType<FishingUI>();
+            if (fishingUI != null)
+            {
+                fishingUI.HideFishCard();
+            }
+
+            // Show results screen
+            if (resultsManager != null)
+            {
+                Debug.Log($"Calling resultsManager.ShowResults with damage report: '{damageReport}'");
+                resultsManager.ShowResults(false, currentFish, 0, damageReport);
+            }
+            else
+            {
+                Debug.Log("ResultsManager is null!");
+            }
+
+            // Reset fishing state
+            isInteractionPhase = false;
+
+            // Clear played action cards
+            ActionCardDropZone[] failureDropZones = FindObjectsByType<ActionCardDropZone>(FindObjectsSortMode.None);
+            foreach (ActionCardDropZone dropZone in failureDropZones)
+            {
+                dropZone.ClearPlayedCards();
+            }
+        }
+
+        Debug.Log("Fishing phase ended in failure!");
+    // At the end of HandleSuccess() method:
+NetworkGameManager turnManager = FindFirstObjectByType<NetworkGameManager>();
+if (turnManager != null)
+{
+    turnManager.NextTurnServerRpc();
+    Debug.Log("Advanced to next player's turn after fishing success");
+}
 }
 
     string ApplyGearDamage()
@@ -716,7 +793,11 @@ foreach (ActionCardDropZone dropZone in dropZones)
         UpdateGearDisplay(gear);
 
         Debug.Log($"Protection from {protectionUsed} consumed. {gear.gearName} takes no damage.");
-        return $"{gear.gearName} PROTECTED";
+        
+        // ADD DEBUG LINE:
+        string protectedResult = $"{gear.gearName} PROTECTED";
+        Debug.Log($"Returning damage result: '{protectedResult}'");
+        return protectedResult;
     }
 
     // No protection - apply damage normally
@@ -731,12 +812,19 @@ foreach (ActionCardDropZone dropZone in dropZones)
     if (gear.durability <= 0)
     {
         Debug.Log($"⚠️ {gear.gearName} is BROKEN! (0 durability)");
-        DestroyBrokenGear(gear); // THIS IS THE FIX - ADDED THIS LINE
-        return $"{gear.gearName} BROKEN";
+        DestroyBrokenGear(gear);
+        
+        // ADD DEBUG LINE:
+        string brokenResult = $"{gear.gearName} BROKEN";
+        Debug.Log($"Returning damage result: '{brokenResult}'");
+        return brokenResult;
     }
     else
     {
-        return $"{gear.gearName} -{damageAmount}";
+        // ADD DEBUG LINE:
+        string damageResult = $"{gear.gearName} -{damageAmount}";
+        Debug.Log($"Returning damage result: '{damageResult}'");
+        return damageResult;
     }
 }
 void UpdateGearDisplay(GearCard gear)

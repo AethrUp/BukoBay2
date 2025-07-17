@@ -14,6 +14,9 @@ public class FishingUI : MonoBehaviour
     [Header("Game References")]
     public FishingManager fishingManager;
     public PlayerInventory playerInventory;
+
+    [Header("Multiplayer")]
+public NetworkGameManager gameManager;
     
     // Track previous gear count to avoid spam
     private int previousGearCount = -1;
@@ -83,7 +86,7 @@ public class FishingUI : MonoBehaviour
             UpdateDepthInfo(gearCount);
         }
     }
-    
+    // Public method to hide fish card (can be called by other scripts)
     int CountEquippedGear()
     {
         if (playerInventory == null) return 0;
@@ -142,6 +145,13 @@ public class FishingUI : MonoBehaviour
 
     public void StartFishing()
 {
+    // Check if it's our turn in multiplayer
+    if (gameManager != null && !gameManager.IsMyTurn())
+    {
+        Debug.Log("Not your turn! Cannot fish.");
+        return;
+    }
+
     if (fishingManager == null)
     {
         Debug.LogError("No FishingManager assigned!");
