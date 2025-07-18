@@ -893,9 +893,10 @@ void DestroyBrokenGear(GearCard brokenGear)
     
     Debug.Log($"Successfully destroyed {brokenGear.gearName}");
 }
-    
-// Public function to play action cards during interactive phase
-// Public function to play action cards during interactive phase
+
+    // Public function to play action cards during interactive phase
+    // Public function to play action cards during interactive phase
+    // Public function to play action cards during interactive phase
 public bool PlayActionCard(ActionCard actionCard, bool targetingPlayer)
 {
     if (!isInteractionPhase)
@@ -910,7 +911,7 @@ public bool PlayActionCard(ActionCard actionCard, bool targetingPlayer)
         return false;
     }
     
-    // NEW: Check if this player has reached their card limit
+    // Check if this player has reached their card limit
     if (NetworkManager.Singleton != null)
     {
         ulong playerId = NetworkManager.Singleton.LocalClientId;
@@ -940,10 +941,52 @@ public bool PlayActionCard(ActionCard actionCard, bool targetingPlayer)
         return false;
     }
     
-    // Apply the effect (existing code stays the same)
+    // NEW: Use network RPC to sync across all players
+    if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsConnectedClient)
+    {
+        ulong playerId = NetworkManager.Singleton.LocalClientId;
+        int effectValue = targetingPlayer ? actionCard.playerEffect : actionCard.fishEffect;
+        
+        Debug.Log($"Sending action card play to network: {actionCard.actionName}");
+        PlayActionCardServerRpc(actionCard.actionName, targetingPlayer, actionCard.playerEffect, actionCard.fishEffect, playerId);
+    }
+    else
+    {
+        // Fallback for single player or when network isn't available
+        Debug.Log("Network not available - applying action card locally");
+        ApplyActionCardEffect(actionCard.actionName, targetingPlayer, actionCard.playerEffect, actionCard.fishEffect, 0);
+    }
+    
+    return true;
+}
+// NEW: Network RPC to sync action card plays across all clients
+[ServerRpc(RequireOwnership = false)]
+public void PlayActionCardServerRpc(string cardName, bool targetingPlayer, int playerEffect, int fishEffect, ulong playerId)
+{
+    Debug.Log($"Server received action card play: {cardName} from player {playerId}");
+    
+    // Apply the effect on the server
+    ApplyActionCardEffect(cardName, targetingPlayer, playerEffect, fishEffect, playerId);
+    
+    // Tell all clients about this card play
+    NotifyActionCardPlayedClientRpc(cardName, targetingPlayer, playerEffect, fishEffect, playerId);
+}
+
+[ClientRpc]
+public void NotifyActionCardPlayedClientRpc(string cardName, bool targetingPlayer, int playerEffect, int fishEffect, ulong playerId)
+{
+    Debug.Log($"All clients notified: Player {playerId} played {cardName}");
+    
+    // Apply the effect on all clients
+    ApplyActionCardEffect(cardName, targetingPlayer, playerEffect, fishEffect, playerId);
+}
+
+void ApplyActionCardEffect(string cardName, bool targetingPlayer, int playerEffect, int fishEffect, ulong playerId)
+{
+    // Apply the effect (existing logic from PlayActionCard)
     if (targetingPlayer)
     {
-        int effectToApply = actionCard.playerEffect;
+        int effectToApply = playerEffect;
         
         // Check for shield absorption if this is a negative effect
         if (effectToApply < 0 && currentPlayer != null && currentPlayer.equippedShield != null)
@@ -958,30 +1001,24 @@ public bool PlayActionCard(ActionCard actionCard, bool targetingPlayer)
         }
         
         totalPlayerBuffs += effectToApply;
-        Debug.Log($"Played {actionCard.actionName} on player: {effectToApply:+0;-#} effect (original: {actionCard.playerEffect:+0;-#})");
+        Debug.Log($"Player {playerId} played {cardName} on player: {effectToApply:+0;-#} effect");
     }
     else
     {
-        totalFishBuffs += actionCard.fishEffect;
-        Debug.Log($"Played {actionCard.actionName} on fish: {actionCard.fishEffect:+0;-#} effect");
+        totalFishBuffs += fishEffect;
+        Debug.Log($"Player {playerId} played {cardName} on fish: {fishEffect:+0;-#} effect");
     }
     
-    appliedEffects.Add($"{actionCard.actionName}: {(targetingPlayer ? actionCard.playerEffect : actionCard.fishEffect):+0;-#} to {(targetingPlayer ? "player" : "fish")}");
+    appliedEffects.Add($"{cardName} (Player {playerId}): {(targetingPlayer ? playerEffect : fishEffect):+0;-#} to {(targetingPlayer ? "player" : "fish")}");
     
-    // NEW: Track that this player used a card
-    if (NetworkManager.Singleton != null)
+    // Track that this player used a card
+    InteractivePhaseUI interactiveUI = FindFirstObjectByType<InteractivePhaseUI>();
+    if (interactiveUI != null)
     {
-        ulong playerId = NetworkManager.Singleton.LocalClientId;
-        InteractivePhaseUI interactiveUI = FindFirstObjectByType<InteractivePhaseUI>();
-        if (interactiveUI != null)
-        {
-            interactiveUI.RecordCardPlayed(playerId);
-        }
+        interactiveUI.RecordCardPlayed(playerId);
     }
     
     Debug.Log($"Current totals - Player buffs: {totalPlayerBuffs:+0;-#}, Fish buffs: {totalFishBuffs:+0;-#}");
-    
-    return true;
 }
 
     int ApplyShieldAbsorption(int negativeEffect)

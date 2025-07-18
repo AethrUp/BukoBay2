@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using Unity.Netcode;
 
 public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
 {
@@ -348,13 +349,22 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         return false;
     }
     
-    // TODO: Add your max action card check here if you have one
-    // Example:
-    // if (GetPlayedActionCardCount() >= maxActionCards)
-    // {
-    //     Debug.LogWarning("Maximum action cards exceeded!");
-    //     return false;
-    // }
+    // Check max action card limit
+    if (NetworkManager.Singleton != null)
+    {
+        ulong playerId = NetworkManager.Singleton.LocalClientId;
+        
+        // Get the interactive UI to check limits
+        InteractivePhaseUI interactiveUI = FindFirstObjectByType<InteractivePhaseUI>();
+        if (interactiveUI != null)
+        {
+            if (!interactiveUI.CanPlayerPlayMoreCards(playerId))
+            {
+                Debug.LogWarning($"Player {playerId} has reached their card limit this turn!");
+                return false;
+            }
+        }
+    }
     
     Debug.Log($"Action card {actionCard.actionName} passed all validation checks");
     return true;
