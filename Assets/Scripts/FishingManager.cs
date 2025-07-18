@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.Netcode;
 
 public class FishingManager : MonoBehaviour
 {
@@ -894,6 +895,7 @@ void DestroyBrokenGear(GearCard brokenGear)
 }
     
 // Public function to play action cards during interactive phase
+// Public function to play action cards during interactive phase
 public bool PlayActionCard(ActionCard actionCard, bool targetingPlayer)
 {
     if (!isInteractionPhase)
@@ -906,6 +908,23 @@ public bool PlayActionCard(ActionCard actionCard, bool targetingPlayer)
     {
         Debug.LogWarning("Invalid action card!");
         return false;
+    }
+    
+    // NEW: Check if this player has reached their card limit
+    if (NetworkManager.Singleton != null)
+    {
+        ulong playerId = NetworkManager.Singleton.LocalClientId;
+        
+        // Get the interactive UI to check limits
+        InteractivePhaseUI interactiveUI = FindFirstObjectByType<InteractivePhaseUI>();
+        if (interactiveUI != null)
+        {
+            if (!interactiveUI.CanPlayerPlayMoreCards(playerId))
+            {
+                Debug.LogWarning($"Player {playerId} has reached their card limit this turn!");
+                return false;
+            }
+        }
     }
     
     // Check if card can target the chosen target
@@ -921,7 +940,7 @@ public bool PlayActionCard(ActionCard actionCard, bool targetingPlayer)
         return false;
     }
     
-    // Apply the effect
+    // Apply the effect (existing code stays the same)
     if (targetingPlayer)
     {
         int effectToApply = actionCard.playerEffect;
@@ -948,6 +967,17 @@ public bool PlayActionCard(ActionCard actionCard, bool targetingPlayer)
     }
     
     appliedEffects.Add($"{actionCard.actionName}: {(targetingPlayer ? actionCard.playerEffect : actionCard.fishEffect):+0;-#} to {(targetingPlayer ? "player" : "fish")}");
+    
+    // NEW: Track that this player used a card
+    if (NetworkManager.Singleton != null)
+    {
+        ulong playerId = NetworkManager.Singleton.LocalClientId;
+        InteractivePhaseUI interactiveUI = FindFirstObjectByType<InteractivePhaseUI>();
+        if (interactiveUI != null)
+        {
+            interactiveUI.RecordCardPlayed(playerId);
+        }
+    }
     
     Debug.Log($"Current totals - Player buffs: {totalPlayerBuffs:+0;-#}, Fish buffs: {totalFishBuffs:+0;-#}");
     
