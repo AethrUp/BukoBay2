@@ -84,14 +84,14 @@ public class NetworkGameManager : NetworkBehaviour
     }
 
     // Move to next player's turn (only host can do this)
-    [ServerRpc(RequireOwnership = false)]
+[ServerRpc(RequireOwnership = false)]
 public void NextTurnServerRpc()
 {
     if (!IsHost) return;
     
-    // For local simulation, assume 2 players
-    int simulatedPlayerCount = 2;
-    int nextPlayer = (currentPlayerTurn.Value + 1) % simulatedPlayerCount;
+    // Use actual connected players count
+    int connectedPlayerCount = NetworkManager.Singleton.ConnectedClients.Count;
+    int nextPlayer = (currentPlayerTurn.Value + 1) % connectedPlayerCount;
     currentPlayerTurn.Value = nextPlayer;
     
     Debug.Log($"Host: Advanced turn to player {nextPlayer}");
@@ -99,6 +99,7 @@ public void NextTurnServerRpc()
 
     // Start the game (only host can do this)
     [ServerRpc(RequireOwnership = false)]
+
     public void StartGameServerRpc()
     {
         if (!IsHost) return;
