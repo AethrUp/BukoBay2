@@ -154,37 +154,54 @@ public class FishingManager : NetworkBehaviour
     }
 
     public void CastAtDepth(int depth)
+{
+    if (!CanCastAtDepth(depth))
     {
-        if (!CanCastAtDepth(depth))
+        Debug.LogWarning($"Cannot cast at depth {depth}. Must cast at depth {requiredMinDepth}");
+        return;
+    }
+
+    castDepth = depth;
+
+    // Get random fish from this depth
+    currentFish = GetRandomFishAtDepth(depth);
+
+    if (currentFish != null)
+    {
+        Debug.Log($"Cast at depth {depth}! A {currentFish.fishName} appears!");
+        Debug.Log($"Fish power: {currentFish.power}, Coins: {currentFish.coins}");
+
+        // NEW: Use network to start battle for ALL players
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
         {
-            Debug.LogWarning($"Cannot cast at depth {depth}. Must cast at depth {requiredMinDepth}");
-            return;
-        }
-
-        castDepth = depth;
-
-        // Get random fish from this depth
-        currentFish = GetRandomFishAtDepth(depth);
-
-        if (currentFish != null)
-        {
-            Debug.Log($"Cast at depth {depth}! A {currentFish.fishName} appears!");
-            Debug.Log($"Fish power: {currentFish.power}, Coins: {currentFish.coins}");
-
-            // Start round-based battle
-            StartRoundBasedBattle();
+            StartBattleForAllPlayersServerRpc(currentFish.fishName, currentFish.power, depth);
         }
         else
         {
-            Debug.LogWarning($"No fish found at depth {depth}!");
+            // Fallback for single player
+            StartRoundBasedBattle();
         }
     }
+    else
+    {
+        Debug.LogWarning($"No fish found at depth {depth}!");
+    }
+}
 
     void StartRoundBasedBattle()
+{
+    // Check if we should use networked version or single-player version
+    if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
     {
-        battleEnded = false; // Reset for new battle
-
-        Debug.Log($"=== ROUND-BASED BATTLE STARTED ===");
+        // Networked version - delegate to the networked method
+        StartRoundBasedBattleForAllClients();
+    }
+    else
+    {
+        // Single-player fallback
+        battleEnded = false;
+        
+        Debug.Log($"=== SINGLE-PLAYER BATTLE STARTED ===");
         Debug.Log($"Fighting {currentFish.fishName} (Power: {currentFish.power})");
 
         // Reset battle state
@@ -195,9 +212,13 @@ public class FishingManager : NetworkBehaviour
         totalFishBuffs = 0;
         appliedEffects.Clear();
 
-        // Start first round
+        // Clear old cards locally
+        ClearAllActionCards();
+        
+        // Start first round (old single-player method)
         StartNewRound();
     }
+}
     [ClientRpc]
 void StartInteractivePhaseForAllPlayersClientRpc(string fishName, int fishPower, int playerStamina, int fishStamina, int playerPower, int totalPlayerBuffs, int totalFishBuffs)
 {
@@ -221,6 +242,9 @@ void StartInteractivePhaseForAllPlayersClientRpc(string fishName, int fishPower,
     this.totalPlayerBuffs = totalPlayerBuffs;
     this.totalFishBuffs = totalFishBuffs;
     
+    // IMPORTANT: Set interactive phase for ALL clients
+    this.isInteractionPhase = true;
+    
     // Show interactive UI for ALL players
     if (interactiveUI != null)
     {
@@ -242,27 +266,29 @@ void StartInteractivePhaseForAllPlayersClientRpc(string fishName, int fishPower,
     isInteractionPhase = true;
     lastStaminaUpdate = Time.time;
     
-    // Show UI for all players via network
+    // ALWAYS show UI for all players via network (not just when host)
     if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
     {
-        Debug.Log($"=== SENDING RPC ===");
+        Debug.Log($"=== SENDING RPC TO ALL PLAYERS ===");
         Debug.Log($"NetworkManager found, IsListening: {NetworkManager.Singleton.IsListening}");
         Debug.Log($"IsHost: {NetworkManager.Singleton.IsHost}");
         Debug.Log($"IsClient: {NetworkManager.Singleton.IsClient}");
         Debug.Log($"Connected clients: {NetworkManager.Singleton.ConnectedClients.Count}");
         
         int playerPower = CalculatePlayerPower();
+        
+        // Clear old action cards for ALL players BEFORE starting new round
+        ClearAllActionCardsClientRpc();
+        
+        // Then show the new interactive phase
         StartInteractivePhaseForAllPlayersClientRpc(currentFish.fishName, currentFish.power, playerStamina, fishStamina, playerPower, totalPlayerBuffs, totalFishBuffs);
-        Debug.Log("RPC sent!");
+        Debug.Log("RPC sent to all players!");
     }
     else
     {
-        Debug.Log("=== FALLBACK TO LOCAL ===");
-        Debug.Log($"NetworkManager: {(NetworkManager.Singleton != null ? "EXISTS" : "NULL")}");
-        if (NetworkManager.Singleton != null)
-            Debug.Log($"IsListening: {NetworkManager.Singleton.IsListening}");
-        
         // Fallback for single player
+        Debug.Log("=== FALLBACK TO LOCAL ===");
+        ClearAllActionCards();
         if (interactiveUI != null)
         {
             interactiveUI.ShowInteractivePhase();
@@ -525,62 +551,65 @@ void StartInteractivePhaseForAllPlayersClientRpc(string fishName, int fishPower,
     }
 
     void UpdateStaminaDrain()
+{
+    if (battleEnded) return; // Don't continue if battle already ended
+
+    // Calculate how much time has passed since last update
+    float deltaTime = Time.time - lastStaminaUpdate;
+
+    if (deltaTime >= staminaDrainRate) // Update every second (or whatever drain rate)
     {
-        if (battleEnded) return; // Don't continue if battle already ended
+        // Calculate current power difference
+        int playerPower = CalculatePlayerPower() + totalPlayerBuffs;
+        int fishPower = CalculateFishPower() + totalFishBuffs;
+        int powerDifference = playerPower - fishPower;
 
-        // Calculate how much time has passed since last update
-        float deltaTime = Time.time - lastStaminaUpdate;
+        Debug.Log($"Stamina drain update: Player Power {playerPower} vs Fish Power {fishPower}, Difference: {powerDifference}");
 
-        if (deltaTime >= staminaDrainRate) // Update every second (or whatever drain rate)
+        // Apply stamina damage based on power difference
+        if (powerDifference > 0)
         {
-            // Calculate current power difference
-            int playerPower = CalculatePlayerPower() + totalPlayerBuffs;
-            int fishPower = CalculateFishPower() + totalFishBuffs;
-            int powerDifference = playerPower - fishPower;
-
-            Debug.Log($"Stamina drain update: Player Power {playerPower} vs Fish Power {fishPower}, Difference: {powerDifference}");
-
-            // Apply stamina damage based on power difference
-            if (powerDifference > 0)
-            {
-                // Player is winning - fish loses stamina
-                fishStamina -= Mathf.Abs(powerDifference);
-                Debug.Log($"Fish takes {Mathf.Abs(powerDifference)} damage! Fish stamina: {fishStamina}");
-            }
-            else if (powerDifference < 0)
-            {
-                // Fish is winning - player loses stamina
-                playerStamina -= Mathf.Abs(powerDifference);
-                Debug.Log($"Player takes {Mathf.Abs(powerDifference)} damage! Player stamina: {playerStamina}");
-            }
-            else
-            {
-                Debug.Log("Equal power - no damage dealt");
-            }
-
-            // Clamp stamina values
-            playerStamina = Mathf.Clamp(playerStamina, 0, 100);
-            fishStamina = Mathf.Clamp(fishStamina, 0, 100);
-
-            // Check for battle end
-            if (playerStamina <= 0)
-            {
-                HandleFailure();
-                return;
-            }
-            else if (fishStamina <= 0)
-            {
-                HandleSuccess();
-                return;
-            }
-
-            // Update timer for next drain
-            lastStaminaUpdate = Time.time;
+            // Player is winning - fish loses stamina
+            fishStamina -= Mathf.Abs(powerDifference);
+            Debug.Log($"Fish takes {Mathf.Abs(powerDifference)} damage! Fish stamina: {fishStamina}");
         }
-    }
+        else if (powerDifference < 0)
+        {
+            // Fish is winning - player loses stamina
+            playerStamina -= Mathf.Abs(powerDifference);
+            Debug.Log($"Player takes {Mathf.Abs(powerDifference)} damage! Player stamina: {playerStamina}");
+        }
+        else
+        {
+            Debug.Log("Equal power - no damage dealt");
+        }
 
-    // Remove the old Update method that handled timer
-    // void Update() - REMOVED
+        // Clamp stamina values
+        playerStamina = Mathf.Clamp(playerStamina, 0, 100);
+        fishStamina = Mathf.Clamp(fishStamina, 0, 100);
+
+        // NEW: Send stamina updates to all clients
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsHost)
+        {
+            UpdateStaminaForAllPlayersClientRpc(playerStamina, fishStamina, totalPlayerBuffs, totalFishBuffs);
+        }
+
+        // Check for battle end
+        if (playerStamina <= 0)
+        {
+            HandleFailure();
+            return;
+        }
+        else if (fishStamina <= 0)
+        {
+            HandleSuccess();
+            return;
+        }
+
+        // Update timer for next drain
+        lastStaminaUpdate = Time.time;
+    }
+}
 
     void HandleSuccess()
     {
@@ -1015,17 +1044,20 @@ void StartInteractivePhaseForAllPlayersClientRpc(string fishName, int fishPower,
         return true;
     }
     // NEW: Network RPC to sync action card plays across all clients
-    [ServerRpc(RequireOwnership = false)]
-    public void PlayActionCardServerRpc(string cardName, bool targetingPlayer, int playerEffect, int fishEffect, ulong playerId)
-    {
-        Debug.Log($"Server received action card play: {cardName} from player {playerId}");
+   [ServerRpc(RequireOwnership = false)]
+public void PlayActionCardServerRpc(string cardName, bool targetingPlayer, int playerEffect, int fishEffect, ulong playerId)
+{
+    Debug.Log($"Server received action card play: {cardName} from player {playerId}");
 
-        // Apply the effect on the server
-        ApplyActionCardEffect(cardName, targetingPlayer, playerEffect, fishEffect, playerId);
+    // Apply the effect on the server
+    ApplyActionCardEffect(cardName, targetingPlayer, playerEffect, fishEffect, playerId);
 
-        // Tell all clients about this card play
-        NotifyActionCardPlayedClientRpc(cardName, targetingPlayer, playerEffect, fishEffect, playerId);
-    }
+    // Tell all clients about this card play (both effect AND visual)
+    NotifyActionCardPlayedClientRpc(cardName, targetingPlayer, playerEffect, fishEffect, playerId);
+    
+    // Show the visual card for all players
+    ShowPlayedActionCardClientRpc(cardName, targetingPlayer, playerId, playerEffect, fishEffect);
+}
 
     [ClientRpc]
     public void NotifyActionCardPlayedClientRpc(string cardName, bool targetingPlayer, int playerEffect, int fishEffect, ulong playerId)
@@ -1035,6 +1067,133 @@ void StartInteractivePhaseForAllPlayersClientRpc(string fishName, int fishPower,
         // Apply the effect on all clients
         ApplyActionCardEffect(cardName, targetingPlayer, playerEffect, fishEffect, playerId);
     }
+    [ClientRpc]
+    public void UpdateStaminaForAllPlayersClientRpc(int newPlayerStamina, int newFishStamina, int playerBuffs, int fishBuffs)
+    {
+        Debug.Log($"=== STAMINA UPDATE RPC ===");
+        Debug.Log($"Player stamina: {newPlayerStamina}, Fish stamina: {newFishStamina}");
+        Debug.Log($"Player buffs: {playerBuffs}, Fish buffs: {fishBuffs}");
+
+        // Update local values for all clients
+        playerStamina = newPlayerStamina;
+        fishStamina = newFishStamina;
+        totalPlayerBuffs = playerBuffs;
+        totalFishBuffs = fishBuffs;
+
+        // Force update the tug-of-war display on all clients
+        if (interactiveUI != null && interactiveUI.tugOfWarBar != null)
+        {
+            int playerPower = CalculatePlayerPower() + totalPlayerBuffs;
+            int fishPower = CalculateFishPower() + totalFishBuffs;
+            int powerDifference = playerPower - fishPower;
+
+            interactiveUI.tugOfWarBar.UpdateAll(playerStamina, fishStamina, powerDifference);
+            Debug.Log($"Updated tug-of-war for all players: P{playerStamina} F{fishStamina} Diff{powerDifference}");
+        }
+    }
+    [ClientRpc]
+    public void ShowPlayedActionCardClientRpc(string cardName, bool targetsPlayer, ulong playerId, int playerEffect, int fishEffect)
+    {
+        Debug.Log($"All clients: Show {cardName} played by Player {playerId} targeting {(targetsPlayer ? "player" : "fish")}");
+
+        // Find the correct drop zone
+        ActionCardDropZone targetDropZone = null;
+        ActionCardDropZone[] allDropZones = FindObjectsByType<ActionCardDropZone>(FindObjectsSortMode.None);
+
+        foreach (ActionCardDropZone dropZone in allDropZones)
+        {
+            if (dropZone.targetsPlayer == targetsPlayer)
+            {
+                targetDropZone = dropZone;
+                break;
+            }
+        }
+
+        if (targetDropZone != null)
+        {
+            // Create the visual card for all players with more data
+            targetDropZone.CreateNetworkedPlayedCard(cardName, playerEffect, fishEffect);
+        }
+    }
+[ClientRpc]
+public void ClearAllActionCardsClientRpc()
+{
+    Debug.Log("=== CLEARING ALL ACTION CARDS FOR ALL PLAYERS ===");
+    ClearAllActionCards();
+}
+
+    void ClearAllActionCards()
+    {
+        ActionCardDropZone[] allDropZones = FindObjectsByType<ActionCardDropZone>(FindObjectsSortMode.None);
+        Debug.Log($"Found {allDropZones.Length} ActionCardDropZone components to clear");
+
+        foreach (ActionCardDropZone dropZone in allDropZones)
+        {
+            if (dropZone != null)
+            {
+                Debug.Log($"Clearing cards from drop zone: {dropZone.name}");
+                dropZone.ClearPlayedCards();
+            }
+        }
+
+        Debug.Log("Finished clearing all action cards");
+    }
+
+[ServerRpc(RequireOwnership = false)]
+public void StartBattleForAllPlayersServerRpc(string fishName, int fishPower, int depth)
+{
+    Debug.Log($"Server: Starting battle for all players - {fishName}");
+    
+    // Host finds the fish and starts the battle
+    currentFish = GetRandomFishAtDepth(depth);
+    if (currentFish == null)
+    {
+        currentFish = ScriptableObject.CreateInstance<FishCard>();
+        currentFish.fishName = fishName;
+        currentFish.power = fishPower;
+    }
+    
+    // Start battle on server
+    StartRoundBasedBattleForAllClients();
+}
+
+void StartRoundBasedBattleForAllClients()
+{
+    battleEnded = false; // Reset for new battle
+
+    Debug.Log($"=== ROUND-BASED BATTLE STARTED FOR ALL CLIENTS ===");
+    Debug.Log($"Fighting {currentFish.fishName} (Power: {currentFish.power})");
+
+    // Reset battle state
+    currentRound = 1;
+    playerStamina = 100;
+    fishStamina = 100;
+    totalPlayerBuffs = 0;
+    totalFishBuffs = 0;
+    appliedEffects.Clear();
+
+    // Clear old cards and start new round for ALL players
+    ClearAllActionCardsClientRpc();
+    
+    // Small delay to ensure cards are cleared before showing new UI
+    Invoke("StartNewRoundForAllClients", 0.5f);
+}
+
+void StartNewRoundForAllClients()
+{
+    Debug.Log($"=== ROUND {currentRound} STARTED FOR ALL CLIENTS ===");
+    
+    // Start interactive phase
+    isInteractionPhase = true;
+    lastStaminaUpdate = Time.time;
+    
+    int playerPower = CalculatePlayerPower();
+    
+    // Show UI for ALL players
+    StartInteractivePhaseForAllPlayersClientRpc(currentFish.fishName, currentFish.power, playerStamina, fishStamina, playerPower, totalPlayerBuffs, totalFishBuffs);
+    
+    Debug.Log("Started new round for all clients");
+}
 
     void ApplyActionCardEffect(string cardName, bool targetingPlayer, int playerEffect, int fishEffect, ulong playerId)
     {
