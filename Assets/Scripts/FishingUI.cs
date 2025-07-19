@@ -146,11 +146,12 @@ public NetworkGameManager gameManager;
     public void StartFishing()
 {
     // Check if it's our turn in multiplayer
-    //if (gameManager != null && !gameManager.IsMyTurn())
-  //  {
-  //      Debug.Log("Not your turn! Cannot fish.");
- //       return;
- //   }
+    NetworkGameManager gameManager = FindFirstObjectByType<NetworkGameManager>();
+    if (gameManager != null && !gameManager.IsMyTurn())
+    {
+        Debug.Log("Not your turn! Cannot fish.");
+        return;
+    }
 
     if (fishingManager == null)
     {
