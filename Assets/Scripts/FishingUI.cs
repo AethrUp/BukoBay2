@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Unity.Netcode;
 
 public class FishingUI : MonoBehaviour
 {
@@ -160,6 +161,13 @@ public NetworkGameManager gameManager;
     }
 
     Debug.Log("=== STARTING FISHING COUNTDOWN ===");
+    
+    // NEW: Track who is fishing
+    if (NetworkManager.Singleton != null)
+    {
+        fishingManager.currentFishingPlayerId = NetworkManager.Singleton.LocalClientId;
+        Debug.Log($"Player {fishingManager.currentFishingPlayerId} is fishing");
+    }
     
     // Setup fishing (calculates depth based on gear count)
     fishingManager.SetupFishing();
