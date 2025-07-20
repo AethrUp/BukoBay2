@@ -48,7 +48,7 @@ public class ShopManager : MonoBehaviour
     
   void SetupShop()
     {
-        Debug.Log("Setting up shop...");
+        // Debug.Log("Setting up shop...");
         LoadRealGearItems();
         LoadRealActionItems();
         DisplayShopItems();
@@ -357,11 +357,11 @@ public class ShopManager : MonoBehaviour
     {
         if (item.quantity <= 0)
         {
-            Debug.Log($"{item.itemName} is out of stock!");
+            // Debug.Log($"{item.itemName} is out of stock!");
             return false;
         }
         
-        Debug.Log($"Adding {item.itemName} to cart");
+        // Debug.Log($"Adding {item.itemName} to cart");
         
         cartItems.Add(item);
         cartItemDisplays.Add(itemDisplay);
@@ -370,7 +370,7 @@ public class ShopManager : MonoBehaviour
         MoveCardToCart(itemDisplay);
         UpdateShoppingCart();
         
-        Debug.Log($"Successfully added {item.itemName} to cart");
+        // Debug.Log($"Successfully added {item.itemName} to cart");
         return true;
     }
     
@@ -380,13 +380,13 @@ public class ShopManager : MonoBehaviour
         if (dragComponent != null && dragComponent.OriginalParent != null)
         {
             Transform stackContainer = dragComponent.OriginalParent;
-            Debug.Log($"Removing card from stack: {stackContainer.name}");
+            // Debug.Log($"Removing card from stack: {stackContainer.name}");
             
             StartCoroutine(ActivateNextCardAfterMove(stackContainer, item));
         }
         else
         {
-            Debug.LogWarning("Could not find original parent to activate next card");
+            // Debug.LogWarning("Could not find original parent to activate next card");
         }
     }
     
@@ -394,7 +394,7 @@ public class ShopManager : MonoBehaviour
     {
         yield return null;
         
-        Debug.Log($"Checking for next card in stack: {stackContainer.name}, children: {stackContainer.childCount}");
+        // Debug.Log($"Checking for next card in stack: {stackContainer.name}, children: {stackContainer.childCount}");
         
         if (stackContainer.childCount > 0)
         {
@@ -402,7 +402,7 @@ public class ShopManager : MonoBehaviour
             
             if (newTopCard != null)
             {
-                Debug.Log($"Found new top card: {newTopCard.name}");
+                // Debug.Log($"Found new top card: {newTopCard.name}");
                 
                 RemoveShadowEffect(newTopCard);
                 MakeCardInteractable(newTopCard);
@@ -415,12 +415,12 @@ public class ShopManager : MonoBehaviour
                 
                 SetupDragFunctionality(newTopCard, item);
                 
-                Debug.Log($"Next card {newTopCard.name} is now draggable");
+                // Debug.Log($"Next card {newTopCard.name} is now draggable");
             }
         }
         else
         {
-            Debug.Log($"No more cards in stack {stackContainer.name}");
+            // Debug.Log($"No more cards in stack {stackContainer.name}");
         }
     }
     
@@ -462,17 +462,17 @@ public class ShopManager : MonoBehaviour
                 cartDrag.raycaster = parentCanvas.GetComponent<GraphicRaycaster>();
             }
             
-            Debug.Log($"Moved {cardDisplay.name} to cart at position {cartPosition}");
+            // Debug.Log($"Moved {cardDisplay.name} to cart at position {cartPosition}");
         }
         else
         {
-            Debug.LogError("Shopping cart panel not assigned!");
+            // Debug.LogError("Shopping cart panel not assigned!");
         }
     }
     
     public void RemoveFromCart(ShopItem item, GameObject itemDisplay)
     {
-        Debug.Log($"Removing {item.itemName} from cart");
+        // Debug.Log($"Removing {item.itemName} from cart");
         
         int itemIndex = -1;
         for (int i = 0; i < cartItems.Count; i++)
@@ -493,17 +493,17 @@ public class ShopManager : MonoBehaviour
             UpdateShoppingCart();
             RearrangeCartItems();
             
-            Debug.Log($"Successfully removed {item.itemName} from cart");
+            // Debug.Log($"Successfully removed {item.itemName} from cart");
         }
         else
         {
-            Debug.LogWarning($"Could not find {item.itemName} in cart to remove");
+            // Debug.LogWarning($"Could not find {item.itemName} in cart to remove");
         }
     }
     
     void ReturnCardToStack(ShopItem item, GameObject cardDisplay)
     {
-        Debug.Log($"Returning {cardDisplay.name} to its original stack");
+        // Debug.Log($"Returning {cardDisplay.name} to its original stack");
         
         string stackName = $"{item.itemName}_Stack";
         Transform stackContainer = shopItemsPanel.Find(stackName);
@@ -530,11 +530,11 @@ public class ShopManager : MonoBehaviour
             
             SetupDragFunctionality(cardDisplay, item);
             
-            Debug.Log($"Returned {cardDisplay.name} to stack {stackName}");
+            // Debug.Log($"Returned {cardDisplay.name} to stack {stackName}");
         }
         else
         {
-            Debug.LogWarning($"Could not find stack container {stackName}");
+            // Debug.LogWarning($"Could not find stack container {stackName}");
             Destroy(cardDisplay);
         }
     }
@@ -564,7 +564,7 @@ public class ShopManager : MonoBehaviour
             }
         }
         
-        Debug.Log($"Rearranged {cartItemDisplays.Count} items in cart");
+        // Debug.Log($"Rearranged {cartItemDisplays.Count} items in cart");
     }
     
     GameObject FindTopCard(Transform stackContainer)
@@ -660,14 +660,14 @@ public class ShopManager : MonoBehaviour
             checkoutButton.interactable = canCheckout;
         }
         
-        Debug.Log($"Cart updated: {cartItems.Count} items, total cost: ${totalCost}");
+        // Debug.Log($"Cart updated: {cartItems.Count} items, total cost: ${totalCost}");
     }
     
     public void Checkout()
     {
         if (cartItems.Count == 0)
         {
-            Debug.Log("Cart is empty!");
+            // Debug.Log("Cart is empty!");
             return;
         }
         
@@ -679,11 +679,11 @@ public class ShopManager : MonoBehaviour
         
         if (playerInventory.coins < totalCost)
         {
-            Debug.Log($"Not enough coins! Need {totalCost}, have {playerInventory.coins}");
+            // Debug.Log($"Not enough coins! Need {totalCost}, have {playerInventory.coins}");
             return;
         }
         
-        Debug.Log($"Processing checkout: {cartItems.Count} items for ${totalCost}");
+        // Debug.Log($"Processing checkout: {cartItems.Count} items for ${totalCost}");
         
         playerInventory.coins -= totalCost;
         
@@ -698,12 +698,12 @@ public class ShopManager : MonoBehaviour
     gearCopy.maxDurability = gearCopy.durability; // Store original durability as max
     
     playerInventory.extraGear.Add(gearCopy);
-    Debug.Log($"Added {gearCopy.gearName} copy to player's gear (Durability: {gearCopy.durability}/{gearCopy.maxDurability})");
+    // Debug.Log($"Added {gearCopy.gearName} copy to player's gear (Durability: {gearCopy.durability}/{gearCopy.maxDurability})");
 }
             else if (item.itemType == ShopItem.ItemType.Action && item.actionCard != null)
             {
                 playerInventory.actionCards.Add(item.actionCard);
-                Debug.Log($"Added {item.actionCard.actionName} to player's actions");
+                // Debug.Log($"Added {item.actionCard.actionName} to player's actions");
             }
         }
         
@@ -711,7 +711,7 @@ public class ShopManager : MonoBehaviour
         UpdatePlayerInfo();
         UpdateShoppingCart();
         
-        Debug.Log($"Checkout successful! Player now has {playerInventory.coins} coins");
+        // Debug.Log($"Checkout successful! Player now has {playerInventory.coins} coins");
     }
     
     public void ClearCart()
@@ -727,12 +727,12 @@ public class ShopManager : MonoBehaviour
         cartItems.Clear();
         cartItemDisplays.Clear();
         
-        Debug.Log("Shopping cart cleared");
+        // Debug.Log("Shopping cart cleared");
     }
     
     public bool PurchaseItem(ShopItem item, GameObject itemDisplay, Transform originalStackContainer = null)
     {
-        Debug.Log($"PurchaseItem called for {item.itemName}, redirecting to AddToCart");
+        // Debug.Log($"PurchaseItem called for {item.itemName}, redirecting to AddToCart");
         return AddToCart(item, itemDisplay);
     }
 }

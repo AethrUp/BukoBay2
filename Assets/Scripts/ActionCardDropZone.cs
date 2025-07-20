@@ -34,7 +34,7 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
     // Check if we're in the interactive phase
     if (fishingManager == null || !fishingManager.isInteractionPhase)
     {
-        Debug.LogWarning("Cannot play action cards - not in interactive phase!");
+        // Debug.LogWarning("Cannot play action cards - not in interactive phase!");
         return;
     }
 
@@ -43,17 +43,17 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
     // Check if this card can target what this drop zone affects
     if (targetsPlayer && !actionCard.canTargetPlayer)
     {
-        Debug.LogWarning($"{actionCard.actionName} cannot target players!");
+        // Debug.LogWarning($"{actionCard.actionName} cannot target players!");
         return;
     }
 
     if (!targetsPlayer && !actionCard.canTargetFish)
     {
-        Debug.LogWarning($"{actionCard.actionName} cannot target fish!");
+        // Debug.LogWarning($"{actionCard.actionName} cannot target fish!");
         return;
     }
 
-    Debug.Log($"Playing {actionCard.actionName} on {(targetsPlayer ? "player" : "fish")}");
+    // Debug.Log($"Playing {actionCard.actionName} on {(targetsPlayer ? "player" : "fish")}");
 
     // Play the action card through the fishing manager
     bool success = fishingManager.PlayActionCard(actionCard, targetsPlayer);
@@ -82,12 +82,12 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
         if (playerInventory != null && playerInventory.actionCards.Contains(actionCard))
         {
             playerInventory.actionCards.Remove(actionCard);
-            Debug.Log($"Removed {actionCard.actionName} from player inventory");
+            // Debug.Log($"Removed {actionCard.actionName} from player inventory");
         }
     }
     public void CreateNetworkedPlayedCard(string cardName, int playerEffect, int fishEffect)
 {
-    Debug.Log($"Creating networked played card: {cardName} (Player: {playerEffect}, Fish: {fishEffect})");
+    // Debug.Log($"Creating networked played card: {cardName} (Player: {playerEffect}, Fish: {fishEffect})");
     
     // Create the circle card at a random position
     Vector2 randomPos = new Vector2(Random.Range(-100f, 100f), Random.Range(-50f, 50f));
@@ -106,7 +106,7 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
 
 void SetupNetworkedCircleCard(GameObject circleCard, string cardName, int playerEffect, int fishEffect)
 {
-    Debug.Log($"Setting up networked circle card for: {cardName} (Effects: P{playerEffect} F{fishEffect})");
+    // Debug.Log($"Setting up networked circle card for: {cardName} (Effects: P{playerEffect} F{fishEffect})");
     
     // Try to find the actual ActionCard to get the image
     ActionCard foundCard = FindActionCardByName(cardName);
@@ -121,7 +121,7 @@ void SetupNetworkedCircleCard(GameObject circleCard, string cardName, int player
             if (itemImage != null)
             {
                 itemImage.sprite = foundCard.actionImage;
-                Debug.Log($"Assigned sprite: {foundCard.actionImage.name}");
+                // Debug.Log($"Assigned sprite: {foundCard.actionImage.name}");
             }
         }
     }
@@ -160,7 +160,7 @@ ActionCard FindActionCardByName(string cardName)
 
     void MoveCardToPanel(GameObject cardObject)
     {
-        Debug.Log("=== MoveCardToPanel called ==="); // ADD THIS LINE
+        // Debug.Log("=== MoveCardToPanel called ==="); // ADD THIS LINE
 
         // Get the action card data before we destroy the original
         CardDragDrop dragDrop = cardObject.GetComponent<CardDragDrop>();
@@ -183,26 +183,26 @@ ActionCard FindActionCardByName(string cardName)
         // Wake up all cards so they rearrange
         PlayedCardPhysics.WakeAllCardsInPanel(transform);
 
-        Debug.Log($"Created circle card for {actionCard.actionName}");
+        // Debug.Log($"Created circle card for {actionCard.actionName}");
     }
 
     void SetupCircleCard(GameObject circleCard, ActionCard actionCard)
 {
-    Debug.Log($"Setting up circle card for: {actionCard.actionName}");
+    // Debug.Log($"Setting up circle card for: {actionCard.actionName}");
     
     // Set the item image (MainArt is inside Mask, and we ARE the PlayedAction object)
     Transform mainArtTransform = circleCard.transform.Find("Mask/MainArt");
-    Debug.Log($"MainArt found: {mainArtTransform != null}");
+    // Debug.Log($"MainArt found: {mainArtTransform != null}");
     
     if (mainArtTransform != null)
     {
         Image itemImage = mainArtTransform.GetComponent<Image>();
-        Debug.Log($"Image component found: {itemImage != null}");
+        // Debug.Log($"Image component found: {itemImage != null}");
         
         if (itemImage != null && actionCard.actionImage != null)
         {
             itemImage.sprite = actionCard.actionImage;
-            Debug.Log($"Assigned sprite: {actionCard.actionImage.name}");
+            // Debug.Log($"Assigned sprite: {actionCard.actionImage.name}");
         }
     }
     
@@ -221,20 +221,20 @@ ActionCard FindActionCardByName(string cardName)
     // Clear all played cards (call this when the interactive phase ends)
     public void ClearPlayedCards()
 {
-    Debug.Log($"ClearPlayedCards called on {gameObject.name} - found {playedCards.Count} cards to clear");
+    // Debug.Log($"ClearPlayedCards called on {gameObject.name} - found {playedCards.Count} cards to clear");
     foreach (GameObject card in playedCards)
     {
         if (card != null)
         {
-            Debug.Log($"Destroying card: {card.name}");
+            // Debug.Log($"Destroying card: {card.name}");
             Destroy(card);
         }
         else
         {
-            Debug.Log("Found null card in playedCards list");
+            // Debug.Log("Found null card in playedCards list");
         }
     }
     playedCards.Clear();
-    Debug.Log($"All played cards cleared from {gameObject.name}");
+    // Debug.Log($"All played cards cleared from {gameObject.name}");
 }
 }

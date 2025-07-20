@@ -46,7 +46,7 @@ public class PlayerInventory : MonoBehaviour
     
     void CreateGearCopies()
     {
-        Debug.Log("Creating gear copies to avoid modifying original assets...");
+        // Debug.Log("Creating gear copies to avoid modifying original assets...");
         
         // Copy equipped gear and store original durability
         if (equippedRod != null) 
@@ -109,7 +109,7 @@ public class PlayerInventory : MonoBehaviour
                 actionCards[i] = Instantiate(actionCards[i]);
         }
         
-        Debug.Log("Gear copies created successfully with max durability stored");
+        // Debug.Log("Gear copies created successfully with max durability stored");
     }
     
     // Function to check if a specific gear type is equipped
@@ -130,7 +130,7 @@ public class PlayerInventory : MonoBehaviour
     public int GetTotalPower()
     {
         int totalPower = 0;
-        Debug.Log($"Calculating total power...");
+        // Debug.Log($"Calculating total power...");
         
         if (equippedRod != null) totalPower += equippedRod.power;
         if (equippedReel != null) totalPower += equippedReel.power;
@@ -140,7 +140,7 @@ public class PlayerInventory : MonoBehaviour
         if (equippedExtra1 != null) totalPower += equippedExtra1.power;
         if (equippedExtra2 != null) totalPower += equippedExtra2.power;
         
-        Debug.Log($"Total power calculated: {totalPower}");
+        // Debug.Log($"Total power calculated: {totalPower}");
         return totalPower;
     }
     
@@ -148,6 +148,6 @@ public class PlayerInventory : MonoBehaviour
     public void AddCoins(int amount)
     {
         coins += amount;
-        Debug.Log($"Player received {amount} coins! Total: {coins}");
+        // Debug.Log($"Player received {amount} coins! Total: {coins}");
     }
 }

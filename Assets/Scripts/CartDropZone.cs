@@ -8,14 +8,14 @@ public class PurchaseDropZone : MonoBehaviour, IDropHandler
     
     public void OnDrop(PointerEventData eventData)
     {
-        Debug.Log("PurchaseDropZone.OnDrop called!");
+        // Debug.Log("PurchaseDropZone.OnDrop called!");
         
         // Get the dragged object
         GameObject draggedObject = eventData.pointerDrag;
         
         if (draggedObject == null)
         {
-            Debug.Log("No dragged object");
+            // Debug.Log("No dragged object");
             return;
         }
         
@@ -23,7 +23,7 @@ public class PurchaseDropZone : MonoBehaviour, IDropHandler
         ShopItemData shopData = draggedObject.GetComponent<ShopItemData>();
         if (shopData == null || shopData.shopItem == null)
         {
-            Debug.Log("No shop item data found on dragged object");
+            // Debug.Log("No shop item data found on dragged object");
             return;
         }
         
@@ -31,11 +31,11 @@ public class PurchaseDropZone : MonoBehaviour, IDropHandler
         ShopItemDragDrop shopDragDrop = draggedObject.GetComponent<ShopItemDragDrop>();
         if (shopDragDrop == null)
         {
-            Debug.Log("No ShopItemDragDrop component found");
+            // Debug.Log("No ShopItemDragDrop component found");
             return;
         }
         
-        Debug.Log($"Valid shop item dropped: {shopData.shopItem.itemName}");
+        // Debug.Log($"Valid shop item dropped: {shopData.shopItem.itemName}");
         
         // Add item to cart instead of purchasing immediately
         if (shopManager != null)
@@ -43,18 +43,18 @@ public class PurchaseDropZone : MonoBehaviour, IDropHandler
             bool addedToCart = shopManager.AddToCart(shopData.shopItem, draggedObject);
             if (!addedToCart)
             {
-                Debug.Log($"Failed to add {shopData.shopItem.itemName} to cart");
+                // Debug.Log($"Failed to add {shopData.shopItem.itemName} to cart");
                 // Return the card to its original position using SendMessage
                 draggedObject.SendMessage("ReturnToOriginalPosition", SendMessageOptions.DontRequireReceiver);
             }
             else
             {
-                Debug.Log($"Successfully added {shopData.shopItem.itemName} to cart");
+                // Debug.Log($"Successfully added {shopData.shopItem.itemName} to cart");
             }
         }
         else
         {
-            Debug.LogError("No ShopManager assigned to PurchaseDropZone!");
+            // Debug.LogError("No ShopManager assigned to PurchaseDropZone!");
             // Return the card to its original position using SendMessage
             draggedObject.SendMessage("ReturnToOriginalPosition", SendMessageOptions.DontRequireReceiver);
         }

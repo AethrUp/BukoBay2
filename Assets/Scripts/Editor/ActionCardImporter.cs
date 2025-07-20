@@ -51,7 +51,7 @@ public class ActionCardImporter : EditorWindow
             return;
         }
         
-        Debug.Log("Starting action and effect card import...");
+        // Debug.Log("Starting action and effect card import...");
         
         // Create directories if they don't exist
         string cardsPath = "Assets/Cards";
@@ -69,11 +69,11 @@ public class ActionCardImporter : EditorWindow
         
         // Read CSV file
         string csvContent = File.ReadAllText(csvFilePath);
-        Debug.Log($"CSV Content length: {csvContent.Length}");
+        // Debug.Log($"CSV Content length: {csvContent.Length}");
         
         // Split into lines and clean them
         string[] allLines = csvContent.Split('\n');
-        Debug.Log($"Total lines in file: {allLines.Length}");
+        // Debug.Log($"Total lines in file: {allLines.Length}");
         
         if (allLines.Length < 2)
         {
@@ -83,7 +83,7 @@ public class ActionCardImporter : EditorWindow
         
         // Get header line (first line)
         string headerLine = allLines[0].Trim().Replace("\r", "");
-        Debug.Log($"Header line: '{headerLine}'");
+        // Debug.Log($"Header line: '{headerLine}'");
         
         // Simple split by comma for headers
         string[] headers = headerLine.Split(',');
@@ -92,7 +92,7 @@ public class ActionCardImporter : EditorWindow
             headers[i] = headers[i].Trim().Replace("\"", "");
         }
         
-        Debug.Log($"Found {headers.Length} headers: {string.Join(" | ", headers)}");
+        // Debug.Log($"Found {headers.Length} headers: {string.Join(" | ", headers)}");
         
         // Find column indices
         int typeIndex = FindColumnIndex(headers, "Type");
@@ -102,7 +102,7 @@ public class ActionCardImporter : EditorWindow
         int descriptionIndex = FindColumnIndex(headers, "Description");
         int effectIndex = FindColumnIndex(headers, "Effect");
         
-        Debug.Log($"Column indices - Type: {typeIndex}, Item: {itemIndex}, Player: {playerIndex}, Fish: {fishIndex}");
+        // Debug.Log($"Column indices - Type: {typeIndex}, Item: {itemIndex}, Player: {playerIndex}, Fish: {fishIndex}");
         
         int actionCount = 0;
         int effectCount = 0;
@@ -114,14 +114,14 @@ public class ActionCardImporter : EditorWindow
             string line = allLines[lineIndex].Trim().Replace("\r", "");
             if (string.IsNullOrEmpty(line)) continue;
             
-            Debug.Log($"Processing line {lineIndex}: '{line.Substring(0, System.Math.Min(80, line.Length))}...'");
+            // Debug.Log($"Processing line {lineIndex}: '{line.Substring(0, System.Math.Min(80, line.Length))}...'");
             
             // Parse CSV line (handle quotes properly)
             string[] values = ParseCSVLine(line);
             
             if (values.Length < 6) // Need at least Type, Item, Player, Fish, Description
             {
-                Debug.LogWarning($"Line {lineIndex} has too few values ({values.Length}), skipping");
+                // Debug.LogWarning($"Line {lineIndex} has too few values ({values.Length}), skipping");
                 skippedCount++;
                 continue;
             }
@@ -132,12 +132,12 @@ public class ActionCardImporter : EditorWindow
             
             if (string.IsNullOrEmpty(cardName))
             {
-                Debug.LogWarning($"Line {lineIndex} has empty card name, skipping");
+                // Debug.LogWarning($"Line {lineIndex} has empty card name, skipping");
                 skippedCount++;
                 continue;
             }
             
-            Debug.Log($"Creating {cardType} card for: '{cardName}'");
+            // Debug.Log($"Creating {cardType} card for: '{cardName}'");
             
             // Create appropriate card based on type
             if (cardType.Equals("Action", System.StringComparison.OrdinalIgnoreCase))
@@ -152,7 +152,7 @@ public class ActionCardImporter : EditorWindow
             }
             else
             {
-                Debug.LogWarning($"Unknown card type '{cardType}' for {cardName}, skipping");
+                // Debug.LogWarning($"Unknown card type '{cardType}' for {cardName}, skipping");
                 skippedCount++;
             }
         }
@@ -160,7 +160,7 @@ public class ActionCardImporter : EditorWindow
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         
-        Debug.Log($"Import complete! Created {actionCount} action cards, {effectCount} effect cards, skipped {skippedCount} rows");
+        // Debug.Log($"Import complete! Created {actionCount} action cards, {effectCount} effect cards, skipped {skippedCount} rows");
         EditorUtility.DisplayDialog("Import Complete", 
             $"Successfully imported:\n{actionCount} Action Cards\n{effectCount} Effect Cards\nSkipped {skippedCount} rows.\n\nSee console for details.", "OK");
     }
@@ -187,11 +187,11 @@ public class ActionCardImporter : EditorWindow
         if (actionSprite != null)
         {
             actionCard.actionImage = actionSprite;
-            Debug.Log($"Found image for {actionName}");
+            // Debug.Log($"Found image for {actionName}");
         }
         else
         {
-            Debug.LogWarning($"No image found for action: {actionName}");
+            // Debug.LogWarning($"No image found for action: {actionName}");
         }
         
         // Set player and fish effects
@@ -223,7 +223,7 @@ public class ActionCardImporter : EditorWindow
         string fileName = $"{safeFileName}.asset";
         string assetPath = $"{outputPath}/{fileName}";
         
-        Debug.Log($"Creating action card asset at: {assetPath}");
+        // Debug.Log($"Creating action card asset at: {assetPath}");
         
         AssetDatabase.CreateAsset(actionCard, assetPath);
     }
@@ -252,11 +252,11 @@ public class ActionCardImporter : EditorWindow
         if (effectSprite != null)
         {
             effectCard.effectImage = effectSprite;
-            Debug.Log($"Found image for {effectName}");
+            // Debug.Log($"Found image for {effectName}");
         }
         else
         {
-            Debug.LogWarning($"No image found for effect: {effectName}");
+            // Debug.LogWarning($"No image found for effect: {effectName}");
         }
         
         // Try to automatically detect effect type based on the effect description
@@ -295,7 +295,7 @@ public class ActionCardImporter : EditorWindow
         string fileName = $"{safeFileName}.asset";
         string assetPath = $"{outputPath}/{fileName}";
         
-        Debug.Log($"Creating effect card asset at: {assetPath}");
+        // Debug.Log($"Creating effect card asset at: {assetPath}");
         
         AssetDatabase.CreateAsset(effectCard, assetPath);
     }

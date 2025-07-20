@@ -34,7 +34,7 @@ public class PlayedCardPhysics : MonoBehaviour
         // Cards start where they are placed, no random velocity initially
         velocity = Vector2.zero;
         
-        Debug.Log($"Card physics started at position: {transform.localPosition}. Cards in this panel: {cardsByPanel[parentPanel].Count}");
+        // Debug.Log($"Card physics started at position: {transform.localPosition}. Cards in this panel: {cardsByPanel[parentPanel].Count}");
     }
     
     void Update()
@@ -68,7 +68,7 @@ public class PlayedCardPhysics : MonoBehaviour
         {
             isSettled = true;
             velocity = Vector2.zero;
-            Debug.Log($"Card settled at position: {transform.localPosition}");
+            // Debug.Log($"Card settled at position: {transform.localPosition}");
         }
     }
     
@@ -121,7 +121,7 @@ public class PlayedCardPhysics : MonoBehaviour
                     Vector2 repulsion = difference.normalized * repulsionStrength;
                     totalRepulsion += repulsion;
                     
-                    Debug.Log($"Repelling from card at distance {distance:F1}, force: {repulsionStrength:F1}");
+                    // Debug.Log($"Repelling from card at distance {distance:F1}, force: {repulsionStrength:F1}");
                 }
             }
         }
@@ -134,7 +134,7 @@ public class PlayedCardPhysics : MonoBehaviour
     {
         if (!cardsByPanel.ContainsKey(panel)) return;
         
-        Debug.Log($"Waking up {cardsByPanel[panel].Count} cards in panel {panel.name}");
+        // Debug.Log($"Waking up {cardsByPanel[panel].Count} cards in panel {panel.name}");
         foreach (PlayedCardPhysics card in cardsByPanel[panel])
         {
             if (card != null)
@@ -152,7 +152,7 @@ public class PlayedCardPhysics : MonoBehaviour
         if (cardsByPanel.ContainsKey(parentPanel))
         {
             cardsByPanel[parentPanel].Remove(this);
-            Debug.Log($"Card destroyed. Remaining cards in panel: {cardsByPanel[parentPanel].Count}");
+            // Debug.Log($"Card destroyed. Remaining cards in panel: {cardsByPanel[parentPanel].Count}");
         }
     }
     

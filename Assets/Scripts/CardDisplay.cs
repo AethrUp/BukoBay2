@@ -43,11 +43,11 @@ public class CardDisplay : MonoBehaviour
     
     void DisplayCard()
     {
-        Debug.Log("DisplayCard called");
+        // Debug.Log("DisplayCard called");
         
         if (gearCard != null)
         {
-            Debug.Log("Displaying gear card: " + gearCard.gearName);
+            // Debug.Log("Displaying gear card: " + gearCard.gearName);
             DisplayGearCard();
         }
         else if (fishCard != null)
@@ -56,17 +56,17 @@ public class CardDisplay : MonoBehaviour
         }
         else if (actionCard != null)
         {
-            Debug.Log("Displaying action card: " + actionCard.actionName);
+            // Debug.Log("Displaying action card: " + actionCard.actionName);
             DisplayActionCard();
         }
         else if (effectCard != null)
         {
-            Debug.Log("Displaying effect card: " + effectCard.effectName);
+            // Debug.Log("Displaying effect card: " + effectCard.effectName);
             DisplayEffectCard();
         }
         else
         {
-            Debug.Log("No card assigned");
+            // Debug.Log("No card assigned");
         }
         
         // Display shop information if this is a shop item
@@ -78,26 +78,26 @@ public class CardDisplay : MonoBehaviour
     
     void DisplayShopInfo()
     {
-        Debug.Log($"DisplayShopInfo called - isShopItem: {isShopItem}, price: {itemPrice}, quantity: {itemQuantity}");
+        // Debug.Log($"DisplayShopInfo called - isShopItem: {isShopItem}, price: {itemPrice}, quantity: {itemQuantity}");
         
         if (priceText != null)
         {
             priceText.text = $"${itemPrice}";
-            Debug.Log($"Set price text to: ${itemPrice}");
+            // Debug.Log($"Set price text to: ${itemPrice}");
         }
         else
         {
-            Debug.Log("PriceText is null!");
+            // Debug.Log("PriceText is null!");
         }
         
         if (quantityText != null)
         {
             quantityText.text = $"Qty: {itemQuantity}";
-            Debug.Log($"Set quantity text to: Qty: {itemQuantity}");
+            // Debug.Log($"Set quantity text to: Qty: {itemQuantity}");
         }
         else
         {
-            Debug.Log("QuantityText is null!");
+            // Debug.Log("QuantityText is null!");
         }
     }
     
@@ -234,7 +234,7 @@ public class CardDisplay : MonoBehaviour
         if (gearCard != null && gearCard.hasProtection)
         {
             protectionIcon.gameObject.SetActive(true);
-            Debug.Log($"Showing protection icon for {gearCard.gearName}");
+            // Debug.Log($"Showing protection icon for {gearCard.gearName}");
         }
         else
         {

@@ -44,11 +44,11 @@ public class EffectCardManager : MonoBehaviour
     {
         if (effectCard == null || playerInventory == null)
         {
-            Debug.LogError("Cannot use effect card - missing components!");
+            // Debug.LogError("Cannot use effect card - missing components!");
             return;
         }
         
-        Debug.Log($"Using effect card: {effectCard.effectName}");
+        // Debug.Log($"Using effect card: {effectCard.effectName}");
         
         switch (effectCard.effectType)
         {
@@ -77,7 +77,7 @@ public class EffectCardManager : MonoBehaviour
         
         if (damagedGear.Count == 0)
         {
-            Debug.Log("No damaged gear to repair!");
+            // Debug.Log("No damaged gear to repair!");
             return;
         }
         
@@ -133,7 +133,7 @@ public class EffectCardManager : MonoBehaviour
     {
         if (gearSelectionPanel == null || gearSelectionContainer == null)
         {
-            Debug.LogError("Gear selection UI not set up!");
+            // Debug.LogError("Gear selection UI not set up!");
             return;
         }
         
@@ -154,7 +154,7 @@ public class EffectCardManager : MonoBehaviour
         // Show the panel
         gearSelectionPanel.SetActive(true);
         
-        Debug.Log($"Showing {damagedGear.Count} damaged gear options for repair");
+        // Debug.Log($"Showing {damagedGear.Count} damaged gear options for repair");
     }
     
     void CreateGearDisplay(GearCard gear)
@@ -211,7 +211,7 @@ public class EffectCardManager : MonoBehaviour
         // Update confirm button
         UpdateConfirmButton();
         
-        Debug.Log($"Selected {gear.gearName} for repair");
+        // Debug.Log($"Selected {gear.gearName} for repair");
     }
     
     void UpdateConfirmButton()
@@ -239,11 +239,11 @@ public class EffectCardManager : MonoBehaviour
     {
         if (selectedGear == null || currentEffectCard == null)
         {
-            Debug.LogError("Cannot confirm repair - no gear selected!");
+            // Debug.LogError("Cannot confirm repair - no gear selected!");
             return;
         }
         
-        Debug.Log($"Confirming repair of {selectedGear.gearName} with {currentEffectCard.effectName}");
+        // Debug.Log($"Confirming repair of {selectedGear.gearName} with {currentEffectCard.effectName}");
         
         // Apply the repair effect
         int repairAmount = CalculateRepairAmount(currentEffectCard, selectedGear);
@@ -253,13 +253,13 @@ public class EffectCardManager : MonoBehaviour
         selectedGear.durability = Mathf.Min(maxDurability, selectedGear.durability + repairAmount);
         int actualRepair = selectedGear.durability - oldDurability;
         
-        Debug.Log($"Repaired {selectedGear.gearName}: {oldDurability} → {selectedGear.durability} (+{actualRepair})");
+        // Debug.Log($"Repaired {selectedGear.gearName}: {oldDurability} → {selectedGear.durability} (+{actualRepair})");
         
         // Remove the effect card from inventory (most are single use)
         if (currentEffectCard.singleUse && playerInventory.effectCards.Contains(currentEffectCard))
         {
             playerInventory.effectCards.Remove(currentEffectCard);
-            Debug.Log($"Consumed {currentEffectCard.effectName}");
+            // Debug.Log($"Consumed {currentEffectCard.effectName}");
         }
         
         // Hide the gear selection panel
@@ -314,7 +314,7 @@ public class EffectCardManager : MonoBehaviour
     
     public void CancelGearSelection()
     {
-        Debug.Log("Gear selection cancelled");
+        // Debug.Log("Gear selection cancelled");
         HideGearSelection();
         currentEffectCard = null;
     }
@@ -322,16 +322,16 @@ public class EffectCardManager : MonoBehaviour
     // Placeholder methods for other effect types
     void HandleProtectionEffect(EffectCard effectCard)
     {
-        Debug.Log($"Protection effect not implemented yet: {effectCard.effectName}");
+        // Debug.Log($"Protection effect not implemented yet: {effectCard.effectName}");
     }
     
     void HandleUtilityEffect(EffectCard effectCard)
     {
-        Debug.Log($"Utility effect not implemented yet: {effectCard.effectName}");
+        // Debug.Log($"Utility effect not implemented yet: {effectCard.effectName}");
     }
     
     void HandlePersistentEffect(EffectCard effectCard)
     {
-        Debug.Log($"Persistent effect not implemented yet: {effectCard.effectName}");
+        // Debug.Log($"Persistent effect not implemented yet: {effectCard.effectName}");
     }
 }

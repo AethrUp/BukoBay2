@@ -22,7 +22,7 @@ public class InventoryComparison : MonoBehaviour
         if (playerInventory == null && PlayerInventory.Instance != null)
         {
             playerInventory = PlayerInventory.Instance;
-            Debug.Log("InventoryComparison: Found persistent PlayerInventory");
+            // Debug.Log("InventoryComparison: Found persistent PlayerInventory");
         }
         
         // Clear the panels initially
@@ -33,7 +33,7 @@ public class InventoryComparison : MonoBehaviour
     {
         if (selectedGear == null) return;
         
-        Debug.Log($"Showing comparison for {selectedGear.gearName} ({selectedGear.gearType})");
+        // Debug.Log($"Showing comparison for {selectedGear.gearName} ({selectedGear.gearType})");
         
         // Check if the selected gear is currently equipped
         GearCard equippedGear = GetEquippedGearOfType(selectedGear.gearType);
@@ -42,10 +42,10 @@ public class InventoryComparison : MonoBehaviour
         if (selectedGearIsEquipped)
         {
             // If clicked gear is equipped, show it in the top panel only
-            Debug.Log($"Selected gear is equipped. Clearing compared panel.");
+            // Debug.Log($"Selected gear is equipped. Clearing compared panel.");
             ClearComparedDisplay(); // Clear first
             ShowEquippedGear(selectedGear);
-            Debug.Log($"Showing equipped gear: {selectedGear.gearName}");
+            // Debug.Log($"Showing equipped gear: {selectedGear.gearName}");
         }
         else
         {
@@ -56,12 +56,12 @@ public class InventoryComparison : MonoBehaviour
             if (equippedGear != null && equippedGear != selectedGear)
             {
                 ShowEquippedGear(equippedGear);
-                Debug.Log($"Comparing {selectedGear.gearName} with equipped {equippedGear.gearName}");
+                // Debug.Log($"Comparing {selectedGear.gearName} with equipped {equippedGear.gearName}");
             }
             else
             {
                 ClearEquippedDisplay();
-                Debug.Log($"No {selectedGear.gearType} is currently equipped");
+                // Debug.Log($"No {selectedGear.gearType} is currently equipped");
             }
         }
     }
@@ -99,7 +99,7 @@ public class InventoryComparison : MonoBehaviour
                 cardDisplay.actionCard = null;
             }
             
-            Debug.Log($"Showing equipped gear: {gearCard.gearName}");
+            // Debug.Log($"Showing equipped gear: {gearCard.gearName}");
         }
     }
     
@@ -122,7 +122,7 @@ public class InventoryComparison : MonoBehaviour
                 cardDisplay.actionCard = null;
             }
             
-            Debug.Log($"Showing compared gear: {gearCard.gearName}");
+            // Debug.Log($"Showing compared gear: {gearCard.gearName}");
         }
     }
     
@@ -166,16 +166,16 @@ public class InventoryComparison : MonoBehaviour
     
     void ClearComparedDisplay()
     {
-        Debug.Log("ClearComparedDisplay called");
+        // Debug.Log("ClearComparedDisplay called");
         if (currentComparedDisplay != null)
         {
-            Debug.Log("Destroying compared display object");
+            // Debug.Log("Destroying compared display object");
             DestroyImmediate(currentComparedDisplay);
             currentComparedDisplay = null;
         }
         else
         {
-            Debug.Log("No compared display object to clear");
+            // Debug.Log("No compared display object to clear");
         }
     }
     

@@ -50,7 +50,7 @@ public class UpdatedFishCardImporter : EditorWindow
             return;
         }
         
-        Debug.Log("Starting updated fish card import with treasures and coins...");
+        // Debug.Log("Starting updated fish card import with treasures and coins...");
         
         // Create directories if they don't exist
         string cardsPath = "Assets/Cards";
@@ -64,11 +64,11 @@ public class UpdatedFishCardImporter : EditorWindow
         
         // Read CSV file
         string csvContent = File.ReadAllText(csvFilePath);
-        Debug.Log($"CSV Content length: {csvContent.Length}");
+        // Debug.Log($"CSV Content length: {csvContent.Length}");
         
         // Split into lines and clean them
         string[] allLines = csvContent.Split('\n');
-        Debug.Log($"Total lines in file: {allLines.Length}");
+        // Debug.Log($"Total lines in file: {allLines.Length}");
         
         if (allLines.Length < 3) // Need number row + header row + at least one data line
         {
@@ -78,7 +78,7 @@ public class UpdatedFishCardImporter : EditorWindow
         
         // Skip the first line (0,1,2,3...) and use the second line as headers
         string headerLine = allLines[1].Trim().Replace("\r", "");
-        Debug.Log($"Header line: '{headerLine}'");
+        // Debug.Log($"Header line: '{headerLine}'");
         
         // Simple split by comma for headers
         string[] headers = headerLine.Split(',');
@@ -87,17 +87,17 @@ public class UpdatedFishCardImporter : EditorWindow
             headers[i] = headers[i].Trim().Replace("\"", "");
         }
         
-        Debug.Log($"Found {headers.Length} headers");
-        Debug.Log("Column mapping:");
-        Debug.Log("  Column 1: Fish Name");
-        Debug.Log("  Column 2: Depth Type");
-        Debug.Log("  Column 4: Sub Depth");
-        Debug.Log("  Column 5: Treasures");
-        Debug.Log("  Column 6: Coins");
-        Debug.Log("  Column 7: Strength");
-        Debug.Log("  Column 9-14: Materials");
-        Debug.Log("  Column 15-19: Gear Damage");
-        Debug.Log("  Column 20: Description");
+        // Debug.Log($"Found {headers.Length} headers");
+        // Debug.Log("Column mapping:");
+        // Debug.Log("  Column 1: Fish Name");
+        // Debug.Log("  Column 2: Depth Type");
+        // Debug.Log("  Column 4: Sub Depth");
+        // Debug.Log("  Column 5: Treasures");
+        // Debug.Log("  Column 6: Coins");
+        // Debug.Log("  Column 7: Strength");
+        // Debug.Log("  Column 9-14: Materials");
+        // Debug.Log("  Column 15-19: Gear Damage");
+        // Debug.Log("  Column 20: Description");
         
         int importedCount = 0;
         int skippedCount = 0;
@@ -108,7 +108,7 @@ public class UpdatedFishCardImporter : EditorWindow
             string line = allLines[lineIndex].Trim().Replace("\r", "");
             if (string.IsNullOrEmpty(line)) continue;
             
-            Debug.Log($"Processing line {lineIndex}");
+            // Debug.Log($"Processing line {lineIndex}");
             
             // Simple split by comma
             string[] values = line.Split(',');
@@ -119,7 +119,7 @@ public class UpdatedFishCardImporter : EditorWindow
             
             if (values.Length < 20) // Need at least through Description column
             {
-                Debug.LogWarning($"Line {lineIndex} has too few values ({values.Length}), skipping");
+                // Debug.LogWarning($"Line {lineIndex} has too few values ({values.Length}), skipping");
                 skippedCount++;
                 continue;
             }
@@ -128,12 +128,12 @@ public class UpdatedFishCardImporter : EditorWindow
             string fishName = GetValue(values, 1);
             if (string.IsNullOrEmpty(fishName))
             {
-                Debug.LogWarning($"Line {lineIndex} has empty fish name, skipping");
+                // Debug.LogWarning($"Line {lineIndex} has empty fish name, skipping");
                 skippedCount++;
                 continue;
             }
             
-            Debug.Log($"Creating updated fish card for: '{fishName}'");
+            // Debug.Log($"Creating updated fish card for: '{fishName}'");
             
             // Create new FishCard
             FishCard fishCard = ScriptableObject.CreateInstance<FishCard>();
@@ -197,7 +197,7 @@ public class UpdatedFishCardImporter : EditorWindow
             if (fishSprite != null)
             {
                 fishCard.fishImage = fishSprite;
-                Debug.Log($"Found image for {fishName}: {imageName}");
+                // Debug.Log($"Found image for {fishName}: {imageName}");
             }
             
             // Create safe filename
@@ -212,10 +212,10 @@ public class UpdatedFishCardImporter : EditorWindow
             string fileName = $"{safeFileName}.asset";
             string assetPath = $"{fishPath}/{fileName}";
             
-            Debug.Log($"Creating asset at: {assetPath}");
-            Debug.Log($"  Treasures: {fishCard.treasures}");
-            Debug.Log($"  Coins: {fishCard.coins}");
-            Debug.Log($"  Power: {fishCard.power}");
+            // Debug.Log($"Creating asset at: {assetPath}");
+            // Debug.Log($"  Treasures: {fishCard.treasures}");
+            // Debug.Log($"  Coins: {fishCard.coins}");
+            // Debug.Log($"  Power: {fishCard.power}");
             
             AssetDatabase.CreateAsset(fishCard, assetPath);
             importedCount++;
@@ -224,7 +224,7 @@ public class UpdatedFishCardImporter : EditorWindow
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         
-        Debug.Log($"Import complete! Created {importedCount} updated fish cards with treasures and coins, skipped {skippedCount} rows");
+        // Debug.Log($"Import complete! Created {importedCount} updated fish cards with treasures and coins, skipped {skippedCount} rows");
         EditorUtility.DisplayDialog("Import Complete", 
             $"Successfully imported {importedCount} updated fish cards with treasures and coins.\nSkipped {skippedCount} rows.\nSee console for details.", "OK");
     }

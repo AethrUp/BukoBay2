@@ -48,7 +48,7 @@ public class CameraManager : MonoBehaviour
         if (gearSetupUI != null) gearSetupUI.SetActive(false);
         if (resultsUI != null) resultsUI.SetActive(false);
 
-        Debug.Log("Switched to Main Camera");
+        // Debug.Log("Switched to Main Camera");
     }
 
     public void SwitchToShoppingCamera()
@@ -66,7 +66,7 @@ public class CameraManager : MonoBehaviour
         if (gearSetupUI != null) gearSetupUI.SetActive(false);
         if (resultsUI != null) resultsUI.SetActive(false);
 
-        Debug.Log("Switched to Shopping Camera");
+        // Debug.Log("Switched to Shopping Camera");
     }
     public void SwitchToGearSetupCamera()
     {
@@ -81,7 +81,7 @@ public class CameraManager : MonoBehaviour
         if (shoppingUI != null) shoppingUI.SetActive(false);
         if (gearSetupUI != null) gearSetupUI.SetActive(true);
 
-        Debug.Log("Switched to Gear Setup Camera");
+        // Debug.Log("Switched to Gear Setup Camera");
     }
     public void SwitchToResultsCamera()
     {
@@ -98,7 +98,7 @@ public class CameraManager : MonoBehaviour
         if (gearSetupUI != null) gearSetupUI.SetActive(false);
         if (resultsUI != null) resultsUI.SetActive(true);
 
-        Debug.Log("Switched to Results Camera");
+        // Debug.Log("Switched to Results Camera");
     }
 
     // Test methods you can call from inspector buttons

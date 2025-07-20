@@ -40,11 +40,11 @@ public class DropZone : MonoBehaviour
     playerInventory = FindFirstObjectByType<PlayerInventory>();
     if (playerInventory == null)
     {
-        Debug.LogError("DropZone: Could not find PlayerInventory!");
+        // Debug.LogError("DropZone: Could not find PlayerInventory!");
     }
     else
     {
-        Debug.Log("DropZone: Found PlayerInventory successfully!");
+        // Debug.Log("DropZone: Found PlayerInventory successfully!");
     }
 }
     
@@ -90,12 +90,12 @@ public class DropZone : MonoBehaviour
         playerInventory = FindFirstObjectByType<PlayerInventory>();
         if (playerInventory == null)
         {
-            Debug.LogError("DropZone: Still cannot find PlayerInventory!");
+            // Debug.LogError("DropZone: Still cannot find PlayerInventory!");
             return;
         }
     }
     
-    Debug.Log($"DropZone: Accepting {gearCard.gearName} in {zoneName}");
+    // Debug.Log($"DropZone: Accepting {gearCard.gearName} in {zoneName}");
     
     // Store the currently equipped gear (if any) before replacing it
     GearCard previousGear = null;
@@ -144,7 +144,7 @@ public class DropZone : MonoBehaviour
         if (!playerInventory.extraGear.Contains(previousGear))
         {
             playerInventory.extraGear.Add(previousGear);
-            Debug.Log($"Moved {previousGear.gearName} to tackle box");
+            // Debug.Log($"Moved {previousGear.gearName} to tackle box");
         }
     }
     
@@ -152,12 +152,12 @@ public class DropZone : MonoBehaviour
     GearComparisonDisplay comparisonDisplay = FindFirstObjectByType<GearComparisonDisplay>();
     if (comparisonDisplay != null)
     {
-        Debug.Log("Found GearComparisonDisplay, updating totals...");
+        // Debug.Log("Found GearComparisonDisplay, updating totals...");
         comparisonDisplay.UpdateTotalEquippedDisplay();
     }
     else
     {
-        Debug.LogWarning("Could not find GearComparisonDisplay component!");
+        // Debug.LogWarning("Could not find GearComparisonDisplay component!");
     }
 }
     

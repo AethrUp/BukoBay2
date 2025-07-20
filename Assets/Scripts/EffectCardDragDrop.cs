@@ -46,20 +46,20 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
 
         if (playerInventory == null)
         {
-            Debug.LogError("Could not find PlayerInventory in scene!");
+            // // Debug.LogError("Could not find PlayerInventory in scene!");
         }
         else
         {
-            Debug.Log("Found PlayerInventory successfully");
+            // // Debug.Log("Found PlayerInventory successfully");
         }
         
         if (inventoryDisplay == null)
         {
-            Debug.LogError("Could not find InventoryDisplay in scene!");
+            // // Debug.LogError("Could not find InventoryDisplay in scene!");
         }
         else
         {
-            Debug.Log("Found InventoryDisplay successfully");
+            // // Debug.Log("Found InventoryDisplay successfully");
         }
     }
     
@@ -67,7 +67,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
     {
         if (effectCard == null) 
         {
-            Debug.LogError("No effect card assigned to drag component!");
+            // // Debug.LogError("No effect card assigned to drag component!");
             return;
         }
         
@@ -82,7 +82,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         // Move to top of hierarchy so it renders on top
         transform.SetParent(canvas.transform, true);
         
-        Debug.Log($"Started dragging effect card: {effectCard.effectName}");
+        // // Debug.Log($"Started dragging effect card: {effectCard.effectName}");
     }
     
     public void OnDrag(PointerEventData eventData)
@@ -97,7 +97,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
     {
         if (effectCard == null) return;
         
-        Debug.Log($"Ended dragging effect card: {effectCard.effectName}");
+        // // Debug.Log($"Ended dragging effect card: {effectCard.effectName}");
         
         // Restore appearance
         canvasGroup.alpha = 1f;
@@ -128,19 +128,19 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
             ReturnToOriginalPosition();
             if (targetGear != null)
             {
-                Debug.Log($"Cannot use {effectCard.effectName} on {targetGear.gearName}");
+                // Debug.Log($"Cannot use {effectCard.effectName} on {targetGear.gearName}");
             }
             else if (isShieldDrop)
             {
-                Debug.Log($"Cannot use {effectCard.effectName} as shield");
+                // Debug.Log($"Cannot use {effectCard.effectName} as shield");
             }
             else if (IsEquippedShield(effectCard))
             {
-                Debug.Log($"Must drop {effectCard.effectName} on action card panel to unequip");
+                // Debug.Log($"Must drop {effectCard.effectName} on action card panel to unequip");
             }
             else
             {
-                Debug.Log($"Invalid drop target for {effectCard.effectName}");
+                // Debug.Log($"Invalid drop target for {effectCard.effectName}");
             }
         }
     }
@@ -151,17 +151,17 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         var raycastResults = new System.Collections.Generic.List<RaycastResult>();
         raycaster.Raycast(eventData, raycastResults);
         
-        Debug.Log($"Effect card raycast found {raycastResults.Count} results");
+        // Debug.Log($"Effect card raycast found {raycastResults.Count} results");
         
         foreach (var raycastResult in raycastResults)
         {
-            Debug.Log($"Effect raycast hit: {raycastResult.gameObject.name}");
+            // Debug.Log($"Effect raycast hit: {raycastResult.gameObject.name}");
             
             // Check if we hit a gear card display
             CardDisplay cardDisplay = raycastResult.gameObject.GetComponent<CardDisplay>();
             if (cardDisplay != null && cardDisplay.gearCard != null)
             {
-                Debug.Log($"Found gear card: {cardDisplay.gearCard.gearName}");
+                // Debug.Log($"Found gear card: {cardDisplay.gearCard.gearName}");
                 return cardDisplay.gearCard;
             }
             
@@ -172,14 +172,14 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
                 CardDisplay parentCardDisplay = current.GetComponent<CardDisplay>();
                 if (parentCardDisplay != null && parentCardDisplay.gearCard != null)
                 {
-                    Debug.Log($"Found gear card on parent: {parentCardDisplay.gearCard.gearName}");
+                    // Debug.Log($"Found gear card on parent: {parentCardDisplay.gearCard.gearName}");
                     return parentCardDisplay.gearCard;
                 }
                 current = current.parent;
             }
         }
         
-        Debug.Log("No gear card found in raycast results");
+        // Debug.Log("No gear card found in raycast results");
         return null;
     }
     
@@ -192,12 +192,12 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         foreach (var raycastResult in raycastResults)
         {
             string objectName = raycastResult.gameObject.name.ToLower();
-            Debug.Log($"Checking drop zone: {objectName}");
+            // Debug.Log($"Checking drop zone: {objectName}");
             
             // Check if this is a shield panel or player area
             if (objectName.Contains("shield") || objectName.Contains("player"))
             {
-                Debug.Log("Found shield drop zone");
+                // Debug.Log("Found shield drop zone");
                 return true;
             }
             
@@ -208,7 +208,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
                 string parentName = current.name.ToLower();
                 if (parentName.Contains("shield") || parentName.Contains("player"))
                 {
-                    Debug.Log($"Found shield drop zone on parent: {current.name}");
+                    // Debug.Log($"Found shield drop zone on parent: {current.name}");
                     return true;
                 }
                 current = current.parent;
@@ -243,7 +243,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         
         if (!isDamaged)
         {
-            Debug.Log($"{gear.gearName} is not damaged (durability: {gear.durability}/{maxDurability})");
+            // Debug.Log($"{gear.gearName} is not damaged (durability: {gear.durability}/{maxDurability})");
             return false;
         }
         
@@ -252,11 +252,11 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         
         if (!isPlayerGear)
         {
-            Debug.Log($"{gear.gearName} does not belong to the player");
+            // Debug.Log($"{gear.gearName} does not belong to the player");
             return false;
         }
         
-        Debug.Log($"{gear.gearName} can be repaired (durability: {gear.durability}/{maxDurability})");
+        // Debug.Log($"{gear.gearName} can be repaired (durability: {gear.durability}/{maxDurability})");
         return true;
     }
     
@@ -265,7 +265,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         // Check if gear already has protection
         if (gear.hasProtection)
         {
-            Debug.Log($"{gear.gearName} already has protection ({gear.protectionType})");
+            // Debug.Log($"{gear.gearName} already has protection ({gear.protectionType})");
             return false;
         }
         
@@ -274,11 +274,11 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         
         if (!isPlayerGear)
         {
-            Debug.Log($"{gear.gearName} does not belong to the player");
+            // Debug.Log($"{gear.gearName} does not belong to the player");
             return false;
         }
         
-        Debug.Log($"{gear.gearName} can be protected with {protectionCard.effectName}");
+        // Debug.Log($"{gear.gearName} can be protected with {protectionCard.effectName}");
         return true;
     }
     
@@ -309,7 +309,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
     
     void UseEffectOnGear(EffectCard effect, GearCard targetGear)
     {
-        Debug.Log($"Using {effect.effectName} on {targetGear.gearName}");
+        // Debug.Log($"Using {effect.effectName} on {targetGear.gearName}");
         
         switch (effect.effectType)
         {
@@ -326,7 +326,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         if (effect.singleUse && playerInventory.effectCards.Contains(effect))
         {
             playerInventory.effectCards.Remove(effect);
-            Debug.Log($"Consumed {effect.effectName}");
+            // Debug.Log($"Consumed {effect.effectName}");
             
             // Destroy this card display
             Destroy(gameObject);
@@ -344,7 +344,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         gear.durability = Mathf.Min(maxDurability, gear.durability + repairAmount);
         int actualRepair = gear.durability - oldDurability;
         
-        Debug.Log($"Repaired {gear.gearName}: {oldDurability} → {gear.durability} (+{actualRepair})");
+        // Debug.Log($"Repaired {gear.gearName}: {oldDurability} → {gear.durability} (+{actualRepair})");
         
         // Show repair feedback and update the specific card display
         ShowRepairFeedback(gear, actualRepair);
@@ -357,7 +357,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         gear.hasProtection = true;
         gear.protectionType = protectionCard.effectName;
         
-        Debug.Log($"Applied {protectionCard.effectName} protection to {gear.gearName}");
+        // Debug.Log($"Applied {protectionCard.effectName} protection to {gear.gearName}");
         
         // For HandsOff, we need to protect ALL equipped gear
         if (protectionCard.effectName.Contains("HandsOff"))
@@ -374,7 +374,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
     {
         if (playerInventory == null) return;
         
-        Debug.Log("Applying HandsOff protection to all equipped gear");
+        // Debug.Log("Applying HandsOff protection to all equipped gear");
         
         // Apply protection to all equipped gear
         if (playerInventory.equippedRod != null && !playerInventory.equippedRod.hasProtection)
@@ -426,7 +426,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
             UpdateSpecificGearDisplay(playerInventory.equippedExtra2);
         }
         
-        Debug.Log("HandsOff protection applied to all equipped gear");
+        // Debug.Log("HandsOff protection applied to all equipped gear");
     }
     
     int CalculateRepairAmount(EffectCard effectCard, GearCard gear)
@@ -447,14 +447,14 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
     
     void ShowProtectionFeedback(GearCard gear, string protectionType)
     {
-        Debug.Log($"🛡️ {gear.gearName} protected with {protectionType}!");
+        // Debug.Log($"🛡️ {gear.gearName} protected with {protectionType}!");
     }
     
     void ShowRepairFeedback(GearCard gear, int repairAmount)
     {
         // Simple console feedback for now
         // You could add floating text or other visual effects later
-        Debug.Log($"✓ {gear.gearName} repaired for +{repairAmount} durability!");
+        // Debug.Log($"✓ {gear.gearName} repaired for +{repairAmount} durability!");
     }
     
     void UpdateSpecificGearDisplay(GearCard updatedGear)
@@ -462,19 +462,19 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         // Find all CardDisplay components in the scene
         CardDisplay[] allCardDisplays = FindObjectsByType<CardDisplay>(FindObjectsSortMode.None);
         
-        Debug.Log($"Found {allCardDisplays.Length} CardDisplay components to check");
+        // Debug.Log($"Found {allCardDisplays.Length} CardDisplay components to check");
         
         foreach (CardDisplay cardDisplay in allCardDisplays)
         {
             // Check if this card display is showing the updated gear
             if (cardDisplay.gearCard == updatedGear)
             {
-                Debug.Log($"Found CardDisplay showing {updatedGear.gearName}, forcing update");
+                // Debug.Log($"Found CardDisplay showing {updatedGear.gearName}, forcing update");
                 
                 // Force the card display to update by calling DisplayCard
                 cardDisplay.SendMessage("DisplayCard", SendMessageOptions.DontRequireReceiver);
                 
-                Debug.Log($"Updated CardDisplay for {updatedGear.gearName}");
+                // Debug.Log($"Updated CardDisplay for {updatedGear.gearName}");
             }
         }
     }
@@ -491,11 +491,11 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
             // Check if player already has a shield
             if (playerInventory.equippedShield != null)
             {
-                Debug.Log($"Player already has shield: {playerInventory.equippedShield.effectName}");
+                // Debug.Log($"Player already has shield: {playerInventory.equippedShield.effectName}");
                 return false;
             }
             
-            Debug.Log($"{effect.effectName} can be used as player shield");
+            // Debug.Log($"{effect.effectName} can be used as player shield");
             return true;
         }
         
@@ -504,7 +504,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
     
     void UseEffectAsShield(EffectCard effect)
     {
-        Debug.Log($"Equipping {effect.effectName} as player shield");
+        // Debug.Log($"Equipping {effect.effectName} as player shield");
         
         // Equip the shield
         playerInventory.equippedShield = effect;
@@ -512,13 +512,13 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         // Set shield strength based on the effect
         playerInventory.shieldStrength = GetShieldStrength(effect.effectName);
         
-        Debug.Log($"Player shield equipped: {effect.effectName} with {playerInventory.shieldStrength} absorption");
+        // Debug.Log($"Player shield equipped: {effect.effectName} with {playerInventory.shieldStrength} absorption");
         
         // Remove effect card from inventory if single use
         if (effect.singleUse && playerInventory.effectCards.Contains(effect))
         {
             playerInventory.effectCards.Remove(effect);
-            Debug.Log($"Consumed {effect.effectName} from inventory");
+            // Debug.Log($"Consumed {effect.effectName} from inventory");
             
             // Destroy this card display
             Destroy(gameObject);
@@ -544,7 +544,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         if (inventoryDisplay != null)
         {
             inventoryDisplay.UpdateDisplay();
-            Debug.Log("Updated shield display");
+            // Debug.Log("Updated shield display");
         }
     }
     
@@ -564,12 +564,12 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
         foreach (var raycastResult in raycastResults)
         {
             string objectName = raycastResult.gameObject.name.ToLower();
-            Debug.Log($"Checking drop target: {objectName}");
+            // Debug.Log($"Checking drop target: {objectName}");
             
             // Check if this is the action card panel or any child of it
             if (objectName.Contains("action") || objectName.Contains("effect"))
             {
-                Debug.Log("Found action/effect card panel");
+                // Debug.Log("Found action/effect card panel");
                 return true;
             }
             
@@ -580,7 +580,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
                 string parentName = current.name.ToLower();
                 if (parentName.Contains("action") || parentName.Contains("effect"))
                 {
-                    Debug.Log($"Found action/effect panel on parent: {current.name}");
+                    // Debug.Log($"Found action/effect panel on parent: {current.name}");
                     return true;
                 }
                 current = current.parent;
@@ -592,7 +592,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
 
     void UnequipShield(EffectCard shieldCard)
     {
-        Debug.Log($"Unequipping shield: {shieldCard.effectName}");
+        // Debug.Log($"Unequipping shield: {shieldCard.effectName}");
         
         PlayerInventory playerInv = FindFirstObjectByType<PlayerInventory>();
         if (playerInv != null)
@@ -605,7 +605,7 @@ public class EffectCardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler
             if (!playerInv.effectCards.Contains(shieldCard))
             {
                 playerInv.effectCards.Add(shieldCard);
-                Debug.Log($"Added {shieldCard.effectName} back to effect cards inventory");
+                // Debug.Log($"Added {shieldCard.effectName} back to effect cards inventory");
             }
             
             // Destroy this card display (it will be recreated in the action panel)

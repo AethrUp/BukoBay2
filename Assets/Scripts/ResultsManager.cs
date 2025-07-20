@@ -78,38 +78,61 @@ public class FishingResultsManager : MonoBehaviour
     }
     
     public void ShowResults(bool success, FishCard fish, int coins, string damage)
+{
+    Debug.Log($"=== SHOWING RESULTS ===");
+    Debug.Log($"Success: {success}");
+    Debug.Log($"Fish: {(fish != null ? fish.fishName : "None")}");
+    Debug.Log($"Coins: {coins}");
+    Debug.Log($"Damage: {damage}");
+    
+    // NEW: Check if this player should get coins
+    bool shouldGetCoins = false;
+    if (Unity.Netcode.NetworkManager.Singleton != null)
     {
-        Debug.Log($"=== SHOWING RESULTS ===");
-        Debug.Log($"Success: {success}");
-        Debug.Log($"Fish: {(fish != null ? fish.fishName : "None")}");
-        Debug.Log($"Coins: {coins}");
-        Debug.Log($"Damage: {damage}");
-        
-        // Store the results data
-        fishingSuccess = success;
-        caughtFish = fish;
-        coinsEarned = coins;
-        damageReport = damage;
-        
-        // Reset all phases
-        currentPhase = 0;
-        gearDisplayComplete = false;
-        coinAnimationComplete = false;
-        treasurePhaseComplete = false;
-        damagePhaseComplete = false;
-        
-        // Update the UI
-        UpdateResultsDisplay();
-        
-        // Switch to results camera
-        if (cameraManager != null)
+        FishingManager fishingManager = FindFirstObjectByType<FishingManager>();
+        if (fishingManager != null)
         {
-            cameraManager.SwitchToResultsCamera();
+            ulong myClientId = Unity.Netcode.NetworkManager.Singleton.LocalClientId;
+            shouldGetCoins = (myClientId == fishingManager.currentFishingPlayerId.Value);
+            Debug.Log($"COIN CHECK - My ID: {myClientId}, Fishing Player ID: {fishingManager.currentFishingPlayerId}, Should I get coins? {shouldGetCoins}");
         }
-
-        // Start the first phase
-        StartCoroutine(AnimateGearDisplay());
+        else
+        {
+            Debug.LogError("Could not find FishingManager!");
+        }
     }
+    else
+    {
+        // Single player - always get coins
+        shouldGetCoins = true;
+        Debug.Log("Single player mode - getting coins");
+    }
+    
+    // Store the results data
+    fishingSuccess = success;
+    caughtFish = fish;
+    coinsEarned = shouldGetCoins ? coins : 0; // Only show coins if this player should get them
+    damageReport = damage;
+    
+    // Reset all phases
+    currentPhase = 0;
+    gearDisplayComplete = false;
+    coinAnimationComplete = false;
+    treasurePhaseComplete = false;
+    damagePhaseComplete = false;
+    
+    // Update the UI
+    UpdateResultsDisplay();
+    
+    // Switch to results camera
+    if (cameraManager != null)
+    {
+        cameraManager.SwitchToResultsCamera();
+    }
+
+    // Start the first phase
+    StartCoroutine(AnimateGearDisplay());
+}
     
     void UpdateResultsDisplay()
     {
@@ -367,77 +390,106 @@ public class FishingResultsManager : MonoBehaviour
     }
 
     System.Collections.IEnumerator TransferCoins()
+{
+    // Get the starting values for animation (don't modify actual inventory)
+    int startPlayerTotal = playerInventory != null ? playerInventory.coins : 0;
+    int targetPlayerTotal = startPlayerTotal + coinsEarned;
+
+    float duration = 1f;
+    float elapsed = 0f;
+
+    while (elapsed < duration)
     {
-        int startPlayerTotal = playerInventory != null ? playerInventory.coins : 0;
-        int endPlayerTotal = startPlayerTotal + coinsEarned;
+        elapsed += Time.deltaTime;
+        float progress = elapsed / duration;
 
-        float duration = 1f;
-        float elapsed = 0f;
+        // Animate the earned coins counting down
+        int currentEarned = Mathf.RoundToInt(Mathf.Lerp(coinsEarned, 0, progress));
+        if (earnedCoinsText != null) earnedCoinsText.text = currentEarned.ToString();
 
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            float progress = elapsed / duration;
+        // Animate the total coins counting up (but don't actually modify inventory)
+        int animatedTotal = Mathf.RoundToInt(Mathf.Lerp(startPlayerTotal, targetPlayerTotal, progress));
+        if (playerTotalCoinsText != null) playerTotalCoinsText.text = animatedTotal.ToString();
 
-            int currentEarned = Mathf.RoundToInt(Mathf.Lerp(coinsEarned, 0, progress));
-            if (earnedCoinsText != null) earnedCoinsText.text = currentEarned.ToString();
-
-            int currentTotal = Mathf.RoundToInt(Mathf.Lerp(startPlayerTotal, endPlayerTotal, progress));
-            if (playerTotalCoinsText != null) playerTotalCoinsText.text = currentTotal.ToString();
-
-            yield return null;
-        }
-
-        if (earnedCoinsText != null) earnedCoinsText.text = "0";
-        if (playerTotalCoinsText != null) playerTotalCoinsText.text = endPlayerTotal.ToString();
+        yield return null;
     }
-    // ADD THIS TO YOUR ResultsManager class - Part 4
+
+    // Final animation state
+    if (earnedCoinsText != null) earnedCoinsText.text = "0";
+    
+    // Show the actual current coins (which may have been updated by FishingManager)
+    int actualCurrentCoins = playerInventory != null ? playerInventory.coins : targetPlayerTotal;
+    if (playerTotalCoinsText != null) playerTotalCoinsText.text = actualCurrentCoins.ToString();
+}
 
     void StartTreasurePhase()
+{
+    Debug.Log("Starting treasure phase");
+    
+    // NEW: Check if this player should get treasures (same logic as coins)
+    bool shouldGetTreasures = false;
+    if (Unity.Netcode.NetworkManager.Singleton != null)
     {
-        Debug.Log("Starting treasure phase");
-        
-        // FIX: Only give treasures if fishing was successful
-        if (fishingSuccess && caughtFish != null)
+        FishingManager fishingManager = FindFirstObjectByType<FishingManager>();
+        if (fishingManager != null)
         {
-            remainingTreasures = caughtFish.treasures;
+            ulong myClientId = Unity.Netcode.NetworkManager.Singleton.LocalClientId;
+            shouldGetTreasures = (myClientId == fishingManager.currentFishingPlayerId.Value);
+            Debug.Log($"TREASURE CHECK - My ID: {myClientId}, Fishing Player ID: {fishingManager.currentFishingPlayerId}, Should I get treasures? {shouldGetTreasures}");
         }
         else
         {
-            remainingTreasures = 0;
-        }
-        
-        Debug.Log($"Remaining treasures: {remainingTreasures}");
-        
-        if (remainingTreasures > 0)
-        {
-            ClearRewardCards();
-            
-            if (treasurePanel != null) treasurePanel.SetActive(true);
-            UpdateTreasureDisplay();
-            
-            if (gearChestButton != null)
-            {
-                gearChestButton.onClick.RemoveAllListeners();
-                gearChestButton.onClick.AddListener(() => OpenChest("gear"));
-            }
-            
-            if (actionChestButton != null)
-            {
-                actionChestButton.onClick.RemoveAllListeners();
-                actionChestButton.onClick.AddListener(() => OpenChest("action"));
-            }
-            
-            // Hide continue button during treasure phase
-            if (continueButton != null) continueButton.gameObject.SetActive(false);
-        }
-        else
-        {
-            treasurePhaseComplete = true;
-            currentPhase = 3;
-            UpdateContinueButtonText();
+            Debug.LogError("Could not find FishingManager!");
         }
     }
+    else
+    {
+        // Single player - always get treasures
+        shouldGetTreasures = true;
+        Debug.Log("Single player mode - getting treasures");
+    }
+    
+    // Only give treasures if fishing was successful AND this is the fishing player
+    if (fishingSuccess && caughtFish != null && shouldGetTreasures)
+    {
+        remainingTreasures = caughtFish.treasures;
+    }
+    else
+    {
+        remainingTreasures = 0;
+    }
+    
+    Debug.Log($"Remaining treasures: {remainingTreasures}");
+    
+    if (remainingTreasures > 0)
+    {
+        ClearRewardCards();
+        
+        if (treasurePanel != null) treasurePanel.SetActive(true);
+        UpdateTreasureDisplay();
+        
+        if (gearChestButton != null)
+        {
+            gearChestButton.onClick.RemoveAllListeners();
+            gearChestButton.onClick.AddListener(() => OpenChest("gear"));
+        }
+        
+        if (actionChestButton != null)
+        {
+            actionChestButton.onClick.RemoveAllListeners();
+            actionChestButton.onClick.AddListener(() => OpenChest("action"));
+        }
+        
+        // Hide continue button during treasure phase
+        if (continueButton != null) continueButton.gameObject.SetActive(false);
+    }
+    else
+    {
+        treasurePhaseComplete = true;
+        currentPhase = 3;
+        UpdateContinueButtonText();
+    }
+}
 
     void UpdateTreasureDisplay()
     {

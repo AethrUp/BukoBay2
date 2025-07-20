@@ -25,7 +25,7 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
     void Awake()
     {
-        Debug.Log($"CardDragDrop Awake called on {gameObject.name}");
+        // Debug.Log($"CardDragDrop Awake called on {gameObject.name}");
 
         rectTransform = GetComponent<RectTransform>();
         canvasGroup = GetComponent<CanvasGroup>();
@@ -52,11 +52,11 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
         if (playerInventory == null)
         {
-            Debug.LogError("Could not find PlayerInventory in scene!");
+            // Debug.LogError("Could not find PlayerInventory in scene!");
         }
         else
         {
-            Debug.Log("Found PlayerInventory successfully!");
+            // Debug.Log("Found PlayerInventory successfully!");
         }
 
         // Find the inventory display - but don't fail if it's not found yet
@@ -65,18 +65,18 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
             inventoryDisplay = FindFirstObjectByType<InventoryDisplay>();
             if (inventoryDisplay == null)
             {
-                Debug.LogWarning("InventoryDisplay not found in Awake, will try again later");
+                // Debug.LogWarning("InventoryDisplay not found in Awake, will try again later");
             }
         }
 
-        Debug.Log($"After Awake - GearCard: {(gearCard != null ? gearCard.gearName : "NULL")}");
+        // Debug.Log($"After Awake - GearCard: {(gearCard != null ? gearCard.gearName : "NULL")}");
     }
     public void OnPointerClick(PointerEventData eventData)
     {
         // Only handle clicks on gear cards (not action cards)
         if (gearCard == null) return;
 
-        Debug.Log($"Clicked on gear: {gearCard.gearName}");
+        // Debug.Log($"Clicked on gear: {gearCard.gearName}");
 
         // Find the gear comparison display
         GearComparisonDisplay comparisonDisplay = FindFirstObjectByType<GearComparisonDisplay>();
@@ -84,11 +84,11 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         if (comparisonDisplay != null)
         {
             comparisonDisplay.ShowGearComparison(gearCard);
-            Debug.Log($"Sent {gearCard.gearName} to comparison display");
+            // Debug.Log($"Sent {gearCard.gearName} to comparison display");
         }
         else
         {
-            Debug.LogError("Could not find GearComparisonDisplay component!");
+            // Debug.LogError("Could not find GearComparisonDisplay component!");
         }
     }
 
@@ -110,11 +110,11 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
         if (gearCard != null)
         {
-            Debug.Log($"Started dragging gear: {gearCard.gearName}");
+            // Debug.Log($"Started dragging gear: {gearCard.gearName}");
         }
         else if (actionCard != null)
         {
-            Debug.Log($"Started dragging action: {actionCard.actionName}");
+            // Debug.Log($"Started dragging action: {actionCard.actionName}");
         }
     }
 
@@ -128,9 +128,9 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        Debug.Log("=== OnEndDrag called ===");
-        Debug.Log($"GearCard: {(gearCard != null ? gearCard.gearName : "NULL")}");
-        Debug.Log($"ActionCard: {(actionCard != null ? actionCard.actionName : "NULL")}");
+        // Debug.Log("=== OnEndDrag called ===");
+        // Debug.Log($"GearCard: {(gearCard != null ? gearCard.gearName : "NULL")}");
+        // Debug.Log($"ActionCard: {(actionCard != null ? actionCard.actionName : "NULL")}");
 
         if (gearCard == null && actionCard == null) return;
 
@@ -151,7 +151,7 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
             ActionCardDropZone actionDropZone = GetActionDropZone(eventData);
             if (actionDropZone != null)
             {
-                Debug.Log($"Attempting to drop {actionCard.actionName} on action drop zone");
+                // Debug.Log($"Attempting to drop {actionCard.actionName} on action drop zone");
 
                 // Validate the drop first
                 bool canDrop = ValidateActionCardDrop(actionDropZone);
@@ -159,14 +159,14 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
                 if (canDrop)
                 {
                     // Let the ActionCardDropZone handle the drop
-                    Debug.Log($"Letting ActionCardDropZone handle {actionCard.actionName}");
+                    // Debug.Log($"Letting ActionCardDropZone handle {actionCard.actionName}");
                     actionDropZone.OnDrop(eventData);
                     shouldRefresh = false; // Don't refresh if card was successfully played
                 }
                 else
                 {
                     // Invalid drop - return to original position
-                    Debug.Log($"Invalid drop for {actionCard.actionName}, returning to original position");
+                    // Debug.Log($"Invalid drop for {actionCard.actionName}, returning to original position");
                     ReturnToOriginalPosition();
                 }
             }
@@ -174,7 +174,7 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
             {
                 // Invalid drop - return to original position
                 ReturnToOriginalPosition();
-                Debug.Log($"Invalid drop for {actionCard.actionName}, returning to original position");
+                // Debug.Log($"Invalid drop for {actionCard.actionName}, returning to original position");
             }
         }
 
@@ -203,13 +203,13 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         {
             // Valid drop - handle the gear movement
             HandleGearMove(dropZone);
-            Debug.Log($"Dropped {gearCard.gearName} on {dropZone.zoneName}");
+            // Debug.Log($"Dropped {gearCard.gearName} on {dropZone.zoneName}");
         }
         else
         {
             // Invalid drop - return to original position
             ReturnToOriginalPosition();
-            Debug.Log($"Invalid drop for {gearCard.gearName}, returning to original position");
+            // Debug.Log($"Invalid drop for {gearCard.gearName}, returning to original position");
         }
     }
 
@@ -227,20 +227,20 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         var raycastResults = new System.Collections.Generic.List<RaycastResult>();
         raycaster.Raycast(eventData, raycastResults);
 
-        Debug.Log($"Raycast found {raycastResults.Count} objects");
+        // Debug.Log($"Raycast found {raycastResults.Count} objects");
 
         foreach (var result in raycastResults)
         {
-            Debug.Log($"Raycast hit: {result.gameObject.name}");
+            // Debug.Log($"Raycast hit: {result.gameObject.name}");
             DropZone dropZone = result.gameObject.GetComponent<DropZone>();
             if (dropZone != null)
             {
-                Debug.Log($"Found DropZone: {dropZone.zoneName}");
+                // Debug.Log($"Found DropZone: {dropZone.zoneName}");
                 return dropZone;
             }
         }
 
-        Debug.Log("No DropZone found in raycast results");
+        // Debug.Log("No DropZone found in raycast results");
         return null;
     }
 
@@ -250,32 +250,32 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         var raycastResults = new System.Collections.Generic.List<RaycastResult>();
         raycaster.Raycast(eventData, raycastResults);
 
-        Debug.Log($"Raycast found {raycastResults.Count} results");
+        // Debug.Log($"Raycast found {raycastResults.Count} results");
 
         foreach (var raycastResult in raycastResults)
         {
-            Debug.Log($"Raycast hit: {raycastResult.gameObject.name}");
+            // Debug.Log($"Raycast hit: {raycastResult.gameObject.name}");
             ActionCardDropZone actionDropZone = raycastResult.gameObject.GetComponent<ActionCardDropZone>();
             if (actionDropZone != null)
             {
-                Debug.Log("Found ActionCardDropZone component!");
+                // Debug.Log("Found ActionCardDropZone component!");
                 return actionDropZone;
             }
         }
 
-        Debug.Log("No ActionCardDropZone found in raycast results");
+        // Debug.Log("No ActionCardDropZone found in raycast results");
         return null;
     }
 
     void HandleGearMove(DropZone dropZone)
     {
-        Debug.Log("=== HandleGearMove called ===");
-        Debug.Log($"PlayerInventory is: {(playerInventory != null ? "FOUND" : "NULL")}");
-        Debug.Log($"GearCard is: {(gearCard != null ? gearCard.gearName : "NULL")}");
-        Debug.Log($"DropZone is: {(dropZone != null ? dropZone.zoneName : "NULL")}");
+        // Debug.Log("=== HandleGearMove called ===");
+        // Debug.Log($"PlayerInventory is: {(playerInventory != null ? "FOUND" : "NULL")}");
+        // Debug.Log($"GearCard is: {(gearCard != null ? gearCard.gearName : "NULL")}");
+        // Debug.Log($"DropZone is: {(dropZone != null ? dropZone.zoneName : "NULL")}");
         if (playerInventory == null)
         {
-            Debug.LogError("PlayerInventory not assigned to CardDragDrop!");
+            // Debug.LogError("PlayerInventory not assigned to CardDragDrop!");
             ReturnToOriginalPosition();
             return;
         }
@@ -324,20 +324,20 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     FishingManager fishingManager = FindFirstObjectByType<FishingManager>();
     if (fishingManager == null || !fishingManager.isInteractionPhase)
     {
-        Debug.LogWarning("Cannot play action cards - not in interactive phase!");
+        // Debug.LogWarning("Cannot play action cards - not in interactive phase!");
         return false;
     }
     
     // Check if this card can target what this drop zone affects
     if (dropZone.targetsPlayer && !actionCard.canTargetPlayer)
     {
-        Debug.LogWarning($"{actionCard.actionName} cannot target players!");
+        // Debug.LogWarning($"{actionCard.actionName} cannot target players!");
         return false;
     }
     
     if (!dropZone.targetsPlayer && !actionCard.canTargetFish)
     {
-        Debug.LogWarning($"{actionCard.actionName} cannot target fish!");
+        // Debug.LogWarning($"{actionCard.actionName} cannot target fish!");
         return false;
     }
     
@@ -345,7 +345,7 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     int effectValue = dropZone.targetsPlayer ? actionCard.playerEffect : actionCard.fishEffect;
     if (effectValue == 0)
     {
-        Debug.LogWarning($"{actionCard.actionName} has no effect on {(dropZone.targetsPlayer ? "players" : "fish")}!");
+        // Debug.LogWarning($"{actionCard.actionName} has no effect on {(dropZone.targetsPlayer ? "players" : "fish")}!");
         return false;
     }
     
@@ -360,13 +360,13 @@ public class CardDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         {
             if (!interactiveUI.CanPlayerPlayMoreCards(playerId))
             {
-                Debug.LogWarning($"Player {playerId} has reached their card limit this turn!");
+                // Debug.LogWarning($"Player {playerId} has reached their card limit this turn!");
                 return false;
             }
         }
     }
     
-    Debug.Log($"Action card {actionCard.actionName} passed all validation checks");
+    // Debug.Log($"Action card {actionCard.actionName} passed all validation checks");
     return true;
 }
 }

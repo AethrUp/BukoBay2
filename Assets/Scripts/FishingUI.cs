@@ -165,8 +165,8 @@ public NetworkGameManager gameManager;
     // NEW: Track who is fishing
     if (NetworkManager.Singleton != null)
     {
-        fishingManager.currentFishingPlayerId = NetworkManager.Singleton.LocalClientId;
-        Debug.Log($"Player {fishingManager.currentFishingPlayerId} is fishing");
+        fishingManager.currentFishingPlayerId.Value = NetworkManager.Singleton.LocalClientId;
+        Debug.Log($"Player {fishingManager.currentFishingPlayerId.Value} is fishing");
     }
     
     // Setup fishing (calculates depth based on gear count)

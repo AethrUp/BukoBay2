@@ -98,7 +98,7 @@ public class InteractivePhaseUI : MonoBehaviour
         {
             currentFishingPlayer = NetworkManager.Singleton.LocalClientId;
             playerCardCounts.Clear();
-            Debug.Log($"Interactive phase started - Fishing player: {currentFishingPlayer}");
+            // Debug.Log($"Interactive phase started - Fishing player: {currentFishingPlayer}");
         }
 
         SetupActionCards();
@@ -131,7 +131,7 @@ public class InteractivePhaseUI : MonoBehaviour
     if (inventoryDisplay != null)
     {
         inventoryDisplay.RefreshDisplay();
-        Debug.Log("Refreshed inventory display for interactive phase");
+        // Debug.Log("Refreshed inventory display for interactive phase");
     }
 }
 
@@ -148,7 +148,7 @@ public class InteractivePhaseUI : MonoBehaviour
     void SelectActionCard(ActionCard actionCard)
     {
         selectedActionCard = actionCard;
-        Debug.Log($"Selected action card: {actionCard.actionName}");
+        // Debug.Log($"Selected action card: {actionCard.actionName}");
 
         // Update target buttons based on what this card can target
         UpdateTargetButtons();
@@ -174,7 +174,7 @@ public class InteractivePhaseUI : MonoBehaviour
 
         if (success)
         {
-            Debug.Log($"Successfully played {selectedActionCard.actionName}!");
+            // Debug.Log($"Successfully played {selectedActionCard.actionName}!");
 
             // TODO: Remove card from player's inventory
             // For now, just clear selection
@@ -287,7 +287,7 @@ public class InteractivePhaseUI : MonoBehaviour
 
     void SkipAction()
     {
-        Debug.Log("Player skipped their action this round");
+        // Debug.Log("Player skipped their action this round");
         // For now, just advance to next round
         // Later we might want to track who skipped for auto-win logic
         NextRound();
@@ -297,29 +297,29 @@ public class InteractivePhaseUI : MonoBehaviour
     public void OnInteractivePhaseEnd()
     {
         // Clear played action cards BEFORE hiding the phase
-        Debug.Log("Clearing played action cards from interactive phase end...");
+        // Debug.Log("Clearing played action cards from interactive phase end...");
 
         if (targetPlayerDropZone != null)
         {
-            Debug.Log("Clearing cards from Target Player drop zone");
+            // Debug.Log("Clearing cards from Target Player drop zone");
             targetPlayerDropZone.ClearPlayedCards();
         }
         else
         {
-            Debug.Log("Target Player drop zone is null!");
+            // Debug.Log("Target Player drop zone is null!");
         }
 
         if (targetFishDropZone != null)
         {
-            Debug.Log("Clearing cards from Target Fish drop zone");
+            // Debug.Log("Clearing cards from Target Fish drop zone");
             targetFishDropZone.ClearPlayedCards();
         }
         else
         {
-            Debug.Log("Target Fish drop zone is null!");
+            // Debug.Log("Target Fish drop zone is null!");
         }
 
-        Debug.Log("Finished clearing played action cards");
+        // Debug.Log("Finished clearing played action cards");
 
         // Now hide the phase
         HideInteractivePhase();
@@ -336,7 +336,7 @@ public class InteractivePhaseUI : MonoBehaviour
 
             tugOfWarBar.UpdateAll(fishingManager.playerStamina, fishingManager.fishStamina, powerDifference);
 
-            Debug.Log($"Initialized tug-of-war bar: Player Power {playerPower}, Fish Power {fishPower}, Difference {powerDifference}");
+            // Debug.Log($"Initialized tug-of-war bar: Player Power {playerPower}, Fish Power {fishPower}, Difference {powerDifference}");
         }
     }
 
@@ -366,7 +366,7 @@ public bool CanPlayerPlayMoreCards(ulong playerId)
     }
     
     bool canPlay = playerCardCounts[playerId] < maxCardsPerPlayerPerTurn;
-    Debug.Log($"Player {playerId} has played {playerCardCounts[playerId]}/{maxCardsPerPlayerPerTurn} cards this turn. Can play more: {canPlay}");
+    // Debug.Log($"Player {playerId} has played {playerCardCounts[playerId]}/{maxCardsPerPlayerPerTurn} cards this turn. Can play more: {canPlay}");
     
     return canPlay;
 }
@@ -379,6 +379,6 @@ public void RecordCardPlayed(ulong playerId)
     }
     
     playerCardCounts[playerId]++;
-    Debug.Log($"Player {playerId} has now played {playerCardCounts[playerId]}/{maxCardsPerPlayerPerTurn} cards this turn");
+    // Debug.Log($"Player {playerId} has now played {playerCardCounts[playerId]}/{maxCardsPerPlayerPerTurn} cards this turn");
 }
 }

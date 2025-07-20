@@ -40,11 +40,11 @@ public class FishingCountdownController : MonoBehaviour
     {
         if (isCountingDown)
         {
-            Debug.Log("Countdown already in progress!");
+            // Debug.Log("Countdown already in progress!");
             return;
         }
         
-        Debug.Log("Starting fishing countdown...");
+        // Debug.Log("Starting fishing countdown...");
         StartCoroutine(CountdownSequence());
     }
     
@@ -73,7 +73,7 @@ public class FishingCountdownController : MonoBehaviour
         // Phase 1: "Ready?"
         if (countdownText != null)
             countdownText.text = "Ready?";
-        Debug.Log("Countdown phase: Ready?");
+        // Debug.Log("Countdown phase: Ready?");
         
         // Play ready sound
         PlaySound(readySound);
@@ -94,7 +94,7 @@ public class FishingCountdownController : MonoBehaviour
         // Phase 2: "Set!"
         if (countdownText != null)
             countdownText.text = "Set!";
-        Debug.Log("Countdown phase: Set!");
+        // Debug.Log("Countdown phase: Set!");
         
         // Play set sound
         PlaySound(setSound);
@@ -115,7 +115,7 @@ public class FishingCountdownController : MonoBehaviour
         // Phase 3: "Go!"
         if (countdownText != null)
             countdownText.text = "Go!";
-        Debug.Log("Countdown phase: Go!");
+        // Debug.Log("Countdown phase: Go!");
         
         // Play go sound
         PlaySound(goSound);
@@ -151,6 +151,6 @@ public class FishingCountdownController : MonoBehaviour
         }
         
         isCountingDown = false;
-        Debug.Log("Countdown complete!");
+        // Debug.Log("Countdown complete!");
 }
 }

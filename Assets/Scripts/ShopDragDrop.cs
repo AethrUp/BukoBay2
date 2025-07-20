@@ -51,23 +51,23 @@ public class ShopItemDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     
     public void OnBeginDrag(PointerEventData eventData)
     {
-        Debug.Log($"OnBeginDrag called for item: {(shopItem != null ? shopItem.itemName : "NULL")}");
+        // Debug.Log($"OnBeginDrag called for item: {(shopItem != null ? shopItem.itemName : "NULL")}");
         
         if (shopItem == null) 
         {
-            Debug.LogError("ShopItem is null, cannot drag!");
+            // Debug.LogError("ShopItem is null, cannot drag!");
             return;
         }
         
         if (rectTransform == null)
         {
-            Debug.LogError("RectTransform is null!");
+            // Debug.LogError("RectTransform is null!");
             return;
         }
         
         if (canvasGroup == null)
         {
-            Debug.LogError("CanvasGroup is null!");
+            // Debug.LogError("CanvasGroup is null!");
             return;
         }
         
@@ -76,8 +76,8 @@ public class ShopItemDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         originalParent = transform.parent;
         originalSiblingIndex = transform.GetSiblingIndex();
         
-        Debug.Log($"Stored original position: {originalPosition}, parent: {originalParent.name}, sibling index: {originalSiblingIndex}");
-        Debug.Log($"Original parent contains '_Stack': {originalParent.name.Contains("_Stack")}");
+        // Debug.Log($"Stored original position: {originalPosition}, parent: {originalParent.name}, sibling index: {originalSiblingIndex}");
+        // Debug.Log($"Original parent contains '_Stack': {originalParent.name.Contains("_Stack")}");
         
         // Make the card semi-transparent while dragging
         canvasGroup.alpha = 0.6f;
@@ -87,34 +87,34 @@ public class ShopItemDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         if (canvas != null)
         {
             transform.SetParent(canvas.transform, true);
-            Debug.Log($"Moved to canvas: {canvas.name}");
-            Debug.Log($"After move - current parent: {transform.parent.name}, original parent still: {originalParent.name}");
+            // Debug.Log($"Moved to canvas: {canvas.name}");
+            // Debug.Log($"After move - current parent: {transform.parent.name}, original parent still: {originalParent.name}");
         }
         else
         {
-            Debug.LogError("Canvas is null, cannot move to top!");
+            // Debug.LogError("Canvas is null, cannot move to top!");
         }
         
-        Debug.Log($"Started dragging shop item: {shopItem.itemName}");
+        // Debug.Log($"Started dragging shop item: {shopItem.itemName}");
     }
     
     public void OnDrag(PointerEventData eventData)
     {
         if (shopItem == null) 
         {
-            Debug.LogError("OnDrag: ShopItem is null!");
+            // Debug.LogError("OnDrag: ShopItem is null!");
             return;
         }
         
         if (rectTransform == null)
         {
-            Debug.LogError("OnDrag: RectTransform is null!");
+            // Debug.LogError("OnDrag: RectTransform is null!");
             return;
         }
         
         if (canvas == null)
         {
-            Debug.LogError("OnDrag: Canvas is null!");
+            // Debug.LogError("OnDrag: Canvas is null!");
             return;
         }
         
@@ -124,7 +124,7 @@ public class ShopItemDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     
     public void OnEndDrag(PointerEventData eventData)
     {
-        Debug.Log($"OnEndDrag called for {(shopItem != null ? shopItem.itemName : "NULL")}");
+        // Debug.Log($"OnEndDrag called for {(shopItem != null ? shopItem.itemName : "NULL")}");
         
         if (shopItem == null) 
         {
@@ -141,40 +141,40 @@ public class ShopItemDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         
         if (purchaseZone != null)
         {
-            Debug.Log($"Dropped {shopItem.itemName} on purchase zone");
+            // Debug.Log($"Dropped {shopItem.itemName} on purchase zone");
             
             // The purchase zone will handle the actual purchase
             // We need to check if the purchase was successful
             ShopManager shopManager = purchaseZone.shopManager;
             if (shopManager != null)
             {
-                Debug.Log($"About to call PurchaseItem with originalParent: {(originalParent != null ? originalParent.name : "NULL")}");
+                // Debug.Log($"About to call PurchaseItem with originalParent: {(originalParent != null ? originalParent.name : "NULL")}");
                 
                 // IMPORTANT: Pass the original parent (stack container) to the shop manager
                 bool purchaseSuccessful = shopManager.PurchaseItem(shopItem, gameObject, originalParent);
                 
                 if (purchaseSuccessful)
                 {
-                    Debug.Log($"Purchase successful! Card will be destroyed by ShopManager.");
+                    // Debug.Log($"Purchase successful! Card will be destroyed by ShopManager.");
                     // Don't return to position - the card will be destroyed
                     // The ShopManager handles making the next card draggable
                 }
                 else
                 {
-                    Debug.Log($"Purchase failed, returning to original position");
+                    // Debug.Log($"Purchase failed, returning to original position");
                     ReturnToOriginalPosition();
                 }
             }
             else
             {
-                Debug.LogError("ShopManager not found on PurchaseDropZone!");
+                // Debug.LogError("ShopManager not found on PurchaseDropZone!");
                 ReturnToOriginalPosition();
             }
         }
         else
         {
             // Invalid drop - return to original position
-            Debug.Log($"Invalid drop for {shopItem.itemName}, returning to original position");
+            // Debug.Log($"Invalid drop for {shopItem.itemName}, returning to original position");
             ReturnToOriginalPosition();
         }
     }
@@ -185,26 +185,26 @@ public class ShopItemDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         var raycastResults = new System.Collections.Generic.List<RaycastResult>();
         raycaster.Raycast(eventData, raycastResults);
         
-        Debug.Log($"Shop item raycast found {raycastResults.Count} results");
+        // Debug.Log($"Shop item raycast found {raycastResults.Count} results");
         
         foreach (var raycastResult in raycastResults)
         {
-            Debug.Log($"Shop raycast hit: {raycastResult.gameObject.name}");
+            // Debug.Log($"Shop raycast hit: {raycastResult.gameObject.name}");
             PurchaseDropZone purchaseZone = raycastResult.gameObject.GetComponent<PurchaseDropZone>();
             if (purchaseZone != null)
             {
-                Debug.Log("Found PurchaseDropZone component!");
+                // Debug.Log("Found PurchaseDropZone component!");
                 return purchaseZone;
             }
         }
         
-        Debug.Log("No PurchaseDropZone found in raycast results");
+        // Debug.Log("No PurchaseDropZone found in raycast results");
         return null;
     }
     
     void ReturnToOriginalPosition()
     {
-        Debug.Log($"Returning {gameObject.name} to original position");
+        // Debug.Log($"Returning {gameObject.name} to original position");
         
         // Return to original parent and position
         if (originalParent != null)
@@ -224,11 +224,11 @@ public class ShopItemDragDrop : MonoBehaviour, IBeginDragHandler, IDragHandler, 
                 canvasGroup.blocksRaycasts = true;
             }
             
-            Debug.Log($"Returned {gameObject.name} to parent {originalParent.name} at position {originalPosition}");
+            // Debug.Log($"Returned {gameObject.name} to parent {originalParent.name} at position {originalPosition}");
         }
         else
         {
-            Debug.LogError("Original parent is null! Cannot return to position.");
+            // Debug.LogError("Original parent is null! Cannot return to position.");
         }
     }
 }

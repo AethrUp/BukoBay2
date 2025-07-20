@@ -41,18 +41,17 @@ public class FishingManager : NetworkBehaviour
     public InteractivePhaseUI interactiveUI;
     public FishingResultsManager resultsManager;
     [Header("Turn Tracking")]
-    public ulong currentFishingPlayerId = 0;
-
+public NetworkVariable<ulong> currentFishingPlayerId = new NetworkVariable<ulong>(0);
 
     void Start()
     {
-        Debug.Log("FishingManager Start() called");
+        // Debug.Log("FishingManager Start() called");
 
         LoadAllFishCards();
         // Debug: Check what PlayerInventory objects exist
         PlayerInventory[] allInventories = FindObjectsByType<PlayerInventory>(FindObjectsSortMode.None);
-        Debug.Log($"Found {allInventories.Length} PlayerInventory objects in scene");
-        Debug.Log($"PlayerInventory.Instance = {(PlayerInventory.Instance != null ? PlayerInventory.Instance.name : "NULL")}");
+        // Debug.Log($"Found {allInventories.Length} PlayerInventory objects in scene");
+        // Debug.Log($"PlayerInventory.Instance = {(PlayerInventory.Instance != null ? PlayerInventory.Instance.name : "NULL")}");
 
         // Find the persistent PlayerInventory if not assigned
         if (currentPlayer == null)
@@ -62,7 +61,7 @@ public class FishingManager : NetworkBehaviour
             {
                 currentPlayer = PlayerInventory.Instance;
             }
-            Debug.Log($"FishingManager found PlayerInventory: {(currentPlayer != null ? currentPlayer.name : "NOT FOUND")}");
+            // Debug.Log($"FishingManager found PlayerInventory: {(currentPlayer != null ? currentPlayer.name : "NOT FOUND")}");
         }
     }
 
@@ -82,12 +81,12 @@ public class FishingManager : NetworkBehaviour
             if (fish != null)
             {
                 allFishCards.Add(fish);
-                Debug.Log($"Loaded fish: {fish.fishName} at main depth {fish.mainDepth}, sub depth {fish.subDepth}");
+                // Debug.Log($"Loaded fish: {fish.fishName} at main depth {fish.mainDepth}, sub depth {fish.subDepth}");
             }
         }
 #endif
 
-        Debug.Log($"Loaded {allFishCards.Count} fish cards total");
+        // Debug.Log($"Loaded {allFishCards.Count} fish cards total");
     }
 
     public void SetupFishing()
@@ -102,8 +101,8 @@ public class FishingManager : NetworkBehaviour
         // Calculate required depth based on gear count
         CalculateRequiredDepthFromGearCount(gearCount);
 
-        Debug.Log($"Player has {gearCount} gear pieces");
-        Debug.Log($"Must cast at depth {requiredMinDepth}");
+        // Debug.Log($"Player has {gearCount} gear pieces");
+        // Debug.Log($"Must cast at depth {requiredMinDepth}");
     }
 
     int CountEquippedGear()
@@ -159,7 +158,7 @@ public class FishingManager : NetworkBehaviour
     {
         if (!CanCastAtDepth(depth))
         {
-            Debug.LogWarning($"Cannot cast at depth {depth}. Must cast at depth {requiredMinDepth}");
+            // Debug.LogWarning($"Cannot cast at depth {depth}. Must cast at depth {requiredMinDepth}");
             return;
         }
 
@@ -175,7 +174,7 @@ public class FishingManager : NetworkBehaviour
 
                 if (currentFish != null)
                 {
-                    Debug.Log($"Host selected fish: {currentFish.fishName} at depth {depth}");
+                    // Debug.Log($"Host selected fish: {currentFish.fishName} at depth {depth}");
 
                     // Tell all clients which fish was selected and start battle
                     StartBattleWithSpecificFishServerRpc(currentFish.fishName, currentFish.power, currentFish.coins, currentFish.treasures, depth);
@@ -639,73 +638,96 @@ public class FishingManager : NetworkBehaviour
     }
 
     void HandleSuccess()
-    {
-        Debug.Log($"SUCCESS! Player catches {currentFish.fishName}!");
-        Debug.Log($"Received {currentFish.coins} coins!");
+{
+    Debug.Log($"SUCCESS! Player catches {currentFish.fishName}!");
+    Debug.Log($"Received {currentFish.coins} coins!");
 
-        // IMPORTANT: Only the original fishing player gets coins
-        bool isOriginalFishingPlayer = false;
-        if (NetworkManager.Singleton != null)
+    // IMPORTANT: Only the original fishing player gets coins
+    bool isOriginalFishingPlayer = false;
+    if (NetworkManager.Singleton != null)
+    {
+        ulong myClientId = NetworkManager.Singleton.LocalClientId;
+        isOriginalFishingPlayer = (myClientId == currentFishingPlayerId.Value);
+        Debug.Log($"Checking coin rewards: My ID {myClientId}, Fishing Player ID {currentFishingPlayerId}, Am I fishing player? {isOriginalFishingPlayer}");
+    }
+    else
+    {
+        // Fallback for single player
+        isOriginalFishingPlayer = true;
+        Debug.Log("Single player mode - giving coins");
+    }
+
+    // Only give coins to the fishing player
+    if (isOriginalFishingPlayer)
+    {
+        Debug.Log("I AM the fishing player - attempting to give coins");
+        // Make sure we're updating MY inventory, not just any currentPlayer reference
+        PlayerInventory myInventory = FindFirstObjectByType<PlayerInventory>();
+        if (myInventory != null)
         {
-            ulong myClientId = NetworkManager.Singleton.LocalClientId;
-            isOriginalFishingPlayer = (myClientId == currentFishingPlayerId);
-            Debug.Log($"Checking coin rewards: My ID {myClientId}, Fishing Player ID {currentFishingPlayerId}, Am I fishing player? {isOriginalFishingPlayer}");
+            int coinsBefore = myInventory.coins;
+            myInventory.AddCoins(currentFish.coins);
+            int coinsAfter = myInventory.coins;
+            Debug.Log($"COINS UPDATED: {coinsBefore} -> {coinsAfter} (added {currentFish.coins})");
+            
+            // ADD THIS LINE:
+            Debug.Log($"After adding coins - PlayerInventory.Instance.coins = {PlayerInventory.Instance.coins}");
         }
         else
         {
-            // Fallback for single player
-            isOriginalFishingPlayer = true;
-        }
-
-        // Only give coins to the fishing player
-        if (isOriginalFishingPlayer && currentPlayer != null)
-        {
-            currentPlayer.AddCoins(currentFish.coins);
-            Debug.Log($"Fishing player received {currentFish.coins} coins!");
-        }
-
-        // Hide interactive UI for ALL players
-        if (interactiveUI != null)
-        {
-            interactiveUI.OnInteractivePhaseEnd();
-        }
-
-        // Hide the fish card panel for ALL players
-        FishingUI fishingUI = FindFirstObjectByType<FishingUI>();
-        if (fishingUI != null)
-        {
-            fishingUI.HideFishCard();
-        }
-
-        // Show results screen for ALL players
-        if (resultsManager != null)
-        {
-            resultsManager.ShowResults(true, currentFish, currentFish.coins, "");
-        }
-
-        // Reset fishing state
-        isInteractionPhase = false;
-
-        // Clear played action cards for ALL players
-        ActionCardDropZone[] successDropZones = FindObjectsByType<ActionCardDropZone>(FindObjectsSortMode.None);
-        foreach (ActionCardDropZone dropZone in successDropZones)
-        {
-            dropZone.ClearPlayedCards();
-        }
-
-        Debug.Log("Fishing phase ended successfully!");
-
-        // Advance to next player's turn (only host should do this)
-        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsHost)
-        {
-            NetworkGameManager turnManager = FindFirstObjectByType<NetworkGameManager>();
-            if (turnManager != null)
-            {
-                turnManager.NextTurnServerRpc();
-                Debug.Log("Advanced to next player's turn after fishing success");
-            }
+            Debug.LogError("Could not find my inventory!");
         }
     }
+    else
+    {
+        Debug.Log("I am NOT the fishing player - no coins for me");
+        
+        // ADD THIS DEBUG FOR NON-FISHING PLAYER TOO:
+        Debug.Log($"Non-fishing player sees PlayerInventory.Instance.coins = {PlayerInventory.Instance.coins}");
+    }
+
+    // Hide interactive UI for ALL players
+    if (interactiveUI != null)
+    {
+        interactiveUI.OnInteractivePhaseEnd();
+    }
+
+    // Hide the fish card panel for ALL players
+    FishingUI fishingUI = FindFirstObjectByType<FishingUI>();
+    if (fishingUI != null)
+    {
+        fishingUI.HideFishCard();
+    }
+
+    // Show results screen for ALL players
+    if (resultsManager != null)
+    {
+        resultsManager.ShowResults(true, currentFish, currentFish.coins, "");
+    }
+
+    // Reset fishing state
+    isInteractionPhase = false;
+
+    // Clear played action cards for ALL players
+    ActionCardDropZone[] successDropZones = FindObjectsByType<ActionCardDropZone>(FindObjectsSortMode.None);
+    foreach (ActionCardDropZone dropZone in successDropZones)
+    {
+        dropZone.ClearPlayedCards();
+    }
+
+    Debug.Log("Fishing phase ended successfully!");
+
+    // Advance to next player's turn (only host should do this)
+    if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsHost)
+    {
+        NetworkGameManager turnManager = FindFirstObjectByType<NetworkGameManager>();
+        if (turnManager != null)
+        {
+            turnManager.NextTurnServerRpc();
+            Debug.Log("Advanced to next player's turn after fishing success");
+        }
+    }
+}
 
     void HandleFailure()
     {
@@ -718,7 +740,7 @@ public class FishingManager : NetworkBehaviour
         if (NetworkManager.Singleton != null)
         {
             ulong myClientId = NetworkManager.Singleton.LocalClientId;
-            isOriginalFishingPlayer = (myClientId == currentFishingPlayerId);
+            isOriginalFishingPlayer = (myClientId == currentFishingPlayerId.Value);
             Debug.Log($"Checking gear damage: My ID {myClientId}, Fishing Player ID {currentFishingPlayerId}, Am I fishing player? {isOriginalFishingPlayer}");
         }
         else
@@ -1521,7 +1543,7 @@ public class FishingManager : NetworkBehaviour
         for (int i = 0; i <= 3; i++)
         {
             string depthName = i == 1 ? "Coast" : i == 2 ? "Ocean" : i == 3 ? "Abyss" : "Invalid";
-            Debug.Log($"Depth {i} ({depthName}): {depthCounts[i]} fish");
+            // Debug.Log($"Depth {i} ({depthName}): {depthCounts[i]} fish");
         }
     }
 
@@ -1531,7 +1553,7 @@ public class FishingManager : NetworkBehaviour
         // Quick test to verify tug-of-war integration
         if (interactiveUI != null && interactiveUI.tugOfWarBar != null)
         {
-            Debug.Log("Testing tug-of-war display...");
+            // Debug.Log("Testing tug-of-war display...");
 
             // Simulate a battle scenario
             playerStamina = 75;
@@ -1547,12 +1569,12 @@ public class FishingManager : NetworkBehaviour
                 int powerDiff = playerPower - fishPower;
 
                 interactiveUI.tugOfWarBar.UpdateAll(playerStamina, fishStamina, powerDiff);
-                Debug.Log($"Updated tug-of-war: Player {playerStamina} stamina, Fish {fishStamina} stamina, Power diff {powerDiff}");
+                // Debug.Log($"Updated tug-of-war: Player {playerStamina} stamina, Fish {fishStamina} stamina, Power diff {powerDiff}");
             }
         }
         else
         {
-            Debug.LogWarning("Tug-of-war bar not found! Make sure InteractivePhaseUI.tugOfWarBar is assigned.");
+            // Debug.LogWarning("Tug-of-war bar not found! Make sure InteractivePhaseUI.tugOfWarBar is assigned.");
         }
     }
 
@@ -1561,21 +1583,21 @@ public class FishingManager : NetworkBehaviour
     {
         if (currentPlayer == null || currentFish == null)
         {
-            Debug.LogWarning("No active fishing battle to debug!");
+            // Debug.LogWarning("No active fishing battle to debug!");
             return;
         }
 
-        Debug.Log("=== DETAILED POWER CALCULATION ===");
+        // Debug.Log("=== DETAILED POWER CALCULATION ===");
 
         // Calculate player power with detailed logging
         int basePower = currentPlayer.GetTotalPower();
-        Debug.Log($"Base gear power: {basePower}");
+        // Debug.Log($"Base gear power: {basePower}");
 
         int materialModifier = CalculateMaterialModifier();
-        Debug.Log($"Material modifier: {materialModifier:+0;-#;0}");
+        // Debug.Log($"Material modifier: {materialModifier:+0;-#;0}");
 
         int subDepthModifier = CalculateSubDepthGearModifier();
-        Debug.Log($"Sub-depth gear modifier: {subDepthModifier:+0;-#;0}");
+        // Debug.Log($"Sub-depth gear modifier: {subDepthModifier:+0;-#;0}");
 
         int playerPower = basePower + materialModifier + subDepthModifier + totalPlayerBuffs;
         Debug.Log($"Final player power: {basePower} + {materialModifier} + {subDepthModifier} + {totalPlayerBuffs} = {playerPower}");

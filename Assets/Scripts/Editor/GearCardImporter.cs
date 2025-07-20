@@ -50,7 +50,7 @@ public class GearCardImporter : EditorWindow
             return;
         }
         
-        Debug.Log("Starting updated gear card import...");
+        // Debug.Log("Starting updated gear card import...");
         
         // Create directories if they don't exist
         string cardsPath = "Assets/Cards";
@@ -64,11 +64,11 @@ public class GearCardImporter : EditorWindow
         
         // Read CSV file
         string csvContent = File.ReadAllText(csvFilePath);
-        Debug.Log($"CSV Content length: {csvContent.Length}");
+        // Debug.Log($"CSV Content length: {csvContent.Length}");
         
         // Split into lines and clean them
         string[] allLines = csvContent.Split('\n');
-        Debug.Log($"Total lines in file: {allLines.Length}");
+        // Debug.Log($"Total lines in file: {allLines.Length}");
         
         if (allLines.Length < 2) // Need header + at least one data line
         {
@@ -78,11 +78,11 @@ public class GearCardImporter : EditorWindow
         
         // Use the first line as headers (no number row in this CSV)
         string headerLine = allLines[0].Trim().Replace("\r", "");
-        Debug.Log($"Header line: '{headerLine}'");
+        // Debug.Log($"Header line: '{headerLine}'");
         
         // Parse CSV headers
         string[] headers = ParseCSVLine(headerLine);
-        Debug.Log($"Found {headers.Length} headers");
+        // Debug.Log($"Found {headers.Length} headers");
         
         // Find column indices
         int titleIndex = FindColumnIndex(headers, "Title");
@@ -96,7 +96,7 @@ public class GearCardImporter : EditorWindow
         int descriptionIndex = FindColumnIndex(headers, "Description");
         
         // Debug column indices
-        Debug.Log($"Column indices - Type: {typeIndex}, Item: {itemIndex}, Material: {materialIndex}, Power: {powerIndex}, Durability: {durabilityIndex}");
+        // Debug.Log($"Column indices - Type: {typeIndex}, Item: {itemIndex}, Material: {materialIndex}, Power: {powerIndex}, Durability: {durabilityIndex}");
         
         // Find depth effect indices (D1-D9)
         int[] depthIndices = new int[9];
@@ -114,14 +114,14 @@ public class GearCardImporter : EditorWindow
             string line = allLines[lineIndex].Trim().Replace("\r", "");
             if (string.IsNullOrEmpty(line)) continue;
             
-            Debug.Log($"Processing line {lineIndex}");
+            // Debug.Log($"Processing line {lineIndex}");
             
             // Parse CSV line
             string[] values = ParseCSVLine(line);
             
             if (values.Length < 20) // Need at least through D9 column
             {
-                Debug.LogWarning($"Line {lineIndex} has too few values ({values.Length}), skipping");
+                // Debug.LogWarning($"Line {lineIndex} has too few values ({values.Length}), skipping");
                 skippedCount++;
                 continue;
             }
@@ -130,12 +130,12 @@ public class GearCardImporter : EditorWindow
             string gearName = GetValue(values, itemIndex);
             if (string.IsNullOrEmpty(gearName))
             {
-                Debug.LogWarning($"Line {lineIndex} has empty gear name, skipping");
+                // Debug.LogWarning($"Line {lineIndex} has empty gear name, skipping");
                 skippedCount++;
                 continue;
             }
             
-            Debug.Log($"Creating updated gear card for: '{gearName}'");
+            // Debug.Log($"Creating updated gear card for: '{gearName}'");
             
             // Create new GearCard
             GearCard gearCard = ScriptableObject.CreateInstance<GearCard>();
@@ -176,7 +176,7 @@ public class GearCardImporter : EditorWindow
             if (gearSprite != null)
             {
                 gearCard.gearImage = gearSprite;
-                Debug.Log($"Found image for {gearName}");
+                // Debug.Log($"Found image for {gearName}");
             }
             
             // Create safe filename
@@ -191,7 +191,7 @@ public class GearCardImporter : EditorWindow
             string fileName = $"{safeFileName}.asset";
             string assetPath = $"{gearPath}/{fileName}";
             
-            Debug.Log($"Creating asset at: {assetPath}");
+            // Debug.Log($"Creating asset at: {assetPath}");
             
             AssetDatabase.CreateAsset(gearCard, assetPath);
             importedCount++;
@@ -200,7 +200,7 @@ public class GearCardImporter : EditorWindow
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         
-        Debug.Log($"Import complete! Created {importedCount} updated gear cards, skipped {skippedCount} rows");
+        // Debug.Log($"Import complete! Created {importedCount} updated gear cards, skipped {skippedCount} rows");
         EditorUtility.DisplayDialog("Import Complete", 
             $"Successfully imported {importedCount} updated gear cards.\nSkipped {skippedCount} rows.\nSee console for details.", "OK");
     }
