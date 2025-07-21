@@ -657,27 +657,23 @@ public NetworkVariable<ulong> currentFishingPlayerId = new NetworkVariable<ulong
         Debug.Log("Single player mode - giving coins");
     }
 
-    // Only give coins to the fishing player
-    if (isOriginalFishingPlayer)
+  // Only give coins to the fishing player
+if (isOriginalFishingPlayer)
+{
+    Debug.Log("I AM the fishing player - attempting to give coins");
+    // Use the persistent PlayerInventory.Instance instead of finding any random one
+    if (PlayerInventory.Instance != null)
     {
-        Debug.Log("I AM the fishing player - attempting to give coins");
-        // Make sure we're updating MY inventory, not just any currentPlayer reference
-        PlayerInventory myInventory = FindFirstObjectByType<PlayerInventory>();
-        if (myInventory != null)
-        {
-            int coinsBefore = myInventory.coins;
-            myInventory.AddCoins(currentFish.coins);
-            int coinsAfter = myInventory.coins;
-            Debug.Log($"COINS UPDATED: {coinsBefore} -> {coinsAfter} (added {currentFish.coins})");
-            
-            // ADD THIS LINE:
-            Debug.Log($"After adding coins - PlayerInventory.Instance.coins = {PlayerInventory.Instance.coins}");
-        }
-        else
-        {
-            Debug.LogError("Could not find my inventory!");
-        }
+        int coinsBefore = PlayerInventory.Instance.coins;
+        PlayerInventory.Instance.AddCoins(currentFish.coins);
+        int coinsAfter = PlayerInventory.Instance.coins;
+        Debug.Log($"COINS UPDATED: {coinsBefore} -> {coinsAfter} (added {currentFish.coins})");
     }
+    else
+    {
+        Debug.LogError("Could not find PlayerInventory.Instance!");
+    }
+}
     else
     {
         Debug.Log("I am NOT the fishing player - no coins for me");
@@ -1074,30 +1070,29 @@ public NetworkVariable<ulong> currentFishingPlayerId = new NetworkVariable<ulong
 
         return true;
     }
-    // NEW: Network RPC to sync action card plays across all clients
     [ServerRpc(RequireOwnership = false)]
-    public void PlayActionCardServerRpc(string cardName, bool targetingPlayer, int playerEffect, int fishEffect, ulong playerId)
-    {
-        Debug.Log($"Server received action card play: {cardName} from player {playerId}");
+public void PlayActionCardServerRpc(string cardName, bool targetingPlayer, int playerEffect, int fishEffect, ulong playerId)
+{
+    Debug.Log($"Server received action card play: {cardName} from player {playerId}");
 
-        // Apply the effect on the server
-        ApplyActionCardEffect(cardName, targetingPlayer, playerEffect, fishEffect, playerId);
+    // Apply the effect ONLY on the server
+    ApplyActionCardEffect(cardName, targetingPlayer, playerEffect, fishEffect, playerId);
 
-        // Tell all clients about this card play (both effect AND visual)
-        NotifyActionCardPlayedClientRpc(cardName, targetingPlayer, playerEffect, fishEffect, playerId);
+    // Tell all clients about this card play (both effect AND visual)
+    NotifyActionCardPlayedClientRpc(cardName, targetingPlayer, playerEffect, fishEffect, playerId);
 
-        // Show the visual card for all players
-        ShowPlayedActionCardClientRpc(cardName, targetingPlayer, playerId, playerEffect, fishEffect);
-    }
+    // Show the visual card for all players
+    ShowPlayedActionCardClientRpc(cardName, targetingPlayer, playerId, playerEffect, fishEffect);
+}
 
-    [ClientRpc]
-    public void NotifyActionCardPlayedClientRpc(string cardName, bool targetingPlayer, int playerEffect, int fishEffect, ulong playerId)
-    {
-        Debug.Log($"All clients notified: Player {playerId} played {cardName}");
+[ClientRpc]
+public void NotifyActionCardPlayedClientRpc(string cardName, bool targetingPlayer, int playerEffect, int fishEffect, ulong playerId)
+{
+    Debug.Log($"All clients notified: Player {playerId} played {cardName}");
 
-        // Apply the effect on all clients
-        ApplyActionCardEffect(cardName, targetingPlayer, playerEffect, fishEffect, playerId);
-    }
+    // DO NOT apply the effect here - that's done on the server only
+    // This RPC is just for notification/logging purposes
+}
     [ClientRpc]
     public void UpdateStaminaForAllPlayersClientRpc(int newPlayerStamina, int newFishStamina, int playerBuffs, int fishBuffs)
     {
@@ -1656,24 +1651,31 @@ public void DebugPowerSync()
     Debug.Log("=== END POWER DEBUG ===");
 }
 
-// Simple sync method without string arrays
+    // Simple sync method without string arrays
+    [ServerRpc(RequireOwnership = false)]
+    public void ForceSyncBattleStateServerRpc()
+    {
+        Debug.Log("Host: Force syncing battle state to all clients");
+
+        // Send just the critical numbers for now
+        SyncBattleNumbersClientRpc(
+            currentRound,
+            playerStamina,
+            fishStamina,
+            totalPlayerBuffs,
+            totalFishBuffs,
+            appliedEffects.Count
+        );
+    }
+
 [ServerRpc(RequireOwnership = false)]
-public void ForceSyncBattleStateServerRpc()
+public void SetFishingPlayerServerRpc(ulong playerId)
 {
-    Debug.Log("Host: Force syncing battle state to all clients");
-    
-    // Send just the critical numbers for now
-    SyncBattleNumbersClientRpc(
-        currentRound,
-        playerStamina,
-        fishStamina,
-        totalPlayerBuffs,
-        totalFishBuffs,
-        appliedEffects.Count
-    );
+    Debug.Log($"Host: Setting fishing player to {playerId}");
+    currentFishingPlayerId.Value = playerId;
 }
 
-[ClientRpc]
+    [ClientRpc]
 public void SyncBattleNumbersClientRpc(int round, int pStamina, int fStamina, int pBuffs, int fBuffs, int effectCount)
 {
     Debug.Log($"Client: Received battle numbers sync");

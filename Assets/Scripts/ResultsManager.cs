@@ -94,7 +94,8 @@ public class FishingResultsManager : MonoBehaviour
         {
             ulong myClientId = Unity.Netcode.NetworkManager.Singleton.LocalClientId;
             shouldGetCoins = (myClientId == fishingManager.currentFishingPlayerId.Value);
-            Debug.Log($"COIN CHECK - My ID: {myClientId}, Fishing Player ID: {fishingManager.currentFishingPlayerId}, Should I get coins? {shouldGetCoins}");
+            Debug.Log($"COIN CHECK - My ID: {myClientId}, Fishing Player ID: {fishingManager.currentFishingPlayerId.Value}, Should I get coins? {shouldGetCoins}");
+
         }
         else
         {
@@ -435,7 +436,7 @@ public class FishingResultsManager : MonoBehaviour
         {
             ulong myClientId = Unity.Netcode.NetworkManager.Singleton.LocalClientId;
             shouldGetTreasures = (myClientId == fishingManager.currentFishingPlayerId.Value);
-            Debug.Log($"TREASURE CHECK - My ID: {myClientId}, Fishing Player ID: {fishingManager.currentFishingPlayerId}, Should I get treasures? {shouldGetTreasures}");
+            Debug.Log($"TREASURE CHECK - My ID: {myClientId}, Fishing Player ID: {fishingManager.currentFishingPlayerId.Value}, Should I get treasures? {shouldGetTreasures}");
         }
         else
         {

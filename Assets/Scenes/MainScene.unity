@@ -164,7 +164,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000061035156, y: -12.9999695}
+  m_AnchoredPosition: {x: -0.000061035156, y: -13}
   m_SizeDelta: {x: -426.14, y: -120.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &980835
@@ -7183,10 +7183,13 @@ MonoBehaviour:
   equippedExtra2: {fileID: 0}
   extraGear: []
   actionCards:
-  - {fileID: 11400000, guid: 7cfd0b053e7f5eb428426c3a55e3e03f, type: 2}
+  - {fileID: 11400000, guid: 2c145b28cc658204e930884270d835c5, type: 2}
   - {fileID: 11400000, guid: 7cfd0b053e7f5eb428426c3a55e3e03f, type: 2}
   - {fileID: 11400000, guid: 00cc6a12d2799ae4ba4e70ba96b0d030, type: 2}
-  - {fileID: 11400000, guid: 00cc6a12d2799ae4ba4e70ba96b0d030, type: 2}
+  - {fileID: 11400000, guid: 4b1efa1cc3ee5f04eab2e985dfab0af2, type: 2}
+  - {fileID: 11400000, guid: 89b96cec832c63e4c8c2be505737a345, type: 2}
+  - {fileID: 11400000, guid: b7ad755f83d773d4596885ae78c078c8, type: 2}
+  - {fileID: 11400000, guid: 03d60bac9f6b4954384bc77b5f640659, type: 2}
   effectCards:
   - {fileID: 0}
   coins: 200

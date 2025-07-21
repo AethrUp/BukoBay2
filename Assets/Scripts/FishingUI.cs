@@ -162,12 +162,13 @@ public NetworkGameManager gameManager;
 
     Debug.Log("=== STARTING FISHING COUNTDOWN ===");
     
-    // NEW: Track who is fishing
-    if (NetworkManager.Singleton != null)
-    {
-        fishingManager.currentFishingPlayerId.Value = NetworkManager.Singleton.LocalClientId;
-        Debug.Log($"Player {fishingManager.currentFishingPlayerId.Value} is fishing");
-    }
+    // NEW: Track who is fishing - use ServerRpc so host can set it
+if (NetworkManager.Singleton != null)
+{
+    ulong myPlayerId = NetworkManager.Singleton.LocalClientId;
+    fishingManager.SetFishingPlayerServerRpc(myPlayerId);
+    Debug.Log($"Requesting host to set fishing player to {myPlayerId}");
+}
     
     // Setup fishing (calculates depth based on gear count)
     fishingManager.SetupFishing();

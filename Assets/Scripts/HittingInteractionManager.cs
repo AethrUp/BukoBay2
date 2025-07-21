@@ -179,19 +179,24 @@ public class HittingInteractionManager : NetworkBehaviour
         return positions;
     }
     
-    [ClientRpc]
-    public void StartHittingForAllClientsClientRpc(string actionCardName, bool targetPlayer, ulong playerId, Vector2[] targetPositions, int targetCount)
+[ClientRpc]
+public void StartHittingForAllClientsClientRpc(string actionCardName, bool targetPlayer, ulong playerId, Vector2[] targetPositions, int targetCount)
+{
+    Debug.Log($"CLIENT: StartHittingForAllClientsClientRpc received - {actionCardName}, {targetPositions.Length} targets");
+    
+    // Set hitting state using the provided data instead of trying to find the action card
+    isHittingActive.Value = true;
+    hittingPlayerId.Value = playerId;
+    targetingPlayer = targetPlayer;
+    remainingTargets = targetPositions.Length;
+    
+    Debug.Log($"CLIENT: Set hitting state - targeting {(targetPlayer ? "player" : "fish")}, {remainingTargets} targets");
+    
+    // ONLY CREATE CROSSHAIRS FOR THE ACTING PLAYER
+    ulong myClientId = NetworkManager.Singleton.LocalClientId;
+    if (myClientId == playerId)
     {
-        Debug.Log($"CLIENT: StartHittingForAllClientsClientRpc received - {actionCardName}, {targetPositions.Length} targets");
-        
-        // Set hitting state using the provided data instead of trying to find the action card
-        isHittingActive.Value = true;
-        hittingPlayerId.Value = playerId;
-        targetingPlayer = targetPlayer;
-        remainingTargets = targetPositions.Length;
-        
-        Debug.Log($"CLIENT: Set hitting state - targeting {(targetPlayer ? "player" : "fish")}, {remainingTargets} targets");
-        
+        Debug.Log($"CLIENT: I am the acting player ({playerId}) - creating crosshairs");
         // Create first crosshair
         if (targetPositions.Length > 0)
         {
@@ -203,12 +208,24 @@ public class HittingInteractionManager : NetworkBehaviour
         {
             Debug.LogError("CLIENT: No target positions provided!");
         }
-        
+    }
+    else
+    {
+        Debug.Log($"CLIENT: I am NOT the acting player (I'm {myClientId}, acting player is {playerId}) - no crosshairs for me");
+    }
+    
+    // ONLY START THE HITTING SEQUENCE FOR THE ACTING PLAYER
+    if (myClientId == playerId)
+    {
         // Store remaining positions for sequence
         StartCoroutine(HittingSequence(targetPositions));
-        
         Debug.Log($"CLIENT: Hitting sequence started - {remainingTargets} targets to hit");
     }
+    else
+    {
+        Debug.Log($"CLIENT: I am not the acting player - no hitting sequence for me");
+    }
+}
     
     IEnumerator HittingSequence(Vector2[] positions)
     {
@@ -322,32 +339,50 @@ public class HittingInteractionManager : NetworkBehaviour
         // Play hit effect, update UI, etc.
         Debug.Log("All clients: Crosshair was hit");
     }
-    
+
     void FinishHittingSequence()
+{
+    Debug.Log("Hitting sequence complete!");
+    
+    // Apply the action card effect through existing system
+    if (currentActionCard != null && fishingManager != null)
     {
-        Debug.Log("Hitting sequence complete!");
-        
-        // Apply the action card effect through existing system
-        if (currentActionCard != null && fishingManager != null)
-        {
-            bool success = fishingManager.PlayActionCard(currentActionCard, targetingPlayer);
-            Debug.Log($"Applied hitting effect: {success}");
-        }
-        
-        // Reset state
-        isHittingActive.Value = false;
-        hittingPlayerId.Value = 0;
-        currentActionCard = null;
-        remainingTargets = 0;
-        
-        // Clear any remaining crosshairs
-        foreach (GameObject crosshair in activeCrosshairs)
-        {
-            if (crosshair != null) Destroy(crosshair);
-        }
-        activeCrosshairs.Clear();
+        bool success = fishingManager.PlayActionCard(currentActionCard, targetingPlayer);
+        Debug.Log($"Applied hitting effect: {success}");
     }
     
+    // Tell all clients to clean up
+    if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsHost)
+    {
+        CleanupHittingForAllClientsClientRpc();
+    }
+    
+    // Reset state locally
+    ResetHittingState();
+}
+
+[ClientRpc]
+void CleanupHittingForAllClientsClientRpc()
+{
+    Debug.Log("All clients: Cleaning up hitting sequence");
+    ResetHittingState();
+}
+
+void ResetHittingState()
+{
+    // Reset state
+    isHittingActive.Value = false;
+    hittingPlayerId.Value = 0;
+    currentActionCard = null;
+    remainingTargets = 0;
+    
+    // Clear any remaining crosshairs
+    foreach (GameObject crosshair in activeCrosshairs)
+    {
+        if (crosshair != null) Destroy(crosshair);
+    }
+    activeCrosshairs.Clear();
+}
     // Helper method to find ActionCard by name
     ActionCard FindActionCardByName(string cardName)
     {
