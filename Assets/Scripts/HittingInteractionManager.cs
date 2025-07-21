@@ -18,7 +18,7 @@ public class HittingInteractionManager : NetworkBehaviour
     [Header("Settings")]
     public float targetAreaWidth = 200f;        // How wide the target area is
     public float targetAreaHeight = 300f;       // How tall the target area is
-    public float crosshairSize = 30f;           // Size of crosshair targets
+    public float crosshairSize = 80f;           // Size of crosshair targets (increased from 30f)
     
     [Header("Game References")]
     public FishingManager fishingManager;
@@ -32,6 +32,12 @@ public class HittingInteractionManager : NetworkBehaviour
     // Network variables for syncing hitting state
     public NetworkVariable<bool> isHittingActive = new NetworkVariable<bool>(false);
     public NetworkVariable<ulong> hittingPlayerId = new NetworkVariable<ulong>(0);
+    
+    public override void OnNetworkSpawn()
+    {
+        Debug.Log($"HittingInteractionManager spawned - IsHost: {IsHost}, IsClient: {IsClient}");
+        base.OnNetworkSpawn();
+    }
     
     void Start()
     {
@@ -72,9 +78,45 @@ public class HittingInteractionManager : NetworkBehaviour
             return false;
         }
         
-        // Start hitting sequence
+        // Use RPC system for networking
         StartHittingServerRpc(actionCard.actionName, targetPlayer, playerId);
+        
         return true;
+    }
+    
+    /// <summary>
+    /// Handle hitting sequence locally for single player
+    /// </summary>
+    void StartHittingLocally(ActionCard actionCard, bool targetPlayer)
+    {
+        // Calculate number of targets needed
+        int targetCount = targetPlayer ? Mathf.Abs(actionCard.playerEffect) : Mathf.Abs(actionCard.fishEffect);
+        
+        if (targetCount <= 0)
+        {
+            Debug.LogWarning($"No targets needed for {actionCard.actionName}");
+            return;
+        }
+        
+        // Generate random target positions
+        Vector2[] targetPositions = GenerateTargetPositions(targetCount, targetPlayer);
+        
+        // Set hitting state locally
+        isHittingActive.Value = true;
+        currentActionCard = actionCard;
+        targetingPlayer = targetPlayer;
+        remainingTargets = targetPositions.Length;
+        
+        // Create first crosshair
+        if (targetPositions.Length > 0)
+        {
+            CreateNextCrosshair(targetPositions[0]);
+        }
+        
+        // Start sequence
+        StartCoroutine(HittingSequence(targetPositions));
+        
+        Debug.Log($"Single player hitting sequence started - {remainingTargets} targets to hit");
     }
     
 
@@ -82,9 +124,13 @@ public class HittingInteractionManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void StartHittingServerRpc(string actionCardName, bool targetPlayer, ulong playerId)
     {
-        if (!IsHost) return;
+        Debug.Log($"HOST: StartHittingServerRpc called - {actionCardName}, targeting {(targetPlayer ? "player" : "fish")}");
         
-        Debug.Log($"Host: Starting hitting sequence - {actionCardName}, targeting {(targetPlayer ? "player" : "fish")}");
+        if (!IsHost) 
+        {
+            Debug.LogWarning("StartHittingServerRpc called but not host!");
+            return;
+        }
         
         // Find the action card
         ActionCard actionCard = FindActionCardByName(actionCardName);
@@ -94,8 +140,12 @@ public class HittingInteractionManager : NetworkBehaviour
             return;
         }
         
+        Debug.Log($"HOST: Found action card {actionCard.actionName}");
+        
         // Calculate number of targets needed
         int targetCount = targetPlayer ? Mathf.Abs(actionCard.playerEffect) : Mathf.Abs(actionCard.fishEffect);
+        
+        Debug.Log($"HOST: Target count calculated as {targetCount}");
         
         if (targetCount <= 0)
         {
@@ -106,8 +156,12 @@ public class HittingInteractionManager : NetworkBehaviour
         // Generate random target positions
         Vector2[] targetPositions = GenerateTargetPositions(targetCount, targetPlayer);
         
+        Debug.Log($"HOST: Generated {targetPositions.Length} target positions");
+        
         // Start hitting for all clients
-        StartHittingForAllClientsClientRpc(actionCardName, targetPlayer, playerId, targetPositions);
+        StartHittingForAllClientsClientRpc(actionCardName, targetPlayer, playerId, targetPositions, targetCount);
+        
+        Debug.Log($"HOST: Sent ClientRpc to all players");
     }
     
     Vector2[] GenerateTargetPositions(int count, bool onPlayer)
@@ -126,31 +180,34 @@ public class HittingInteractionManager : NetworkBehaviour
     }
     
     [ClientRpc]
-    public void StartHittingForAllClientsClientRpc(string actionCardName, bool targetPlayer, ulong playerId, Vector2[] targetPositions)
+    public void StartHittingForAllClientsClientRpc(string actionCardName, bool targetPlayer, ulong playerId, Vector2[] targetPositions, int targetCount)
     {
-        Debug.Log($"All clients: Starting hitting sequence for {actionCardName}");
+        Debug.Log($"CLIENT: StartHittingForAllClientsClientRpc received - {actionCardName}, {targetPositions.Length} targets");
         
-        // Find the action card
-        ActionCard actionCard = FindActionCardByName(actionCardName);
-        if (actionCard == null) return;
-        
-        // Set hitting state
+        // Set hitting state using the provided data instead of trying to find the action card
         isHittingActive.Value = true;
         hittingPlayerId.Value = playerId;
-        currentActionCard = actionCard;
         targetingPlayer = targetPlayer;
         remainingTargets = targetPositions.Length;
+        
+        Debug.Log($"CLIENT: Set hitting state - targeting {(targetPlayer ? "player" : "fish")}, {remainingTargets} targets");
         
         // Create first crosshair
         if (targetPositions.Length > 0)
         {
+            Debug.Log($"CLIENT: About to create first crosshair at position {targetPositions[0]}");
             CreateNextCrosshair(targetPositions[0]);
+            Debug.Log($"CLIENT: First crosshair creation attempted");
+        }
+        else
+        {
+            Debug.LogError("CLIENT: No target positions provided!");
         }
         
         // Store remaining positions for sequence
         StartCoroutine(HittingSequence(targetPositions));
         
-        Debug.Log($"Hitting sequence started - {remainingTargets} targets to hit");
+        Debug.Log($"CLIENT: Hitting sequence started - {remainingTargets} targets to hit");
     }
     
     IEnumerator HittingSequence(Vector2[] positions)
@@ -176,18 +233,28 @@ public class HittingInteractionManager : NetworkBehaviour
     
     void CreateNextCrosshair(Vector2 localPosition)
     {
-        if (crosshairPrefab == null) return;
+        Debug.Log($"CLIENT: CreateNextCrosshair called at position {localPosition}");
+        
+        if (crosshairPrefab == null) 
+        {
+            Debug.LogError("CLIENT: Crosshair prefab is null!");
+            return;
+        }
         
         // Choose parent based on target
         Transform parentTransform = targetingPlayer ? playerTargetArea : fishTargetArea;
         if (parentTransform == null)
         {
-            Debug.LogError($"No target area found for {(targetingPlayer ? "player" : "fish")}");
+            Debug.LogError($"CLIENT: No target area found for {(targetingPlayer ? "player" : "fish")}");
             return;
         }
         
+        Debug.Log($"CLIENT: Using parent transform: {parentTransform.name}");
+        
         // Create crosshair
         GameObject crosshair = Instantiate(crosshairPrefab, parentTransform);
+        
+        Debug.Log($"CLIENT: Created crosshair object: {crosshair.name}");
         
         // Position it
         RectTransform rectTransform = crosshair.GetComponent<RectTransform>();
@@ -195,6 +262,11 @@ public class HittingInteractionManager : NetworkBehaviour
         {
             rectTransform.anchoredPosition = localPosition;
             rectTransform.sizeDelta = Vector2.one * crosshairSize;
+            Debug.Log($"CLIENT: Positioned crosshair at {localPosition} with size {crosshairSize}");
+        }
+        else
+        {
+            Debug.LogWarning("CLIENT: Crosshair has no RectTransform!");
         }
         
         // Add click handler
@@ -202,12 +274,25 @@ public class HittingInteractionManager : NetworkBehaviour
         if (targetScript == null)
         {
             targetScript = crosshair.AddComponent<CrosshairTarget>();
+            Debug.Log($"CLIENT: Added CrosshairTarget component to {crosshair.name}");
         }
         targetScript.Initialize(this);
         
+        // Make sure it's clickable
+        UnityEngine.UI.Image image = crosshair.GetComponent<UnityEngine.UI.Image>();
+        if (image != null)
+        {
+            image.raycastTarget = true;
+            Debug.Log($"CLIENT: Set raycastTarget = true on crosshair image");
+        }
+        else
+        {
+            Debug.LogWarning($"CLIENT: No Image component found on crosshair!");
+        }
+        
         activeCrosshairs.Add(crosshair);
         
-        Debug.Log($"Created crosshair at {localPosition}");
+        Debug.Log($"CLIENT: Crosshair setup complete. Active crosshairs: {activeCrosshairs.Count}");
     }
     
     public void OnCrosshairHit(GameObject crosshair)
@@ -223,7 +308,7 @@ public class HittingInteractionManager : NetworkBehaviour
         remainingTargets--;
         
         // Notify all clients of the hit
-        if (NetworkManager.Singleton.IsHost)
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsHost)
         {
             CrosshairHitClientRpc();
         }
@@ -266,6 +351,12 @@ public class HittingInteractionManager : NetworkBehaviour
     // Helper method to find ActionCard by name
     ActionCard FindActionCardByName(string cardName)
     {
+        // First try to get it from the current action card (passed from client)
+        if (currentActionCard != null && currentActionCard.actionName == cardName)
+        {
+            return currentActionCard;
+        }
+        
         #if UNITY_EDITOR
         string[] actionGuids = UnityEditor.AssetDatabase.FindAssets($"{cardName} t:ActionCard");
         
@@ -276,6 +367,7 @@ public class HittingInteractionManager : NetworkBehaviour
         }
         #endif
         
+        Debug.LogWarning($"Could not find ActionCard: {cardName}");
         return null;
     }
 }
@@ -289,18 +381,34 @@ public class CrosshairTarget : MonoBehaviour, UnityEngine.EventSystems.IPointerC
     {
         manager = hittingManager;
         
+        Debug.Log($"CrosshairTarget initialized on {gameObject.name}");
+        
         // Make sure we have a graphic for raycasting
-        if (GetComponent<UnityEngine.UI.Image>() == null)
+        UnityEngine.UI.Image image = GetComponent<UnityEngine.UI.Image>();
+        if (image == null)
         {
-            gameObject.AddComponent<UnityEngine.UI.Image>();
+            image = gameObject.AddComponent<UnityEngine.UI.Image>();
+            Debug.Log($"Added Image component to {gameObject.name}");
         }
+        
+        // Ensure the image can receive raycast events
+        image.raycastTarget = true;
+        
+        Debug.Log($"CrosshairTarget setup complete on {gameObject.name}");
     }
     
     public void OnPointerClick(UnityEngine.EventSystems.PointerEventData eventData)
     {
+        Debug.Log($"CROSSHAIR CLICKED! GameObject: {gameObject.name}");
+        
         if (manager != null)
         {
+            Debug.Log($"Calling manager.OnCrosshairHit()");
             manager.OnCrosshairHit(gameObject);
+        }
+        else
+        {
+            Debug.LogError($"Manager is null on CrosshairTarget!");
         }
     }
 }

@@ -17,6 +17,16 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
 
     [Header("Played Card Prefab")]
     public GameObject playedCardPrefab;  // Add this line
+    [Header("Hitting System")]
+    public HittingInteractionManager hittingManager;
+    private readonly string[] hittingActionCards = {
+    "Apoco-Sluggie Boy",
+    "Bonkman", 
+    "Lil Sluggie Boy",
+    "Otsuchii SS",
+    "Sluggie Boy",
+    "Udar 98"
+};
 
     private List<GameObject> playedCards = new List<GameObject>();
 
@@ -34,37 +44,76 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
     // Check if we're in the interactive phase
     if (fishingManager == null || !fishingManager.isInteractionPhase)
     {
-        // Debug.LogWarning("Cannot play action cards - not in interactive phase!");
+        Debug.LogWarning("Cannot play action cards - not in interactive phase!");
         return;
     }
 
     ActionCard actionCard = dragDrop.actionCard;
 
+    // Check if this is a hitting action card
+    if (IsHittingActionCard(actionCard.actionName))
+    {
+        Debug.Log($"Detected hitting action card: {actionCard.actionName}");
+        
+        // Use hitting system instead of normal drop
+        if (hittingManager != null)
+        {
+            ulong playerId = Unity.Netcode.NetworkManager.Singleton != null ? 
+                            Unity.Netcode.NetworkManager.Singleton.LocalClientId : 0;
+            
+            // The target is determined by which drop zone this is
+            bool targetPlayer = targetsPlayer; // This drop zone's setting determines the target
+            
+            bool success = hittingManager.StartHittingSequence(actionCard, targetPlayer, playerId);
+            
+            if (success)
+            {
+                // Remove from player inventory
+                RemoveFromPlayerInventory(actionCard);
+                
+                // Destroy the original dragged card
+                Destroy(draggedObject);
+                
+                Debug.Log($"Started hitting sequence for {actionCard.actionName} targeting {(targetPlayer ? "player" : "fish")}");
+                return; // Exit early - hitting system handles the rest
+            }
+            else
+            {
+                Debug.LogWarning($"Failed to start hitting sequence for {actionCard.actionName}");
+                return;
+            }
+        }
+        else
+        {
+            Debug.LogError("No HittingInteractionManager found! Falling back to normal action card handling.");
+            // Fall through to normal handling
+        }
+    }
+
+    // Normal action card handling for non-hitting cards
+    
     // Check if this card can target what this drop zone affects
     if (targetsPlayer && !actionCard.canTargetPlayer)
     {
-        // Debug.LogWarning($"{actionCard.actionName} cannot target players!");
+        Debug.LogWarning($"{actionCard.actionName} cannot target players!");
         return;
     }
 
     if (!targetsPlayer && !actionCard.canTargetFish)
     {
-        // Debug.LogWarning($"{actionCard.actionName} cannot target fish!");
+        Debug.LogWarning($"{actionCard.actionName} cannot target fish!");
         return;
     }
 
-    // Debug.Log($"Playing {actionCard.actionName} on {(targetsPlayer ? "player" : "fish")}");
+    Debug.Log($"Playing {actionCard.actionName} on {(targetsPlayer ? "player" : "fish")}");
 
     // Play the action card through the fishing manager
-    bool success = fishingManager.PlayActionCard(actionCard, targetsPlayer);
+    bool playSuccess = fishingManager.PlayActionCard(actionCard, targetsPlayer);
 
-    if (success)
+    if (playSuccess)
     {
         // Remove from player inventory
         RemoveFromPlayerInventory(actionCard);
-
-        // DON'T create local card - the network will handle it
-        // MoveCardToPanel(draggedObject);  // COMMENTED OUT - network handles this now
 
         // Update the drag component so it can't be dragged again
         dragDrop.actionCard = null;
@@ -73,6 +122,28 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
         // Destroy the original dragged card since network creates the visual
         Destroy(draggedObject);
     }
+}
+
+// Helper method to check if an action card is a hitting type
+private bool IsHittingActionCard(string cardName)
+{
+    string[] hittingActionCards = {
+        "Apoco-Sluggie Boy",
+        "Bonkman", 
+        "Lil Sluggie Boy",
+        "Otsuchii SS",
+        "Sluggie Boy",
+        "Udar 98"
+    };
+    
+    foreach (string hittingCard in hittingActionCards)
+    {
+        if (cardName.Equals(hittingCard, System.StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
     void RemoveFromPlayerInventory(ActionCard actionCard)

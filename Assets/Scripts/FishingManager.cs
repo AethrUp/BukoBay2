@@ -375,7 +375,7 @@ public NetworkVariable<ulong> currentFishingPlayerId = new NetworkVariable<ulong
         {
             int damage = fishPower - playerPower;
             playerStamina -= damage;
-            Debug.Log($"Player takes {damage} damage! Player stamina: {playerStamina}");
+            //Debug.Log($"Player takes {damage} damage! Player stamina: {playerStamina}");
         }
         else
         {
@@ -454,13 +454,13 @@ public NetworkVariable<ulong> currentFishingPlayerId = new NetworkVariable<ulong
     // Make these public so UI can access them
     public int CalculatePlayerPower()
     {
-        Debug.Log($"CalculatePlayerPower called. currentPlayer = {(currentPlayer != null ? currentPlayer.name : "NULL")}");
+       // Debug.Log($"CalculatePlayerPower called. currentPlayer = {(currentPlayer != null ? currentPlayer.name : "NULL")}");
         if (currentPlayer == null || currentFish == null) return 0;
 
         // Start with base gear power
         int basePower = currentPlayer.GetTotalPower();
 
-        Debug.Log($"GetTotalPower() returned: {basePower}");
+        //Debug.Log($"GetTotalPower() returned: {basePower}");
 
         // Apply material bonuses/penalties from fish
         int materialModifier = CalculateMaterialModifier();
@@ -584,7 +584,7 @@ public NetworkVariable<ulong> currentFishingPlayerId = new NetworkVariable<ulong
             int fishPower = CalculateFishPower() + totalFishBuffs;
             int powerDifference = playerPower - fishPower;
 
-            Debug.Log($"Stamina drain update: Player Power {playerPower} vs Fish Power {fishPower}, Difference: {powerDifference}");
+            //Debug.Log($"Stamina drain update: Player Power {playerPower} vs Fish Power {fishPower}, Difference: {powerDifference}");
 
             // Apply stamina damage based on power difference
             if (powerDifference > 0)
@@ -597,7 +597,7 @@ public NetworkVariable<ulong> currentFishingPlayerId = new NetworkVariable<ulong
             {
                 // Fish is winning - player loses stamina
                 playerStamina -= Mathf.Abs(powerDifference);
-                Debug.Log($"Player takes {Mathf.Abs(powerDifference)} damage! Player stamina: {playerStamina}");
+                //Debug.Log($"Player takes {Mathf.Abs(powerDifference)} damage! Player stamina: {playerStamina}");
             }
             else
             {
