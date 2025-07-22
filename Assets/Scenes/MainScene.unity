@@ -1502,9 +1502,9 @@ MonoBehaviour:
   playerTargetArea: {fileID: 456722316}
   fishTargetArea: {fileID: 655715886}
   gameCanvas: {fileID: 10610688}
-  sliceDetectionRadius: 20
-  completionThreshold: 0.8
-  lineLength: 200
+  sliceDetectionRadius: 10
+  completionThreshold: 1
+  lineLength: 250
   lineSegments: 20
   fishingManager: {fileID: 1237669416}
   isSlicingActive:
@@ -2578,7 +2578,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -746.0327, y: -434.37415}
+  m_AnchoredPosition: {x: -746.03265, y: -434.37415}
   m_SizeDelta: {x: -1492.066, y: -868.748}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &257166916

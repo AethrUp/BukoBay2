@@ -12,8 +12,8 @@ public class SlicingInteractionManager : NetworkBehaviour
     public Canvas gameCanvas;                   // Canvas for UI positioning
     
     [Header("Slice Detection")]
-    public float sliceDetectionRadius = 20f;   // How close the mouse needs to be to the line
-    public float completionThreshold = 0.8f;   // How much of the line needs to be traced (80%)
+    public float sliceDetectionRadius = 10f;   // How close the mouse needs to be to the line
+    public float completionThreshold = .99f;   // How much of the line needs to be traced (80%)
     
     [Header("Line Generation")]
     public float lineLength = 200f;            // Length of lines to draw
@@ -281,45 +281,66 @@ public void StartSlicingForAllClientsClientRpc(string actionCardName, bool targe
 }
     
     void TrackMouseForSlicing()
+{
+    // Get mouse position in screen space
+    Vector2 mousePosition = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
+    
+    // Convert to local position within the target area
+    Vector2 localMousePosition;
+    RectTransform targetRect = (targetingPlayer ? playerTargetArea : fishTargetArea).GetComponent<RectTransform>();
+    
+    bool isOverTarget = RectTransformUtility.ScreenPointToLocalPointInRectangle(
+        targetRect,
+        mousePosition,
+        gameCanvas.worldCamera,
+        out localMousePosition
+    );
+    
+    if (!isOverTarget) return;
+    
+    // IMPORTANT: Transform mouse position to match the rotated slice line
+    if (currentSliceLine != null)
     {
-        // Get mouse position in screen space
-        Vector2 mousePosition = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
+        RectTransform sliceLineRect = currentSliceLine.GetComponent<RectTransform>();
         
-        // Convert to local position within the target area
-        Vector2 localMousePosition;
-        RectTransform targetRect = (targetingPlayer ? playerTargetArea : fishTargetArea).GetComponent<RectTransform>();
-        
-        bool isOverTarget = RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            targetRect,
+        // Convert mouse position to the slice line's local coordinate space
+        Vector2 sliceLineLocalMouse;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            sliceLineRect,
             mousePosition,
             gameCanvas.worldCamera,
-            out localMousePosition
+            out sliceLineLocalMouse
         );
         
-        if (!isOverTarget) return;
+        // Now check against the line points using the slice line's local coordinates
+        CheckLinePoints(sliceLineLocalMouse);
+    }
+}
+
+void CheckLinePoints(Vector2 mouseLocalPosition)
+{
+    // Check if mouse is near any uncompleted points on the current line
+    for (int i = 0; i < currentLinePoints.Count; i++)
+    {
+        if (pointsCompleted[i]) continue; // Skip already completed points
         
-        // Check if mouse is near any uncompleted points on the current line
-        for (int i = 0; i < currentLinePoints.Count; i++)
+        float distance = Vector2.Distance(mouseLocalPosition, currentLinePoints[i]);
+        
+        if (distance <= sliceDetectionRadius)
         {
-            if (pointsCompleted[i]) continue; // Skip already completed points
+            // Mark this point as completed
+            pointsCompleted[i] = true;
+            Debug.Log($"Completed point {i} of {currentLinePoints.Count} at distance {distance:F1}");
             
-            float distance = Vector2.Distance(localMousePosition, currentLinePoints[i]);
+            // Update visual feedback
+            UpdateSliceVisual(i);
             
-            if (distance <= sliceDetectionRadius)
-            {
-                // Mark this point as completed
-                pointsCompleted[i] = true;
-                Debug.Log($"Completed point {i} of {currentLinePoints.Count}");
-                
-                // Update visual feedback
-                UpdateSliceVisual(i);
-                
-                // Check if slice is complete
-                CheckSliceCompletion();
-                break; // Only complete one point per frame
-            }
+            // Check if slice is complete
+            CheckSliceCompletion();
+            break; // Only complete one point per frame
         }
     }
+}
     
     void UpdateSliceVisual(int completedPointIndex)
 {
@@ -354,31 +375,38 @@ public void StartSlicingForAllClientsClientRpc(string actionCardName, bool targe
     }
     
     void CompleteCurrentSlice()
+{
+    Debug.Log($"Slice completed! {remainingSlices - 1} slices remaining");
+    
+    // Clean up current slice - FORCE cleanup of indicators
+    isSlicing = false;
+    if (currentSliceLine != null)
     {
-        Debug.Log($"Slice completed! {remainingSlices - 1} slices remaining");
-        
-        // Clean up current slice
-        isSlicing = false;
-        if (currentSliceLine != null)
+        // Force cleanup of progress indicators before destroying
+        SliceLineVisual lineVisual = currentSliceLine.GetComponent<SliceLineVisual>();
+        if (lineVisual != null)
         {
-            Destroy(currentSliceLine);
-            currentSliceLine = null;
+            lineVisual.MarkAsCompleted();
         }
         
-        remainingSlices--;
-        
-        // Check if more slices needed
-        if (remainingSlices > 0)
-        {
-            // Start next slice after brief delay
-            StartCoroutine(NextSliceDelay());
-        }
-        else
-        {
-            // All slices complete - apply effect
-            CompleteSlicingSequence();
-        }
+        Destroy(currentSliceLine);
+        currentSliceLine = null;
     }
+    
+    remainingSlices--;
+    
+    // Check if more slices needed
+    if (remainingSlices > 0)
+    {
+        // Start next slice after brief delay
+        StartCoroutine(NextSliceDelay());
+    }
+    else
+    {
+        // All slices complete - apply effect
+        CompleteSlicingSequence();
+    }
+}
     
     IEnumerator NextSliceDelay()
     {

@@ -118,26 +118,41 @@ public class SliceLineVisual : MonoBehaviour
     }
     
     void CreateProgressIndicator(Vector2 position)
-    {
-        // Create a small green circle to show completed points
-        GameObject indicator = new GameObject("ProgressIndicator");
-        indicator.transform.SetParent(transform, false);
-        
-        // Add UI Image component
-        Image indicatorImage = indicator.AddComponent<Image>();
-        indicatorImage.color = Color.green;
-        
-        // Position and size the indicator
-        RectTransform indicatorRect = indicator.GetComponent<RectTransform>();
-        indicatorRect.anchoredPosition = position;
-        indicatorRect.sizeDelta = new Vector2(8f, 8f);
-        indicatorRect.anchorMin = new Vector2(0.5f, 0.5f);
-        indicatorRect.anchorMax = new Vector2(0.5f, 0.5f);
-        indicatorRect.pivot = new Vector2(0.5f, 0.5f);
-        
-        // Add to progress indicators list for cleanup
-        progressIndicators.Add(indicator);
-    }
+{
+    // Create a small green circle to show completed points
+    GameObject indicator = new GameObject("ProgressIndicator");
+    
+    // Parent it directly to this slice line object
+    indicator.transform.SetParent(transform, false);
+    
+    // Add UI Image component
+    Image indicatorImage = indicator.AddComponent<Image>();
+    indicatorImage.color = Color.green;
+    
+    // Position and size the indicator
+    RectTransform indicatorRect = indicator.GetComponent<RectTransform>();
+    
+    // Use the exact same local position as the line point
+    indicatorRect.anchoredPosition = position;
+    indicatorRect.sizeDelta = new Vector2(12f, 12f);
+    indicatorRect.anchorMin = new Vector2(0.5f, 0.5f);
+    indicatorRect.anchorMax = new Vector2(0.5f, 0.5f);
+    indicatorRect.pivot = new Vector2(0.5f, 0.5f);
+    
+    // IMPORTANT: Don't set rotation - it inherits from parent automatically
+    // Since it's parented to the rotated slice line, it will rotate with it
+    
+    // Make sure it renders above the slice line
+    Canvas indicatorCanvas = indicator.AddComponent<Canvas>();
+    indicatorCanvas.overrideSorting = true;
+    indicatorCanvas.sortingLayerName = "UI";
+    indicatorCanvas.sortingOrder = 1001; // Higher than the line renderer (1000)
+    
+    // Add to progress indicators list for cleanup
+    progressIndicators.Add(indicator);
+    
+    Debug.Log($"Created progress indicator at local position {position}, inheriting parent rotation");
+}
     
     void ClearProgressIndicators()
     {
@@ -166,14 +181,15 @@ public class SliceLineVisual : MonoBehaviour
     }
     
     public void MarkAsCompleted()
+{
+    if (lineRenderer != null && lineRenderer.material != null)
     {
-        if (lineRenderer != null && lineRenderer.material != null)
-        {
-            lineRenderer.material.color = completedColor;
-        }
-        
-        ClearProgressIndicators(); // Clean up when slice is done
-        
-        Debug.Log("Slice line marked as completed");
+        lineRenderer.material.color = completedColor;
     }
+    
+    // Clean up progress indicators immediately when slice is done
+    ClearProgressIndicators();
+    
+    Debug.Log("Slice line marked as completed - indicators cleared");
+}
 }
