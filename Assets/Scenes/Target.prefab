@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2642600206358757764}
   - component: {fileID: 5910800410243325962}
   m_Layer: 5
-  m_Name: Crosshair
+  m_Name: Target
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -66,7 +66,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 3389911732521518902, guid: eb9fba1f9f92e0c4c86ff859aab869c8, type: 3}
+  m_Sprite: {fileID: -6142374563283994760, guid: 02572d14a99bc0b47bb7683e566e98a6, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

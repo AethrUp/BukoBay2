@@ -468,6 +468,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 353077778}
+  - {fileID: 1863500628}
   - {fileID: 1840212668}
   - {fileID: 818183347}
   - {fileID: 482620775}
@@ -4122,6 +4123,7 @@ MonoBehaviour:
   cardSpacing: 10
   playedCardPrefab: {fileID: 0}
   hittingManager: {fileID: 353077780}
+  shootingManager: {fileID: 1863500627}
 --- !u!114 &456722314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5571,6 +5573,7 @@ MonoBehaviour:
   cardSpacing: 10
   playedCardPrefab: {fileID: 0}
   hittingManager: {fileID: 353077780}
+  shootingManager: {fileID: 1863500627}
 --- !u!114 &655715884
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7183,9 +7186,9 @@ MonoBehaviour:
   equippedExtra2: {fileID: 0}
   extraGear: []
   actionCards:
-  - {fileID: 11400000, guid: 2c145b28cc658204e930884270d835c5, type: 2}
-  - {fileID: 11400000, guid: 7cfd0b053e7f5eb428426c3a55e3e03f, type: 2}
-  - {fileID: 11400000, guid: 00cc6a12d2799ae4ba4e70ba96b0d030, type: 2}
+  - {fileID: 11400000, guid: 51407c1f321fa364d91b32bcc8569a9c, type: 2}
+  - {fileID: 11400000, guid: ac5251e268621cb4189029b76b96d024, type: 2}
+  - {fileID: 11400000, guid: 73eee5845e0742a418f0b8461c6487b5, type: 2}
   - {fileID: 11400000, guid: 4b1efa1cc3ee5f04eab2e985dfab0af2, type: 2}
   - {fileID: 11400000, guid: 89b96cec832c63e4c8c2be505737a345, type: 2}
   - {fileID: 11400000, guid: b7ad755f83d773d4596885ae78c078c8, type: 2}
@@ -7888,6 +7891,7 @@ MonoBehaviour:
   cardSpacing: 10
   playedCardPrefab: {fileID: 6458836799170135447, guid: c7afd1c31eff2e14d8d961fe6a966b8a, type: 3}
   hittingManager: {fileID: 0}
+  shootingManager: {fileID: 0}
 --- !u!114 &929720405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12545,6 +12549,7 @@ MonoBehaviour:
   cardSpacing: 10
   playedCardPrefab: {fileID: 6458836799170135447, guid: c7afd1c31eff2e14d8d961fe6a966b8a, type: 3}
   hittingManager: {fileID: 0}
+  shootingManager: {fileID: 0}
 --- !u!114 &1603567502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14937,6 +14942,92 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1856265913}
   m_CullTransparentMesh: 1
+--- !u!1 &1863500625
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1863500628}
+  - component: {fileID: 1863500626}
+  - component: {fileID: 1863500627}
+  m_Layer: 0
+  m_Name: ShootingInteractionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1863500626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863500625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 1352989525
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &1863500627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863500625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c206af646bd2844dace732c6efbebd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  reticlePrefab: {fileID: 4873432641036360276, guid: fcde5c242adb2594288374bed0cdd4a4, type: 3}
+  targetPrefab: {fileID: 4873432641036360276, guid: 76ec476a4a8013f4ebe15ee526702adf, type: 3}
+  playerTargetArea: {fileID: 456722316}
+  fishTargetArea: {fileID: 655715886}
+  gameCanvas: {fileID: 10610688}
+  defaultSwayRadius: 50
+  defaultSwaySpeed: 2
+  swayRadius: 50
+  swaySpeed: 2
+  aimTime: 3
+  fishingManager: {fileID: 1237669416}
+  isShootingActive:
+    m_InternalValue: 0
+  shootingPlayerId:
+    m_InternalValue: 0
+--- !u!4 &1863500628
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1863500625}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 28.307299, y: -25.834814, z: -1681.2001}
+  m_LocalScale: {x: 18.68, y: 18.68, z: 18.68}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 10610689}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1873598548
 GameObject:
   m_ObjectHideFlags: 0
