@@ -34,6 +34,7 @@ public class SlicingInteractionManager : NetworkBehaviour
     private List<Vector2> currentLinePoints = new List<Vector2>();
     private List<bool> pointsCompleted = new List<bool>();
     private bool isSlicing = false;
+    private List<GameObject> progressIndicators = new List<GameObject>();
     
     // Network variables for syncing slicing state
     public NetworkVariable<bool> isSlicingActive = new NetworkVariable<bool>(false);
@@ -191,68 +192,58 @@ public void StartSlicingForAllClientsClientRpc(string actionCardName, bool targe
     }
     
     void GenerateSliceLine()
+{
+    // Choose parent based on target
+    Transform parentTransform = targetingPlayer ? playerTargetArea : fishTargetArea;
+    if (parentTransform == null)
     {
-        // Choose parent based on target
-        Transform parentTransform = targetingPlayer ? playerTargetArea : fishTargetArea;
-        if (parentTransform == null)
-        {
-            Debug.LogError($"No target area found for {(targetingPlayer ? "player" : "fish")}");
-            return;
-        }
-        
-        // Generate a zigzag pattern
-        currentLinePoints.Clear();
-        pointsCompleted.Clear();
-        
-        // Zigzag parameters
-        float totalWidth = lineLength;
-        float zigzagHeight = 50f; // How tall the zigzag peaks are
-        int numZigzags = 3; // Number of complete zigzag cycles
-        
-        // Calculate points for zigzag
-        float stepX = totalWidth / lineSegments;
-        float zigzagCycleLength = totalWidth / numZigzags;
-        
-        for (int i = 0; i <= lineSegments; i++)
-        {
-            float x = (i * stepX) - (totalWidth / 2); // Center the line
-            
-            // Calculate y based on zigzag pattern
-            float cycleProgress = (i * stepX) / zigzagCycleLength;
-            float zigzagPhase = (cycleProgress % 1.0f) * 4.0f; // 4 phases per cycle
-            
-            float y = 0;
-            if (zigzagPhase < 1.0f)
-            {
-                // Going up
-                y = Mathf.Lerp(0, zigzagHeight, zigzagPhase);
-            }
-            else if (zigzagPhase < 2.0f)
-            {
-                // Going down to negative
-                y = Mathf.Lerp(zigzagHeight, -zigzagHeight, zigzagPhase - 1.0f);
-            }
-            else if (zigzagPhase < 3.0f)
-            {
-                // Going up from negative
-                y = Mathf.Lerp(-zigzagHeight, zigzagHeight, zigzagPhase - 2.0f);
-            }
-            else
-            {
-                // Going back to center
-                y = Mathf.Lerp(zigzagHeight, 0, zigzagPhase - 3.0f);
-            }
-            
-            Vector2 point = new Vector2(x, y);
-            currentLinePoints.Add(point);
-            pointsCompleted.Add(false);
-        }
-        
-        // Create the visual line
-        CreateVisualSliceLine(parentTransform);
-        
-        Debug.Log($"Generated zigzag slice line with {currentLinePoints.Count} points");
+        Debug.LogError($"No target area found for {(targetingPlayer ? "player" : "fish")}");
+        return;
     }
+    
+    // Generate a simple zigzag pattern
+    currentLinePoints.Clear();
+    pointsCompleted.Clear();
+    
+    // Simpler zigzag parameters
+    float totalWidth = lineLength;
+    float zigzagHeight = 30f; // Reduced height
+    int numZigzags = 2; // Only 2 zigzag cycles instead of 3
+    
+    // Calculate points for simpler zigzag
+    float stepX = totalWidth / lineSegments;
+    float zigzagCycleLength = totalWidth / numZigzags;
+    
+    for (int i = 0; i <= lineSegments; i++)
+    {
+        float x = (i * stepX) - (totalWidth / 2); // Center the line
+        
+        // Simpler zigzag pattern - just up and down
+        float cycleProgress = (i * stepX) / zigzagCycleLength;
+        float zigzagPhase = (cycleProgress % 1.0f) * 2.0f; // Only 2 phases per cycle
+        
+        float y = 0;
+        if (zigzagPhase < 1.0f)
+        {
+            // Going up
+            y = Mathf.Lerp(0, zigzagHeight, zigzagPhase);
+        }
+        else
+        {
+            // Going down
+            y = Mathf.Lerp(zigzagHeight, 0, zigzagPhase - 1.0f);
+        }
+        
+        Vector2 point = new Vector2(x, y);
+        currentLinePoints.Add(point);
+        pointsCompleted.Add(false);
+    }
+    
+    // Create the visual line
+    CreateVisualSliceLine(parentTransform);
+    
+    Debug.Log($"Generated simple zigzag slice line with {currentLinePoints.Count} points");
+}
     
     void CreateVisualSliceLine(Transform parent)
 {
@@ -272,14 +263,21 @@ public void StartSlicingForAllClientsClientRpc(string actionCardName, bool targe
         lineVisual.SetupLine(currentLinePoints.ToArray());
     }
     
-    // Position it in the center of the target area
+    // Position it randomly within the target area and rotate it
     RectTransform lineRect = currentSliceLine.GetComponent<RectTransform>();
     if (lineRect != null)
     {
-        lineRect.anchoredPosition = Vector2.zero;
+        // Random position within the panel (not too close to edges)
+        float randomX = Random.Range(-50f, 50f);
+        float randomY = Random.Range(-30f, 30f);
+        lineRect.anchoredPosition = new Vector2(randomX, randomY);
+        
+        // Random rotation
+        float randomRotation = Random.Range(-30f, 30f); // Up to 30 degrees rotation
+        lineRect.rotation = Quaternion.Euler(0, 0, randomRotation);
     }
     
-    Debug.Log($"Created visual slice line: {currentSliceLine.name}");
+    Debug.Log($"Created visual slice line at random position and rotation");
 }
     
     void TrackMouseForSlicing()

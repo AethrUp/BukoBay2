@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class SliceLineVisual : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class SliceLineVisual : MonoBehaviour
     private Vector2[] linePoints;
     private bool[] pointsCompleted;
     private int lastCompletedIndex = -1;
+    private List<GameObject> progressIndicators = new List<GameObject>();
     
     void Awake()
     {
@@ -26,35 +28,41 @@ public class SliceLineVisual : MonoBehaviour
     }
     
     public void SetupLine(Vector2[] points)
-{
-    linePoints = points;
-    pointsCompleted = new bool[points.Length];
-    
-    // Convert 2D points to 3D for LineRenderer
-    Vector3[] linePositions = new Vector3[points.Length];
-    for (int i = 0; i < points.Length; i++)
     {
-        linePositions[i] = new Vector3(points[i].x, points[i].y, 0);
-    }
-    
-    // Set up the LineRenderer
-    if (lineRenderer != null)
-    {
-        lineRenderer.positionCount = points.Length;
-        lineRenderer.SetPositions(linePositions);
+        linePoints = points;
+        pointsCompleted = new bool[points.Length];
         
-        // ENSURE IT'S SET UP FOR UI
-        lineRenderer.useWorldSpace = false; // Add this line
-        
-        // Set initial color using material
-        if (lineRenderer.material != null)
+        // Convert 2D points to 3D for LineRenderer
+        Vector3[] linePositions = new Vector3[points.Length];
+        for (int i = 0; i < points.Length; i++)
         {
-            lineRenderer.material.color = incompleteColor;
+            linePositions[i] = new Vector3(points[i].x, points[i].y, 0);
         }
+        
+        // Set up the LineRenderer
+        if (lineRenderer != null)
+        {
+            lineRenderer.positionCount = points.Length;
+            lineRenderer.SetPositions(linePositions);
+            lineRenderer.useWorldSpace = false;
+            
+            // FIX THE LAYERING ISSUE
+            lineRenderer.sortingLayerName = "UI";
+            lineRenderer.sortingOrder = 1000; // Put it in front of everything
+            
+            // Make it visible but not too thick
+            lineRenderer.startWidth = 1f;
+            lineRenderer.endWidth = 1f;
+            
+            // Set initial color
+            if (lineRenderer.material != null)
+            {
+                lineRenderer.material.color = incompleteColor;
+            }
+        }
+        
+        Debug.Log($"SliceLineVisual setup with {points.Length} points");
     }
-    
-    Debug.Log($"SliceLineVisual setup with {points.Length} points");
-}
     
     public void UpdateProgress(int completedPointIndex)
     {
@@ -73,10 +81,11 @@ public class SliceLineVisual : MonoBehaviour
     {
         if (lineRenderer == null || lineRenderer.material == null) return;
         
-        // Simple approach: change the whole line color based on progress
+        // Calculate completion percentage
         float completionPercentage = GetCompletionPercentage();
         
-        if (completionPercentage >= 0.8f) // 80% threshold
+        // Update overall line color based on progress
+        if (completionPercentage >= 0.8f) // Near completion
         {
             lineRenderer.material.color = completedColor;
         }
@@ -87,6 +96,59 @@ public class SliceLineVisual : MonoBehaviour
         else
         {
             lineRenderer.material.color = incompleteColor;
+        }
+        
+        // Create visual indicators for completed sections
+        UpdateProgressIndicators();
+    }
+    
+    void UpdateProgressIndicators()
+    {
+        // Clear existing indicators
+        ClearProgressIndicators();
+        
+        // Create small UI indicators for completed points
+        for (int i = 0; i < pointsCompleted.Length; i++)
+        {
+            if (pointsCompleted[i])
+            {
+                CreateProgressIndicator(linePoints[i]);
+            }
+        }
+    }
+    
+    void CreateProgressIndicator(Vector2 position)
+    {
+        // Create a small green circle to show completed points
+        GameObject indicator = new GameObject("ProgressIndicator");
+        indicator.transform.SetParent(transform, false);
+        
+        // Add UI Image component
+        Image indicatorImage = indicator.AddComponent<Image>();
+        indicatorImage.color = Color.green;
+        
+        // Position and size the indicator
+        RectTransform indicatorRect = indicator.GetComponent<RectTransform>();
+        indicatorRect.anchoredPosition = position;
+        indicatorRect.sizeDelta = new Vector2(8f, 8f);
+        indicatorRect.anchorMin = new Vector2(0.5f, 0.5f);
+        indicatorRect.anchorMax = new Vector2(0.5f, 0.5f);
+        indicatorRect.pivot = new Vector2(0.5f, 0.5f);
+        
+        // Add to progress indicators list for cleanup
+        progressIndicators.Add(indicator);
+    }
+    
+    void ClearProgressIndicators()
+    {
+        if (progressIndicators != null)
+        {
+            foreach (GameObject indicator in progressIndicators)
+            {
+                if (indicator != null)
+                    DestroyImmediate(indicator);
+            }
+            progressIndicators.Clear();
         }
     }
     
@@ -109,6 +171,8 @@ public class SliceLineVisual : MonoBehaviour
         {
             lineRenderer.material.color = completedColor;
         }
+        
+        ClearProgressIndicators(); // Clean up when slice is done
         
         Debug.Log("Slice line marked as completed");
     }
