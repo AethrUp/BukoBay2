@@ -17,27 +17,47 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
 
     [Header("Played Card Prefab")]
     public GameObject playedCardPrefab;  // Add this line
+    
     [Header("Hitting System")]
     public HittingInteractionManager hittingManager;
     
     private readonly string[] hittingActionCards = {
-    "Apoco-Sluggie Boy",
-    "Bonkman",
-    "Lil Sluggie Boy",
-    "Otsuchii SS",
-    "Sluggie Boy",
-    "Udar 98"
-};
-[Header("Shooting System")]
-public ShootingInteractionManager shootingManager;
+        "Apoco-Sluggie Boy",
+        "Bonkman",
+        "Lil Sluggie Boy",
+        "Otsuchii SS",
+        "Sluggie Boy",
+        "Udar 98"
+    };
+
+    [Header("Shooting System")]
+    public ShootingInteractionManager shootingManager;
+    
     private readonly string[] shootingActionCards = {
-    "Aries Javeline",
-    "CosmoRocket",
-    "Elektrika 77",
-    "Lil Spittle",
-    "Rattler Venom",
-    "TootiToot",
-    "Tranq-O-Catch"
+        "Aries Javeline",
+        "CosmoRocket",
+        "Elektrika 77",
+        "Lil Spittle",
+        "Rattler Venom",
+        "TootiToot",
+        "Tranq-O-Catch"
+    };
+
+    [Header("Slicing System")]
+public SlicingInteractionManager slicingManager;
+
+private readonly string[] slicingActionCards = {
+    "Arkansas Toothpick",
+    "GRV-V",
+    "Horagai II",
+    "igla",
+    "Itamae",
+    "Jinro's Whisker",
+    "Monarch",
+    "Naginata I",
+    "Naginata S",
+    "Naginata X",
+    "Sasumata"
 };
 
     private List<GameObject> playedCards = new List<GameObject>();
@@ -62,44 +82,83 @@ public ShootingInteractionManager shootingManager;
 
         ActionCard actionCard = dragDrop.actionCard;
 
+        // Check if this is a slicing action card
+        if (IsSlicingActionCard(actionCard.actionName))
+        {
+            Debug.Log($"Detected slicing action card: {actionCard.actionName}");
+            
+            // Use slicing system instead of normal drop
+            if (slicingManager != null)
+            {
+                ulong playerId = Unity.Netcode.NetworkManager.Singleton != null ? 
+                                Unity.Netcode.NetworkManager.Singleton.LocalClientId : 0;
+                
+                bool targetPlayer = targetsPlayer;
+                
+                bool success = slicingManager.StartSlicingSequence(actionCard, targetPlayer, playerId);
+                
+                if (success)
+                {
+                    // Remove from player inventory
+                    RemoveFromPlayerInventory(actionCard);
+                    
+                    // Destroy the original dragged card
+                    Destroy(draggedObject);
+                    
+                    Debug.Log($"Started slicing sequence for {actionCard.actionName} targeting {(targetPlayer ? "player" : "fish")}");
+                    return; // Exit early - slicing system handles the rest
+                }
+                else
+                {
+                    Debug.LogWarning($"Failed to start slicing sequence for {actionCard.actionName}");
+                    return;
+                }
+            }
+            else
+            {
+                Debug.LogError("No SlicingInteractionManager found!");
+                // Fall through to normal handling
+            }
+        }
+
         // Check if this is a shooting action card
-if (IsShootingActionCard(actionCard.actionName))
-{
-    Debug.Log($"Detected shooting action card: {actionCard.actionName}");
-    
-    // Use shooting system instead of normal drop
-    if (shootingManager != null)
-    {
-        ulong playerId = Unity.Netcode.NetworkManager.Singleton != null ? 
-                        Unity.Netcode.NetworkManager.Singleton.LocalClientId : 0;
-        
-        bool targetPlayer = targetsPlayer;
-        
-        bool success = shootingManager.StartShootingSequence(actionCard, targetPlayer, playerId);
-        
-        if (success)
+        if (IsShootingActionCard(actionCard.actionName))
         {
-            // Remove from player inventory
-            RemoveFromPlayerInventory(actionCard);
+            Debug.Log($"Detected shooting action card: {actionCard.actionName}");
             
-            // Destroy the original dragged card
-            Destroy(draggedObject);
-            
-            Debug.Log($"Started shooting sequence for {actionCard.actionName} targeting {(targetPlayer ? "player" : "fish")}");
-            return; // Exit early - shooting system handles the rest
+            // Use shooting system instead of normal drop
+            if (shootingManager != null)
+            {
+                ulong playerId = Unity.Netcode.NetworkManager.Singleton != null ? 
+                                Unity.Netcode.NetworkManager.Singleton.LocalClientId : 0;
+                
+                bool targetPlayer = targetsPlayer;
+                
+                bool success = shootingManager.StartShootingSequence(actionCard, targetPlayer, playerId);
+                
+                if (success)
+                {
+                    // Remove from player inventory
+                    RemoveFromPlayerInventory(actionCard);
+                    
+                    // Destroy the original dragged card
+                    Destroy(draggedObject);
+                    
+                    Debug.Log($"Started shooting sequence for {actionCard.actionName} targeting {(targetPlayer ? "player" : "fish")}");
+                    return; // Exit early - shooting system handles the rest
+                }
+                else
+                {
+                    Debug.LogWarning($"Failed to start shooting sequence for {actionCard.actionName}");
+                    return;
+                }
+            }
+            else
+            {
+                Debug.LogError("No ShootingInteractionManager found!");
+                // Fall through to normal handling
+            }
         }
-        else
-        {
-            Debug.LogWarning($"Failed to start shooting sequence for {actionCard.actionName}");
-            return;
-        }
-    }
-    else
-    {
-        Debug.LogError("No ShootingInteractionManager found!");
-        // Fall through to normal handling
-    }
-}
 
         // Check if this is a hitting action card
         if (IsHittingActionCard(actionCard.actionName))
@@ -141,7 +200,7 @@ if (IsShootingActionCard(actionCard.actionName))
             }
         }
 
-        // Normal action card handling for non-hitting cards
+        // Normal action card handling for non-interactive cards
 
         // Check if this card can target what this drop zone affects
         if (targetsPlayer && !actionCard.canTargetPlayer)
@@ -175,21 +234,38 @@ if (IsShootingActionCard(actionCard.actionName))
         }
     }
 
+    // Helper method to check if an action card is a slicing type
+    private bool IsSlicingActionCard(string cardName)
+    {
+        foreach (string slicingCard in slicingActionCards)
+        {
+            if (cardName.Equals(slicingCard, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Helper method to check if an action card is a hitting type
     private bool IsHittingActionCard(string cardName)
     {
-        string[] hittingActionCards = {
-        "Apoco-Sluggie Boy",
-        "Bonkman",
-        "Lil Sluggie Boy",
-        "Otsuchii SS",
-        "Sluggie Boy",
-        "Udar 98"
-    };
-
         foreach (string hittingCard in hittingActionCards)
         {
             if (cardName.Equals(hittingCard, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Helper method to check if an action card is a shooting type
+    private bool IsShootingActionCard(string cardName)
+    {
+        foreach (string shootingCard in shootingActionCards)
+        {
+            if (cardName.Equals(shootingCard, System.StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
@@ -207,6 +283,7 @@ if (IsShootingActionCard(actionCard.actionName))
             // Debug.Log($"Removed {actionCard.actionName} from player inventory");
         }
     }
+
     public void CreateNetworkedPlayedCard(string cardName, int playerEffect, int fishEffect)
     {
         // Debug.Log($"Creating networked played card: {cardName} (Player: {playerEffect}, Fish: {fishEffect})");
@@ -267,15 +344,15 @@ if (IsShootingActionCard(actionCard.actionName))
     // Helper method to find ActionCard by name
     ActionCard FindActionCardByName(string cardName)
     {
-#if UNITY_EDITOR
-    string[] actionGuids = UnityEditor.AssetDatabase.FindAssets($"{cardName} t:ActionCard");
-    
-    if (actionGuids.Length > 0)
-    {
-        string assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(actionGuids[0]);
-        return UnityEditor.AssetDatabase.LoadAssetAtPath<ActionCard>(assetPath);
-    }
-#endif
+        #if UNITY_EDITOR
+        string[] actionGuids = UnityEditor.AssetDatabase.FindAssets($"{cardName} t:ActionCard");
+        
+        if (actionGuids.Length > 0)
+        {
+            string assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(actionGuids[0]);
+            return UnityEditor.AssetDatabase.LoadAssetAtPath<ActionCard>(assetPath);
+        }
+        #endif
 
         return null;
     }
@@ -359,17 +436,4 @@ if (IsShootingActionCard(actionCard.actionName))
         playedCards.Clear();
         // Debug.Log($"All played cards cleared from {gameObject.name}");
     }
-
-// Helper method to check if an action card is a shooting type
-private bool IsShootingActionCard(string cardName)
-{
-    foreach (string shootingCard in shootingActionCards)
-    {
-        if (cardName.Equals(shootingCard, System.StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
-        }
-    }
-    return false;
-}
 }

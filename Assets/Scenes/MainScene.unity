@@ -469,6 +469,7 @@ RectTransform:
   m_Children:
   - {fileID: 353077778}
   - {fileID: 1863500628}
+  - {fileID: 126978294}
   - {fileID: 1840212668}
   - {fileID: 818183347}
   - {fileID: 482620775}
@@ -1466,6 +1467,94 @@ MonoBehaviour:
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   highlightColor: {r: 0, g: 1, b: 0, a: 1}
   invalidColor: {r: 1, g: 0, b: 0, a: 1}
+--- !u!1 &126978292
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 126978294}
+  - component: {fileID: 126978293}
+  - component: {fileID: 126978295}
+  m_Layer: 5
+  m_Name: SlicingInteractionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &126978293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 126978292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec259af09b11d9a4f8c403d9f526543d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  sliceLinePrefab: {fileID: 4624645146472494559, guid: 861fade467f88f04ea7ba518b8b1457a, type: 3}
+  playerTargetArea: {fileID: 456722316}
+  fishTargetArea: {fileID: 655715886}
+  gameCanvas: {fileID: 10610688}
+  sliceDetectionRadius: 20
+  completionThreshold: 0.8
+  lineLength: 200
+  lineSegments: 20
+  fishingManager: {fileID: 1237669416}
+  isSlicingActive:
+    m_InternalValue: 0
+  slicingPlayerId:
+    m_InternalValue: 0
+--- !u!224 &126978294
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 126978292}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 10610689}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -401.94, y: 79.419}
+  m_SizeDelta: {x: 928.92, y: 517.39}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &126978295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 126978292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3196064772
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!1 &153923451
 GameObject:
   m_ObjectHideFlags: 0
@@ -4124,6 +4213,7 @@ MonoBehaviour:
   playedCardPrefab: {fileID: 0}
   hittingManager: {fileID: 353077780}
   shootingManager: {fileID: 1863500627}
+  slicingManager: {fileID: 126978293}
 --- !u!114 &456722314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5574,6 +5664,7 @@ MonoBehaviour:
   playedCardPrefab: {fileID: 0}
   hittingManager: {fileID: 353077780}
   shootingManager: {fileID: 1863500627}
+  slicingManager: {fileID: 126978293}
 --- !u!114 &655715884
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7192,7 +7283,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4b1efa1cc3ee5f04eab2e985dfab0af2, type: 2}
   - {fileID: 11400000, guid: 89b96cec832c63e4c8c2be505737a345, type: 2}
   - {fileID: 11400000, guid: b7ad755f83d773d4596885ae78c078c8, type: 2}
-  - {fileID: 11400000, guid: 03d60bac9f6b4954384bc77b5f640659, type: 2}
+  - {fileID: 11400000, guid: 12eabcac76f321045be3d04731e07067, type: 2}
+  - {fileID: 11400000, guid: 262e1a7d57f49f348b0db085a50f794b, type: 2}
+  - {fileID: 11400000, guid: 13ec40e33f088954d9b5c6b2a7f06d84, type: 2}
   effectCards:
   - {fileID: 0}
   coins: 200
@@ -7892,6 +7985,7 @@ MonoBehaviour:
   playedCardPrefab: {fileID: 6458836799170135447, guid: c7afd1c31eff2e14d8d961fe6a966b8a, type: 3}
   hittingManager: {fileID: 0}
   shootingManager: {fileID: 0}
+  slicingManager: {fileID: 0}
 --- !u!114 &929720405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12550,6 +12644,7 @@ MonoBehaviour:
   playedCardPrefab: {fileID: 6458836799170135447, guid: c7afd1c31eff2e14d8d961fe6a966b8a, type: 3}
   hittingManager: {fileID: 0}
   shootingManager: {fileID: 0}
+  slicingManager: {fileID: 0}
 --- !u!114 &1603567502
 MonoBehaviour:
   m_ObjectHideFlags: 0
