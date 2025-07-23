@@ -313,23 +313,23 @@ public class InventoryDisplay : MonoBehaviour
         Debug.Log("PlayerInventory found, checking gear...");
         
         // Debug check each equipped item
-        Debug.Log($"Equipped Rod: {(playerInventory.equippedRod != null ? playerInventory.equippedRod.gearName : "NULL")}");
-        Debug.Log($"Equipped Reel: {(playerInventory.equippedReel != null ? playerInventory.equippedReel.gearName : "NULL")}");
-        Debug.Log($"Equipped Line: {(playerInventory.equippedLine != null ? playerInventory.equippedLine.gearName : "NULL")}");
-        Debug.Log($"Extra Gear Count: {playerInventory.extraGear.Count}");
-        Debug.Log($"Action Cards Count: {playerInventory.actionCards.Count}");
-        Debug.Log($"Effect Cards Count: {playerInventory.effectCards.Count}");
+        //Debug.Log($"Equipped Rod: {(playerInventory.equippedRod != null ? playerInventory.equippedRod.gearName : "NULL")}");
+        //Debug.Log($"Equipped Reel: {(playerInventory.equippedReel != null ? playerInventory.equippedReel.gearName : "NULL")}");
+        //Debug.Log($"Equipped Line: {(playerInventory.equippedLine != null ? playerInventory.equippedLine.gearName : "NULL")}");
+        //Debug.Log($"Extra Gear Count: {playerInventory.extraGear.Count}");
+        //Debug.Log($"Action Cards Count: {playerInventory.actionCards.Count}");
+        //Debug.Log($"Effect Cards Count: {playerInventory.effectCards.Count}");
         
         // Display equipped gear
-        Debug.Log("About to display equipped gear...");
+        //Debug.Log("About to display equipped gear...");
         try
         {
             DisplayEquippedGear();
-            Debug.Log("Equipped gear display completed");
+            //Debug.Log("Equipped gear display completed");
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Error displaying equipped gear: {e.Message}");
+            //Debug.LogError($"Error displaying equipped gear: {e.Message}");
         }
         
         // Display tackle box gear
@@ -337,26 +337,26 @@ public class InventoryDisplay : MonoBehaviour
         try
         {
             DisplayTackleBoxGear();
-            Debug.Log("Tackle box display completed");
+            //Debug.Log("Tackle box display completed");
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Error displaying tackle box gear: {e.Message}");
+            //Debug.LogError($"Error displaying tackle box gear: {e.Message}");
         }
         
         // Display action cards and effect cards
-        Debug.Log("About to display action and effect cards...");
+        //Debug.Log("About to display action and effect cards...");
         try
         {
             DisplayActionAndEffectCards();
-            Debug.Log("Action and effect cards display completed");
+            //Debug.Log("Action and effect cards display completed");
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Error displaying action and effect cards: {e.Message}");
+            //Debug.LogError($"Error displaying action and effect cards: {e.Message}");
         }
         
-        Debug.Log($"=== UpdateDisplay complete. Total cards displayed: {displayedCards.Count} ===");
+        //Debug.Log($"=== UpdateDisplay complete. Total cards displayed: {displayedCards.Count} ===");
     }
     
     void ClearDisplay()
@@ -462,12 +462,12 @@ public class InventoryDisplay : MonoBehaviour
     
     void CreateCardDisplay(GearCard gearCard, FishCard fishCard, ActionCard actionCard, EffectCard effectCard, Transform parent, Vector2 position, bool useGridPositioning = false)
     {
-        Debug.Log($"CreateCardDisplay called - Gear: {(gearCard?.gearName ?? "NULL")}, Fish: {(fishCard?.fishName ?? "NULL")}, Action: {(actionCard?.actionName ?? "NULL")}, Effect: {(effectCard?.effectName ?? "NULL")}, Parent: {(parent?.name ?? "NULL")}");
+        //Debug.Log($"CreateCardDisplay called - Gear: {(gearCard?.gearName ?? "NULL")}, Fish: {(fishCard?.fishName ?? "NULL")}, Action: {(actionCard?.actionName ?? "NULL")}, Effect: {(effectCard?.effectName ?? "NULL")}, Parent: {(parent?.name ?? "NULL")}");
         
         // Skip if no card to display
         if (gearCard == null && fishCard == null && actionCard == null && effectCard == null) 
         {
-            Debug.Log("Skipping - no card to display");
+           // Debug.Log("Skipping - no card to display");
             return;
         }
         

@@ -470,6 +470,7 @@ RectTransform:
   - {fileID: 353077778}
   - {fileID: 1863500628}
   - {fileID: 126978294}
+  - {fileID: 1409508165}
   - {fileID: 1840212668}
   - {fileID: 818183347}
   - {fileID: 482620775}
@@ -2578,7 +2579,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -746.03265, y: -434.37415}
+  m_AnchoredPosition: {x: -746.0327, y: -434.37415}
   m_SizeDelta: {x: -1492.066, y: -868.748}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &257166916
@@ -4214,6 +4215,7 @@ MonoBehaviour:
   hittingManager: {fileID: 353077780}
   shootingManager: {fileID: 1863500627}
   slicingManager: {fileID: 126978293}
+  sprayManager: {fileID: 1409508167}
 --- !u!114 &456722314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5665,6 +5667,7 @@ MonoBehaviour:
   hittingManager: {fileID: 353077780}
   shootingManager: {fileID: 1863500627}
   slicingManager: {fileID: 126978293}
+  sprayManager: {fileID: 1409508167}
 --- !u!114 &655715884
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7286,6 +7289,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 12eabcac76f321045be3d04731e07067, type: 2}
   - {fileID: 11400000, guid: 262e1a7d57f49f348b0db085a50f794b, type: 2}
   - {fileID: 11400000, guid: 13ec40e33f088954d9b5c6b2a7f06d84, type: 2}
+  - {fileID: 11400000, guid: 6d0b3ef0a5d0fca43b48a9601c32f6d0, type: 2}
+  - {fileID: 11400000, guid: 17f1daefc5bed55489cec93ac9544f88, type: 2}
   effectCards:
   - {fileID: 0}
   coins: 200
@@ -7986,6 +7991,7 @@ MonoBehaviour:
   hittingManager: {fileID: 0}
   shootingManager: {fileID: 0}
   slicingManager: {fileID: 0}
+  sprayManager: {fileID: 0}
 --- !u!114 &929720405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11213,6 +11219,95 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1406641332}
   m_CullTransparentMesh: 1
+--- !u!1 &1409508164
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1409508165}
+  - component: {fileID: 1409508166}
+  - component: {fileID: 1409508167}
+  m_Layer: 5
+  m_Name: SprayInteractionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1409508165
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1409508164}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 10610689}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -401.94, y: 79.419}
+  m_SizeDelta: {x: 928.92, y: 517.39}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1409508166
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1409508164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3997363926
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &1409508167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1409508164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15aad8f1f17ecc5419cfe13c56239070, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  sprayAreaPrefab: {fileID: 4931301258931714640, guid: 6f92666172f37114d8f24514508e4ee5, type: 3}
+  playerTargetArea: {fileID: 456722316}
+  fishTargetArea: {fileID: 655715886}
+  gameCanvas: {fileID: 10610688}
+  sprayRadius: 15
+  completionThreshold: 0.8
+  areaWidth: 150
+  areaHeight: 100
+  fillResolution: 20
+  fishingManager: {fileID: 1237669416}
+  isSprayingActive:
+    m_InternalValue: 0
+  sprayingPlayerId:
+    m_InternalValue: 0
 --- !u!1 &1410902353
 GameObject:
   m_ObjectHideFlags: 0
@@ -12645,6 +12740,7 @@ MonoBehaviour:
   hittingManager: {fileID: 0}
   shootingManager: {fileID: 0}
   slicingManager: {fileID: 0}
+  sprayManager: {fileID: 0}
 --- !u!114 &1603567502
 MonoBehaviour:
   m_ObjectHideFlags: 0

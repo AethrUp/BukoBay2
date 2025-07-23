@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;  // ADD THIS LINE
+using UnityEngine.UI;  
 using System.Collections.Generic;
 
 public class ActionCardDropZone : MonoBehaviour, IDropHandler
@@ -16,7 +16,7 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
     public float cardSpacing = 10f;
 
     [Header("Played Card Prefab")]
-    public GameObject playedCardPrefab;  // Add this line
+    public GameObject playedCardPrefab;  
     
     [Header("Hitting System")]
     public HittingInteractionManager hittingManager;
@@ -44,21 +44,37 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
     };
 
     [Header("Slicing System")]
-public SlicingInteractionManager slicingManager;
+    public SlicingInteractionManager slicingManager;
 
-private readonly string[] slicingActionCards = {
-    "Arkansas Toothpick",
-    "GRV-V",
-    "Horagai II",
-    "igla",
-    "Itamae",
-    "Jinro's Whisker",
-    "Monarch",
-    "Naginata I",
-    "Naginata S",
-    "Naginata X",
-    "Sasumata"
-};
+    private readonly string[] slicingActionCards = {
+        "Arkansas Toothpick",
+        "GRV-V",
+        "Horagai II",
+        "igla",
+        "Itamae",
+        "Jinro's Whisker",
+        "Monarch",
+        "Naginata I",
+        "Naginata S",
+        "Naginata X",
+        "Sasumata"
+    };
+
+    [Header("Spray System")]
+    public SprayInteractionManager sprayManager;
+
+    private readonly string[] sprayActionCards = {
+        "Bakunawa Bile",
+        "Cow Salve",
+        "Gipnotizi Ochkii",
+        "Lip Slip",
+        "Magno WOW",
+        "Mikrowev M3",
+        "Molniya K",
+        "QuickFire",
+        "Red Eye",
+        "Zavyshennii ZZ"
+    };
 
     private List<GameObject> playedCards = new List<GameObject>();
 
@@ -81,6 +97,45 @@ private readonly string[] slicingActionCards = {
         }
 
         ActionCard actionCard = dragDrop.actionCard;
+
+        // Check if this is a spray action card
+        if (IsSprayActionCard(actionCard.actionName))
+        {
+            Debug.Log($"Detected spray action card: {actionCard.actionName}");
+            
+            // Use spray system instead of normal drop
+            if (sprayManager != null)
+            {
+                ulong playerId = Unity.Netcode.NetworkManager.Singleton != null ? 
+                                Unity.Netcode.NetworkManager.Singleton.LocalClientId : 0;
+                
+                bool targetPlayer = targetsPlayer;
+                
+                bool success = sprayManager.StartSpraySequence(actionCard, targetPlayer, playerId);
+                
+                if (success)
+                {
+                    // Remove from player inventory
+                    RemoveFromPlayerInventory(actionCard);
+                    
+                    // Destroy the original dragged card
+                    Destroy(draggedObject);
+                    
+                    Debug.Log($"Started spray sequence for {actionCard.actionName} targeting {(targetPlayer ? "player" : "fish")}");
+                    return; // Exit early - spray system handles the rest
+                }
+                else
+                {
+                    Debug.LogWarning($"Failed to start spray sequence for {actionCard.actionName}");
+                    return;
+                }
+            }
+            else
+            {
+                Debug.LogError("No SprayInteractionManager found!");
+                // Fall through to normal handling
+            }
+        }
 
         // Check if this is a slicing action card
         if (IsSlicingActionCard(actionCard.actionName))
@@ -232,6 +287,19 @@ private readonly string[] slicingActionCards = {
             // Destroy the original dragged card since network creates the visual
             Destroy(draggedObject);
         }
+    }
+
+    // Helper method to check if an action card is a spray type
+    private bool IsSprayActionCard(string cardName)
+    {
+        foreach (string sprayCard in sprayActionCards)
+        {
+            if (cardName.Equals(sprayCard, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     // Helper method to check if an action card is a slicing type
