@@ -7,6 +7,7 @@ public class HittingInteractionManager : NetworkBehaviour
 {
     [Header("UI References")]
     public GameObject crosshairPrefab;          // Your crosshair sprite prefab
+    public GameObject timingBarPrefab;          // Timing bar UI prefab
     public Transform playerTargetArea;          // Where crosshairs appear on player
     public Transform fishTargetArea;            // Where crosshairs appear on fish
     public Canvas gameCanvas;                   // Canvas for UI positioning
@@ -20,6 +21,9 @@ public class HittingInteractionManager : NetworkBehaviour
     public float targetAreaHeight = 300f;       // How tall the target area is
     public float crosshairSize = 80f;           // Size of crosshair targets (increased from 30f)
     
+    [Header("Timing Settings")]
+    public float timingBarSpeed = 2f;           // Speed of the timing indicator
+    
     [Header("Game References")]
     public FishingManager fishingManager;
     
@@ -28,6 +32,12 @@ public class HittingInteractionManager : NetworkBehaviour
     private bool targetingPlayer;
     private int remainingTargets;
     private List<GameObject> activeCrosshairs = new List<GameObject>();
+    
+    // Timing system data
+    private GameObject currentTimingBar;
+    private HittingTimingBar timingBarScript;
+    private GameObject currentCrosshair;
+    private bool waitingForTiming = false;
     
     // Network variables for syncing hitting state
     public NetworkVariable<bool> isHittingActive = new NetworkVariable<bool>(false);
@@ -229,22 +239,27 @@ public void StartHittingForAllClientsClientRpc(string actionCardName, bool targe
     
     IEnumerator HittingSequence(Vector2[] positions)
     {
-        for (int i = 0; i < positions.Length; i++)
+        // First crosshair is already created, start from index 1
+        int currentTargetIndex = 1; // Start from 1 since first crosshair is already created
+        
+        while (currentTargetIndex <= positions.Length)
         {
-            // Wait for current crosshair to be hit
-            while (activeCrosshairs.Count > 0)
+            // Wait for current crosshair to be hit or missed
+            while (waitingForTiming)
             {
                 yield return null;
             }
             
-            // Create next crosshair if there are more
-            if (i + 1 < positions.Length)
+            // Create next crosshair if there are more targets
+            if (currentTargetIndex < positions.Length)
             {
-                CreateNextCrosshair(positions[i + 1]);
+                CreateNextCrosshair(positions[currentTargetIndex]);
             }
+            
+            currentTargetIndex++;
         }
         
-        // All targets hit - finish sequence
+        // All targets processed - finish sequence
         FinishHittingSequence();
     }
     
@@ -270,6 +285,7 @@ public void StartHittingForAllClientsClientRpc(string actionCardName, bool targe
         
         // Create crosshair
         GameObject crosshair = Instantiate(crosshairPrefab, parentTransform);
+        currentCrosshair = crosshair;
         
         Debug.Log($"CLIENT: Created crosshair object: {crosshair.name}");
         
@@ -286,14 +302,17 @@ public void StartHittingForAllClientsClientRpc(string actionCardName, bool targe
             Debug.LogWarning("CLIENT: Crosshair has no RectTransform!");
         }
         
-        // Add click handler
-        CrosshairTarget targetScript = crosshair.GetComponent<CrosshairTarget>();
+        // Create timing bar near the crosshair
+        CreateTimingBar(localPosition, parentTransform);
+        
+        // Add click handler with timing requirement
+        TimingCrosshairTarget targetScript = crosshair.GetComponent<TimingCrosshairTarget>();
         if (targetScript == null)
         {
-            targetScript = crosshair.AddComponent<CrosshairTarget>();
-            Debug.Log($"CLIENT: Added CrosshairTarget component to {crosshair.name}");
+            targetScript = crosshair.AddComponent<TimingCrosshairTarget>();
+            Debug.Log($"CLIENT: Added TimingCrosshairTarget component to {crosshair.name}");
         }
-        targetScript.Initialize(this);
+        targetScript.Initialize(this, timingBarScript);
         
         // Make sure it's clickable
         UnityEngine.UI.Image image = crosshair.GetComponent<UnityEngine.UI.Image>();
@@ -309,18 +328,64 @@ public void StartHittingForAllClientsClientRpc(string actionCardName, bool targe
         
         activeCrosshairs.Add(crosshair);
         
+        // Start waiting for timing (no auto-fail timer)
+        waitingForTiming = true;
+        
         Debug.Log($"CLIENT: Crosshair setup complete. Active crosshairs: {activeCrosshairs.Count}");
     }
+    
+    void CreateTimingBar(Vector2 crosshairPosition, Transform parent)
+    {
+        if (timingBarPrefab == null)
+        {
+            Debug.LogError("CLIENT: Timing bar prefab is null!");
+            return;
+        }
+        
+        // Create timing bar
+        currentTimingBar = Instantiate(timingBarPrefab, parent);
+        timingBarScript = currentTimingBar.GetComponent<HittingTimingBar>();
+        
+        if (timingBarScript == null)
+        {
+            timingBarScript = currentTimingBar.AddComponent<HittingTimingBar>();
+        }
+        
+        // Position timing bar near crosshair (above it)
+        RectTransform timingBarRect = currentTimingBar.GetComponent<RectTransform>();
+        if (timingBarRect != null)
+        {
+            Vector2 barPosition = crosshairPosition + Vector2.up * (crosshairSize + 20f);
+            timingBarRect.anchoredPosition = barPosition;
+            timingBarRect.sizeDelta = new Vector2(120f, 20f); // Timing bar size
+        }
+        
+        // Configure timing bar
+        timingBarScript.barSpeed = timingBarSpeed;
+        timingBarScript.Initialize(this);
+        timingBarScript.StartTiming();
+        
+        Debug.Log($"CLIENT: Created timing bar at position {crosshairPosition}");
+    }
+    
+    // Removed auto-fail timing window - players must take action
     
     public void OnCrosshairHit(GameObject crosshair)
     {
         Debug.Log("Crosshair hit!");
         
+        // Check if timing is correct (this will be checked by TimingCrosshairTarget)
+        if (!waitingForTiming)
+        {
+            Debug.Log("Not waiting for timing - ignoring hit");
+            return;
+        }
+        
         // Remove from active list
         activeCrosshairs.Remove(crosshair);
         
-        // Destroy the crosshair
-        Destroy(crosshair);
+        // Clean up timing UI
+        CleanupCurrentTarget();
         
         remainingTargets--;
         
@@ -331,6 +396,38 @@ public void StartHittingForAllClientsClientRpc(string actionCardName, bool targe
         }
         
         Debug.Log($"Remaining targets: {remainingTargets}");
+    }
+    
+    public void OnTimingMissed()
+    {
+        Debug.Log("Bad timing - target missed but stays active!");
+        
+        // Don't clean up target - let it stay active for another attempt
+        // Players must hit with correct timing to proceed
+    }
+    
+    void CleanupCurrentTarget()
+    {
+        waitingForTiming = false;
+        
+        // Destroy crosshair
+        if (currentCrosshair != null)
+        {
+            Destroy(currentCrosshair);
+            currentCrosshair = null;
+        }
+        
+        // Destroy timing bar
+        if (currentTimingBar != null)
+        {
+            if (timingBarScript != null)
+            {
+                timingBarScript.StopTiming();
+            }
+            Destroy(currentTimingBar);
+            currentTimingBar = null;
+            timingBarScript = null;
+        }
     }
     
     [ClientRpc]
@@ -375,6 +472,10 @@ void ResetHittingState()
     hittingPlayerId.Value = 0;
     currentActionCard = null;
     remainingTargets = 0;
+    waitingForTiming = false;
+    
+    // Clean up current timing elements
+    CleanupCurrentTarget();
     
     // Clear any remaining crosshairs
     foreach (GameObject crosshair in activeCrosshairs)
@@ -407,16 +508,18 @@ void ResetHittingState()
     }
 }
 
-// Simple component for crosshair click detection
-public class CrosshairTarget : MonoBehaviour, UnityEngine.EventSystems.IPointerClickHandler
+// Timing-based component for crosshair click detection
+public class TimingCrosshairTarget : MonoBehaviour, UnityEngine.EventSystems.IPointerClickHandler
 {
     private HittingInteractionManager manager;
+    private HittingTimingBar timingBar;
     
-    public void Initialize(HittingInteractionManager hittingManager)
+    public void Initialize(HittingInteractionManager hittingManager, HittingTimingBar timing)
     {
         manager = hittingManager;
+        timingBar = timing;
         
-        Debug.Log($"CrosshairTarget initialized on {gameObject.name}");
+        Debug.Log($"TimingCrosshairTarget initialized on {gameObject.name}");
         
         // Make sure we have a graphic for raycasting
         UnityEngine.UI.Image image = GetComponent<UnityEngine.UI.Image>();
@@ -429,21 +532,35 @@ public class CrosshairTarget : MonoBehaviour, UnityEngine.EventSystems.IPointerC
         // Ensure the image can receive raycast events
         image.raycastTarget = true;
         
-        Debug.Log($"CrosshairTarget setup complete on {gameObject.name}");
+        Debug.Log($"TimingCrosshairTarget setup complete on {gameObject.name}");
     }
     
     public void OnPointerClick(UnityEngine.EventSystems.PointerEventData eventData)
     {
         Debug.Log($"CROSSHAIR CLICKED! GameObject: {gameObject.name}");
         
-        if (manager != null)
+        if (manager == null)
         {
-            Debug.Log($"Calling manager.OnCrosshairHit()");
+            Debug.LogError($"Manager is null on TimingCrosshairTarget!");
+            return;
+        }
+        
+        if (timingBar == null)
+        {
+            Debug.LogError($"TimingBar is null on TimingCrosshairTarget!");
+            return;
+        }
+        
+        // Check if the timing is in the sweet spot
+        if (timingBar.IsInSweetSpot)
+        {
+            Debug.Log($"Perfect timing! Hit successful");
             manager.OnCrosshairHit(gameObject);
         }
         else
         {
-            Debug.LogError($"Manager is null on CrosshairTarget!");
+            Debug.Log($"Bad timing! Hit missed - indicator not in sweet spot");
+            manager.OnTimingMissed();
         }
     }
 }

@@ -327,7 +327,7 @@ public class InventoryDisplay : MonoBehaviour
             DisplayEquippedGear();
             //Debug.Log("Equipped gear display completed");
         }
-        catch (System.Exception e)
+        catch (System.Exception)
         {
             //Debug.LogError($"Error displaying equipped gear: {e.Message}");
         }
@@ -339,7 +339,7 @@ public class InventoryDisplay : MonoBehaviour
             DisplayTackleBoxGear();
             //Debug.Log("Tackle box display completed");
         }
-        catch (System.Exception e)
+        catch (System.Exception)
         {
             //Debug.LogError($"Error displaying tackle box gear: {e.Message}");
         }
@@ -351,7 +351,7 @@ public class InventoryDisplay : MonoBehaviour
             DisplayActionAndEffectCards();
             //Debug.Log("Action and effect cards display completed");
         }
-        catch (System.Exception e)
+        catch (System.Exception)
         {
             //Debug.LogError($"Error displaying action and effect cards: {e.Message}");
         }

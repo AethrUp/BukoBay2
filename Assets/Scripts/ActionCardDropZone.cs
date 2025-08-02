@@ -76,6 +76,20 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
         "Zavyshennii ZZ"
     };
 
+    [Header("Drinking System")]
+    public DrinkingInteractionManager drinkingManager;
+
+    private readonly string[] drinkingActionCards = {
+        "CoCoa Kola",
+        "Coffee",
+        "Elixir of Strength",
+        "Elixir of Weakness",
+        "Moon Kombucha",
+        "Prairie Dew",
+        "Rybak Vodka",
+        "Sarsasparilla"
+    };
+
     private List<GameObject> playedCards = new List<GameObject>();
 
     public void OnDrop(PointerEventData eventData)
@@ -97,6 +111,45 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
         }
 
         ActionCard actionCard = dragDrop.actionCard;
+
+        // Check if this is a drinking action card
+        if (IsDrinkingActionCard(actionCard.actionName))
+        {
+            Debug.Log($"Detected drinking action card: {actionCard.actionName}");
+            
+            // Use drinking system instead of normal drop
+            if (drinkingManager != null)
+            {
+                ulong playerId = Unity.Netcode.NetworkManager.Singleton != null ? 
+                                Unity.Netcode.NetworkManager.Singleton.LocalClientId : 0;
+                
+                bool targetPlayer = targetsPlayer;
+                
+                bool success = drinkingManager.StartDrinkingSequence(actionCard, targetPlayer, playerId);
+                
+                if (success)
+                {
+                    // Remove from player inventory
+                    RemoveFromPlayerInventory(actionCard);
+                    
+                    // Destroy the original dragged card
+                    Destroy(draggedObject);
+                    
+                    Debug.Log($"Started drinking sequence for {actionCard.actionName} targeting {(targetPlayer ? "player" : "fish")}");
+                    return; // Exit early - drinking system handles the rest
+                }
+                else
+                {
+                    Debug.LogWarning($"Failed to start drinking sequence for {actionCard.actionName}");
+                    return;
+                }
+            }
+            else
+            {
+                Debug.LogError("No DrinkingInteractionManager found!");
+                // Fall through to normal handling
+            }
+        }
 
         // Check if this is a spray action card
         if (IsSprayActionCard(actionCard.actionName))
@@ -289,6 +342,19 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
         }
     }
 
+    // Helper method to check if an action card is a drinking type
+    private bool IsDrinkingActionCard(string cardName)
+    {
+        foreach (string drinkCard in drinkingActionCards)
+        {
+            if (cardName.Equals(drinkCard, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // Helper method to check if an action card is a spray type
     private bool IsSprayActionCard(string cardName)
     {
@@ -352,17 +418,17 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
         }
     }
 
-    public void CreateNetworkedPlayedCard(string cardName, int playerEffect, int fishEffect)
+    public void CreateNetworkedPlayedCard(string cardName, int playerEffect, int fishEffect, ulong playerId = 0)
     {
-        // Debug.Log($"Creating networked played card: {cardName} (Player: {playerEffect}, Fish: {fishEffect})");
+        // Debug.Log($"Creating networked played card: {cardName} (Player: {playerEffect}, Fish: {fishEffect}, PlayerId: {playerId})");
 
         // Create the circle card at a random position
         Vector2 randomPos = new Vector2(Random.Range(-100f, 100f), Random.Range(-50f, 50f));
         GameObject circleCard = Instantiate(playedCardPrefab, transform, false);
         circleCard.transform.localPosition = randomPos;
 
-        // Set up the circle card with the effect data
-        SetupNetworkedCircleCard(circleCard, cardName, playerEffect, fishEffect);
+        // Set up the circle card with the effect data and player color
+        SetupNetworkedCircleCard(circleCard, cardName, playerEffect, fishEffect, playerId);
 
         // Add to our list
         playedCards.Add(circleCard);
@@ -371,9 +437,9 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
         PlayedCardPhysics.WakeAllCardsInPanel(transform);
     }
 
-    void SetupNetworkedCircleCard(GameObject circleCard, string cardName, int playerEffect, int fishEffect)
+    void SetupNetworkedCircleCard(GameObject circleCard, string cardName, int playerEffect, int fishEffect, ulong playerId = 0)
     {
-        // Debug.Log($"Setting up networked circle card for: {cardName} (Effects: P{playerEffect} F{fishEffect})");
+        // Debug.Log($"Setting up networked circle card for: {cardName} (Effects: P{playerEffect} F{fishEffect}, PlayerId: {playerId})");
 
         // Try to find the actual ActionCard to get the image
         ActionCard foundCard = FindActionCardByName(cardName);
@@ -393,20 +459,35 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
             }
         }
 
-        // Set frame color based on effect type
+        // Set frame color based on player who played the card
         Transform frameTransform = circleCard.transform.Find("Mask/FrameTop");
         if (frameTransform != null)
         {
             Image frameImage = frameTransform.GetComponent<Image>();
             if (frameImage != null)
             {
-                // Different colors for different effects
-                if (playerEffect > 0) frameImage.color = Color.green;      // Positive player effect
-                else if (playerEffect < 0) frameImage.color = Color.red;   // Negative player effect
-                else if (fishEffect != 0) frameImage.color = Color.yellow; // Fish effect
-                else frameImage.color = Color.blue;                        // Default
+                // Get player color from CharacterSelectionManager
+                Color playerColor = GetPlayerColor(playerId);
+                frameImage.color = playerColor;
+                
+                // Debug.Log($"Set frame color to {playerColor} for player {playerId}");
             }
         }
+    }
+
+    // Helper method to get player color
+    Color GetPlayerColor(ulong playerId)
+    {
+        // Try to get color from CharacterSelectionManager
+        if (CharacterSelectionManager.Instance != null)
+        {
+            return CharacterSelectionManager.Instance.GetPlayerColor(playerId);
+        }
+        
+        // Fallback to effect-based colors if no character selection
+        Color[] fallbackColors = { Color.blue, Color.red, Color.green, Color.yellow, Color.magenta, Color.cyan };
+        int colorIndex = (int)(playerId % (ulong)fallbackColors.Length);
+        return fallbackColors[colorIndex];
     }
 
     // Helper method to find ActionCard by name
@@ -474,13 +555,15 @@ public class ActionCardDropZone : MonoBehaviour, IDropHandler
         }
 
         // Set FRAME color (FrameTop is also inside Mask)
+        // NOTE: This is the legacy method - uses default blue color
+        // For networked games, SetupNetworkedCircleCard uses player colors
         Transform frameTransform = circleCard.transform.Find("Mask/FrameTop");
         if (frameTransform != null)
         {
             Image frameImage = frameTransform.GetComponent<Image>();
             if (frameImage != null)
             {
-                frameImage.color = Color.blue;
+                frameImage.color = Color.blue; // Default for single player
             }
         }
     }

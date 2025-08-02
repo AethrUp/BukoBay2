@@ -15,7 +15,7 @@ public class SprayAreaVisual : MonoBehaviour
     
     [Header("Fill Display")]
     public Transform fillContainer;
-    public GameObject fillCellPrefab;
+    public GameObject fillCellPrefab; // Keep this for backward compatibility but we won't use it
     
     private int gridResolution;
     private GameObject[,] fillCells;
@@ -42,41 +42,94 @@ public class SprayAreaVisual : MonoBehaviour
     
     public void InitializeGrid(int resolution, float areaWidth, float areaHeight)
     {
+        // Ensure component is properly initialized first
+        if (fillContainer == null)
+        {
+            // Force initialization if Awake hasn't been called yet
+            if (fillContainer == null)
+                fillContainer = transform;
+                
+            // Try to find the FillContainer child if it exists
+            Transform fillContainerChild = transform.Find("FillContainer");
+            if (fillContainerChild != null)
+                fillContainer = fillContainerChild;
+        }
+        
         gridResolution = resolution;
         totalCells = resolution * resolution;
-        fillCells = new GameObject[resolution, resolution];
         
-        // Clear any existing fill cells
+        // Clear any existing fill cells BEFORE creating the new array
         ClearFillCells();
         
-        // Create fill cells grid
-        CreateFillGrid(areaWidth, areaHeight);
+        // Create new array AFTER clearing
+        fillCells = new GameObject[resolution, resolution];
         
-        Debug.Log($"SprayAreaVisual initialized with {resolution}x{resolution} grid");
+        // Create fill cells grid without using the problematic prefab
+        CreateFillGridDirect(areaWidth, areaHeight);
+        
+        Debug.Log($"SprayAreaVisual initialized with {resolution}x{resolution} grid (direct creation)");
     }
     
-    void CreateFillGrid(float areaWidth, float areaHeight)
+    void CreateFillGridDirect(float areaWidth, float areaHeight)
     {
-        if (fillCellPrefab == null)
+        // Ensure fillContainer is initialized
+        if (fillContainer == null)
         {
-            Debug.LogWarning("Fill cell prefab not assigned - using simple color change");
+            fillContainer = transform;
+            Debug.LogWarning("SprayAreaVisual: fillContainer was null, using transform as fallback.");
+        }
+        
+        if (fillContainer == null)
+        {
+            Debug.LogError("SprayAreaVisual: fillContainer is still null after fallback! Cannot create fill grid.");
+            return;
+        }
+        
+        if (gridResolution <= 0)
+        {
+            Debug.LogError("SprayAreaVisual: Invalid grid resolution!");
             return;
         }
         
         float cellWidth = areaWidth / gridResolution;
         float cellHeight = areaHeight / gridResolution;
         
+        Debug.Log($"SprayAreaVisual: Creating grid {gridResolution}x{gridResolution} with cell size {cellWidth}x{cellHeight}");
+        
         for (int x = 0; x < gridResolution; x++)
         {
             for (int y = 0; y < gridResolution; y++)
             {
-                // Create fill cell
-                GameObject fillCell = Instantiate(fillCellPrefab, fillContainer);
-                
-                // Position the cell
-                RectTransform cellRect = fillCell.GetComponent<RectTransform>();
-                if (cellRect != null)
+                try
                 {
+                    // Create fill cell directly without using a prefab
+                    GameObject fillCell = new GameObject($"FillCell_{x}_{y}");
+                    if (fillCell == null)
+                    {
+                        Debug.LogError($"SprayAreaVisual: Failed to create GameObject for cell [{x},{y}]");
+                        fillCells[x, y] = null;
+                        continue;
+                    }
+                    
+                    // Set parent
+                    if (fillContainer == null)
+                    {
+                        Debug.LogError($"SprayAreaVisual: fillContainer is null when setting parent for cell [{x},{y}]");
+                        Destroy(fillCell);
+                        fillCells[x, y] = null;
+                        continue;
+                    }
+                    fillCell.transform.SetParent(fillContainer, false);
+                    
+                    // Add RectTransform
+                    RectTransform cellRect = fillCell.AddComponent<RectTransform>();
+                    if (cellRect == null)
+                    {
+                        Debug.LogError($"SprayAreaVisual: Failed to add RectTransform to cell [{x},{y}]");
+                        Destroy(fillCell);
+                        fillCells[x, y] = null;
+                        continue;
+                    }
                     cellRect.sizeDelta = new Vector2(cellWidth, cellHeight);
                     
                     // Calculate position (center the grid)
@@ -88,19 +141,33 @@ public class SprayAreaVisual : MonoBehaviour
                     cellRect.anchorMin = new Vector2(0.5f, 0.5f);
                     cellRect.anchorMax = new Vector2(0.5f, 0.5f);
                     cellRect.pivot = new Vector2(0.5f, 0.5f);
+                    
+                    // Add Image component
+                    Image cellImage = fillCell.AddComponent<Image>();
+                    if (cellImage == null)
+                    {
+                        Debug.LogError($"SprayAreaVisual: Failed to add Image component to cell [{x},{y}]");
+                        Destroy(fillCell);
+                        fillCells[x, y] = null;
+                        continue;
+                    }
+                    cellImage.color = Color.clear; // Start invisible
+                    
+                    // Store reference
+                    fillCells[x, y] = fillCell;
                 }
-                
-                // Initialize as empty (invisible)
-                Image cellImage = fillCell.GetComponent<Image>();
-                if (cellImage != null)
+                catch (System.Exception e)
                 {
-                    cellImage.color = Color.clear;
+                    Debug.LogError($"SprayAreaVisual: Error creating fill cell at [{x},{y}]: {e.Message}\nStack trace: {e.StackTrace}");
+                    if (fillCells != null && x < fillCells.GetLength(0) && y < fillCells.GetLength(1))
+                    {
+                        fillCells[x, y] = null;
+                    }
                 }
-                
-                // Store reference
-                fillCells[x, y] = fillCell;
             }
         }
+        
+        Debug.Log($"SprayAreaVisual: Created {gridResolution * gridResolution} fill cells directly");
     }
     
     public void FillGridCell(int gridX, int gridY)
@@ -126,26 +193,8 @@ public class SprayAreaVisual : MonoBehaviour
     
     void UpdateProgressVisual()
     {
-        if (backgroundImage == null) return;
-        
-        // Update background color based on progress
-        float progress = (float)filledCellCount / totalCells;
-        
-        if (progress < 0.3f)
-        {
-            // Early stage - mostly empty
-            backgroundImage.color = Color.Lerp(emptyColor, filledColor, progress * 3f);
-        }
-        else if (progress < 0.8f)
-        {
-            // Mid stage - filling up
-            backgroundImage.color = filledColor;
-        }
-        else
-        {
-            // Near completion - getting ready to complete
-            backgroundImage.color = Color.Lerp(filledColor, completedColor, (progress - 0.8f) * 5f);
-        }
+        // Background color changes removed to improve spray visibility
+        // The individual fill cells provide enough visual feedback
     }
     
     public void MarkAsCompleted()
@@ -194,19 +243,24 @@ public class SprayAreaVisual : MonoBehaviour
                 {
                     if (fillCells[x, y] != null)
                     {
-                        DestroyImmediate(fillCells[x, y]);
+                        if (Application.isPlaying)
+                            Destroy(fillCells[x, y]);
+                        else
+                            DestroyImmediate(fillCells[x, y]);
                     }
                 }
             }
         }
         
-        fillCells = null;
+        // Don't set fillCells to null here - let InitializeGrid create the new array
         filledCellCount = 0;
-        totalCells = 0;
+        // Don't reset totalCells here - InitializeGrid will set it
     }
     
     void OnDestroy()
     {
         ClearFillCells();
+        fillCells = null;
+        totalCells = 0;
     }
 }

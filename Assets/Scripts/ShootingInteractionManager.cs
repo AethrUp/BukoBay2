@@ -12,14 +12,15 @@ public class ShootingInteractionManager : NetworkBehaviour
     public Transform fishTargetArea;            // Where reticle appears on fish
     public Canvas gameCanvas;                   // Canvas for UI positioning
 
-    [Header("Default Sway Settings")]
-    public float defaultSwayRadius = 50f;
-    public float defaultSwaySpeed = 2f;
-
-    [Header("Current Sway (Runtime)")]
-    public float swayRadius = 50f;              // Current sway radius
-    public float swaySpeed = 2f;                // Current sway speed
-    public float aimTime = 3f;                  // Current aim time
+    [Header("Reticle Physics Settings")]
+    public float reticleWeight = 1f;            // How heavy the reticle feels (higher = more momentum)
+    public float followStrength = 5f;           // How strongly reticle follows cursor
+    public float dampening = 0.8f;              // How much velocity is reduced each frame (0-1)
+    public float maxVelocity = 200f;            // Maximum reticle velocity
+    
+    [Header("Weapon-Specific Physics")]
+    public float defaultWeight = 1f;
+    public float defaultFollowStrength = 5f;
 
     [Header("Game References")]
     public FishingManager fishingManager;
@@ -29,8 +30,12 @@ public class ShootingInteractionManager : NetworkBehaviour
     private bool targetingPlayer;
     private GameObject activeReticle;
     private Vector2 cursorPosition;
-    private Vector2 swayOffset;
     private bool isAiming = false;
+    
+    // Physics-based reticle movement
+    private Vector2 reticlePosition;            // Current reticle position in local space
+    private Vector2 reticleVelocity = Vector2.zero;  // Current reticle velocity
+    private Vector2 targetCursorPosition;       // Where the cursor is in local space
     // Multiple shot tracking
     private int shotsRemaining;
     private int totalShots;
@@ -52,109 +57,136 @@ public class ShootingInteractionManager : NetworkBehaviour
             gameCanvas = FindFirstObjectByType<Canvas>();
     }
 
-    void SetSwayForWeapon(string weaponName)
+    void SetPhysicsForWeapon(string weaponName)
     {
-        // Set different sway patterns for each shooting weapon
+        // Set different physics properties for each shooting weapon
         switch (weaponName.ToLower())
         {
             case "aries javeline":
-                swayRadius = 30f;    // Small sway - precise javelin
-                swaySpeed = 1.5f;    // Slow movement - easier to aim
+                reticleWeight = 0.8f;        // Light - responsive
+                followStrength = 6f;         // High precision - follows cursor well
                 break;
 
             case "cosmorocket":
-                swayRadius = 80f;    // Large sway - heavy rocket
-                swaySpeed = 3f;      // Fast movement - harder to control
+                reticleWeight = 2.5f;        // Very heavy - lots of momentum
+                followStrength = 3f;         // Low responsiveness - hard to control
                 break;
 
             case "elektrika 77":
-                swayRadius = 40f;    // Medium sway
-                swaySpeed = 2.5f;    // Medium speed
+                reticleWeight = 1.2f;        // Medium weight
+                followStrength = 4.5f;       // Medium responsiveness
                 break;
 
             case "lil spittle":
-                swayRadius = 20f;    // Very small sway - easy to aim
-                swaySpeed = 1f;      // Very slow - simple weapon
+                reticleWeight = 0.5f;        // Very light - easy to control
+                followStrength = 8f;         // Very responsive - beginner friendly
                 break;
 
             case "rattler venom":
-                swayRadius = 45f;    // Medium-large sway
-                swaySpeed = 4f;      // Fast - venom is quick
+                reticleWeight = 1.5f;        // Heavy
+                followStrength = 4f;         // Lower responsiveness - venom is tricky
                 break;
 
             case "tootitoot":
-                swayRadius = 35f;    // Small-medium sway
-                swaySpeed = 2f;      // Standard speed
+                reticleWeight = 1f;          // Standard weight
+                followStrength = 5f;         // Standard responsiveness
                 break;
 
             case "tranq-o-catch":
-                swayRadius = 25f;    // Small sway - precision tranquilizer
-                swaySpeed = 1.8f;    // Slow-medium - careful aim
+                reticleWeight = 0.9f;        // Light - precision weapon
+                followStrength = 6.5f;       // High precision for careful shots
                 break;
 
             default:
-                swayRadius = defaultSwayRadius;
-                swaySpeed = defaultSwaySpeed;
+                reticleWeight = defaultWeight;
+                followStrength = defaultFollowStrength;
                 break;
         }
 
-        Debug.Log($"Set sway for {weaponName}: Radius={swayRadius}, Speed={swaySpeed}, Time={aimTime}");
+        Debug.Log($"Set physics for {weaponName}: Weight={reticleWeight}, Follow={followStrength}");
     }
 
     void Update()
     {
         if (isAiming)
         {
-            UpdateSwayAndCursor();
+            UpdatePhysicsBasedReticle();
         }
     }
 
-    void UpdateSwayAndCursor()
-{
-    // Get mouse position in screen space using new Input System
-    cursorPosition = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
-    
-    // Calculate sway offset using sine waves for smooth movement
-    float time = Time.time * swaySpeed;
-    swayOffset = new Vector2(
-        Mathf.Sin(time) * swayRadius,
-        Mathf.Cos(time * 1.3f) * swayRadius  // Different frequency for more organic movement
-    );
-    
-    // Update reticle position if it exists - RETICLE FOLLOWS CURSOR + SWAY
-    if (activeReticle != null)
+    void UpdatePhysicsBasedReticle()
     {
-        RectTransform reticleRect = activeReticle.GetComponent<RectTransform>();
-        if (reticleRect != null)
-        {
-            // Convert cursor position to local position within the target area
-            Vector2 localCursorPosition;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                targetingPlayer ? playerTargetArea.GetComponent<RectTransform>() : fishTargetArea.GetComponent<RectTransform>(),
-                cursorPosition,  // Use actual cursor position
-                gameCanvas.worldCamera,
-                out localCursorPosition
-            );
+        // Get mouse position in screen space using new Input System
+        cursorPosition = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
+        
+        // Convert cursor position to local position within the target area
+        RectTransform targetAreaRect = targetingPlayer ? 
+            playerTargetArea.GetComponent<RectTransform>() : 
+            fishTargetArea.GetComponent<RectTransform>();
             
-            // Apply sway offset to cursor position
-            reticleRect.anchoredPosition = localCursorPosition + swayOffset;
+        Vector2 localCursorPosition;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            targetAreaRect,
+            cursorPosition,
+            gameCanvas.worldCamera,
+            out localCursorPosition
+        );
+        
+        targetCursorPosition = localCursorPosition;
+        
+        // Apply physics-based movement
+        UpdateReticlePhysics();
+        
+        // Update reticle visual position
+        if (activeReticle != null)
+        {
+            RectTransform reticleRect = activeReticle.GetComponent<RectTransform>();
+            if (reticleRect != null)
+            {
+                reticleRect.anchoredPosition = reticlePosition;
+            }
+        }
+        
+        // Check for mouse click to shoot
+        if (UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            if (CheckTargetHit())
+            {
+                FireShot();
+            }
+            else
+            {
+                Debug.Log("Missed target!");
+            }
         }
     }
     
-    // Check for mouse click to shoot - BUT ONLY IF OVER TARGET
-    if (UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame)
+    void UpdateReticlePhysics()
     {
-        if (CheckTargetHit())
+        // Calculate the force pulling reticle toward cursor
+        Vector2 directionToCursor = targetCursorPosition - reticlePosition;
+        Vector2 force = directionToCursor * followStrength;
+        
+        // Apply force to velocity (F = ma, so a = F/m)
+        Vector2 acceleration = force / reticleWeight;
+        reticleVelocity += acceleration * Time.deltaTime;
+        
+        // Apply dampening to simulate air resistance/friction
+        reticleVelocity *= (1f - (1f - dampening) * Time.deltaTime * 10f);
+        
+        // Clamp velocity to maximum
+        if (reticleVelocity.magnitude > maxVelocity)
         {
-            FireShot();
+            reticleVelocity = reticleVelocity.normalized * maxVelocity;
         }
-        else
-        {
-            Debug.Log("Missed target!");
-            // Could add miss penalty or feedback here
-        }
+        
+        // Update position based on velocity
+        reticlePosition += reticleVelocity * Time.deltaTime;
+        
+        // Optional: Add slight bounds checking to keep reticle in reasonable area
+        reticlePosition.x = Mathf.Clamp(reticlePosition.x, -300f, 300f);
+        reticlePosition.y = Mathf.Clamp(reticlePosition.y, -200f, 200f);
     }
-}
 
     void FireShot()
 {
@@ -192,12 +224,11 @@ public class ShootingInteractionManager : NetworkBehaviour
 
 bool CheckTargetHit()
 {
-    if (activeReticle == null || activeTarget == null) return false;
+    if (activeTarget == null) return false;
     
-    Vector2 reticlePos = activeReticle.GetComponent<RectTransform>().anchoredPosition;
     Vector2 targetPos = activeTarget.GetComponent<RectTransform>().anchoredPosition;
     
-    float distance = Vector2.Distance(reticlePos, targetPos);
+    float distance = Vector2.Distance(reticlePosition, targetPos);
     float hitRadius = 50f; // How close you need to be to hit
     
     return distance <= hitRadius;
@@ -284,24 +315,46 @@ void CompleteShootingSequence()
     }
 
     void StartAiming()
-{
-    Debug.Log("Starting aim phase");
-    
-    // Set weapon-specific sway settings
-    if (currentActionCard != null)
     {
-        SetSwayForWeapon(currentActionCard.actionName);
+        Debug.Log("Starting aim phase");
+        
+        // Set weapon-specific physics settings
+        if (currentActionCard != null)
+        {
+            SetPhysicsForWeapon(currentActionCard.actionName);
+        }
+        
+        // Initialize reticle physics
+        InitializeReticlePhysics();
+        
+        isAiming = true;
+        
+        // Create reticle
+        Transform targetArea = targetingPlayer ? playerTargetArea : fishTargetArea;
+        activeReticle = Instantiate(reticlePrefab, targetArea);
     }
     
-    isAiming = true;
-    
-    // Create reticle
-    Transform targetArea = targetingPlayer ? playerTargetArea : fishTargetArea;
-    activeReticle = Instantiate(reticlePrefab, targetArea);
-    
-    // REMOVED: Start aim timer with weapon-specific time
-    // StartCoroutine(AimTimer());
-}
+    void InitializeReticlePhysics()
+    {
+        // Start reticle at center of target area
+        reticlePosition = Vector2.zero;
+        reticleVelocity = Vector2.zero;
+        
+        // Initialize cursor position
+        cursorPosition = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
+        RectTransform targetAreaRect = targetingPlayer ? 
+            playerTargetArea.GetComponent<RectTransform>() : 
+            fishTargetArea.GetComponent<RectTransform>();
+            
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            targetAreaRect,
+            cursorPosition,
+            gameCanvas.worldCamera,
+            out targetCursorPosition
+        );
+        
+        Debug.Log($"Initialized reticle physics - Weight: {reticleWeight}, Follow: {followStrength}");
+    }
 
    
     [ServerRpc(RequireOwnership = false)]
@@ -419,11 +472,14 @@ void StartNextShot()
 {
     Debug.Log($"Shot {totalShots - shotsRemaining + 1} of {totalShots}");
     
-    // Set weapon-specific sway settings
+    // Set weapon-specific physics settings
     if (currentActionCard != null)
     {
-        SetSwayForWeapon(currentActionCard.actionName);
+        SetPhysicsForWeapon(currentActionCard.actionName);
     }
+    
+    // Initialize reticle physics for this shot
+    InitializeReticlePhysics();
     
     // Create target at random position
     CreateShootingTarget();
@@ -433,9 +489,6 @@ void StartNextShot()
     // Create reticle
     Transform targetArea = targetingPlayer ? playerTargetArea : fishTargetArea;
     activeReticle = Instantiate(reticlePrefab, targetArea);
-    
-    // REMOVED: Start aim timer with weapon-specific time
-    // StartCoroutine(AimTimer());
 }
 
 void CreateShootingTarget()

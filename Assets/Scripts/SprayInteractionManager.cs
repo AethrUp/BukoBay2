@@ -13,7 +13,7 @@ public class SprayInteractionManager : NetworkBehaviour
     
     [Header("Spray Detection")]
     public float sprayRadius = 15f;             // Radius of the spray cursor
-    public float completionThreshold = 0.8f;   // How much of the area needs to be filled (80%)
+    public float completionThreshold = 0.9f;   // How much of the area needs to be filled (80%)
     
     [Header("Area Generation")]
     public float areaWidth = 150f;              // Width of areas to fill

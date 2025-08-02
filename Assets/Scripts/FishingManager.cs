@@ -1138,7 +1138,7 @@ public void NotifyActionCardPlayedClientRpc(string cardName, bool targetingPlaye
         if (targetDropZone != null)
         {
             // Create the visual card for all players with more data
-            targetDropZone.CreateNetworkedPlayedCard(cardName, playerEffect, fishEffect);
+            targetDropZone.CreateNetworkedPlayedCard(cardName, playerEffect, fishEffect, playerId);
         }
     }
     [ClientRpc]
